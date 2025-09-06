@@ -30,7 +30,10 @@ export interface RepoInfo {
 export class GitHandler {
   private repoPath: string;
 
-  constructor(private companyName: string) {
+  constructor(
+    private companyName: string,
+    private autoCleanup: boolean = false
+  ) {
     this.repoPath = "";
   }
 
@@ -39,26 +42,74 @@ export class GitHandler {
       githubUrl.split("/").pop()?.replace(".git", "") || this.companyName;
     this.repoPath = path.join(REPOS_DIR, repoName);
 
-    // Clean up existing repo
-    if (fs.existsSync(this.repoPath)) {
-      fs.rmSync(this.repoPath, { recursive: true, force: true });
-    }
-
     // Ensure repos directory exists
     if (!fs.existsSync(REPOS_DIR)) {
       fs.mkdirSync(REPOS_DIR, { recursive: true });
     }
 
-    console.log(`Cloning ${githubUrl}...`);
+    // Check if repo already exists
+    if (fs.existsSync(this.repoPath)) {
+      console.log(`📁 Repo already exists, reusing: ${this.repoPath}`);
+
+      // Verify it's a valid git repo
+      try {
+        await execAsync("git status", { cwd: this.repoPath });
+
+        // Fetch latest changes to ensure we have all commits
+        console.log("🔄 Fetching latest changes...");
+        await execAsync("git fetch --all", { cwd: this.repoPath });
+
+        // Reset to clean state (in case previous analysis left uncommitted changes)
+        await execAsync("git reset --hard", { cwd: this.repoPath });
+        await execAsync("git clean -fd", { cwd: this.repoPath });
+
+        return this.repoPath;
+      } catch (error) {
+        console.log(`⚠️ Existing repo seems corrupted, re-cloning...`);
+        fs.rmSync(this.repoPath, { recursive: true, force: true });
+      }
+    }
+
+    // Clone fresh repo
+    console.log(`📥 Cloning ${githubUrl}...`);
     await execAsync(`git clone ${githubUrl} ${this.repoPath}`);
+    console.log(`✅ Cloned to: ${this.repoPath}`);
+
     return this.repoPath;
   }
 
   async checkoutDate(date: string): Promise<string | null> {
     try {
-      // First, try to get commit before or on the date
+      // Always go back to main/master branch first to see all commits
+      try {
+        await execAsync(`git checkout main`, { cwd: this.repoPath });
+      } catch {
+        try {
+          await execAsync(`git checkout master`, { cwd: this.repoPath });
+        } catch {
+          // If neither main nor master exist, just continue
+        }
+      }
+
+      // Debug: Show commits around the target date
+      console.log(`🔍 Looking for commits around ${date}...`);
+      try {
+        const { stdout: debugCommits } = await execAsync(
+          `git log --since="${date} -30 days" --until="${date} +30 days" --oneline --date=short | head -5`,
+          { cwd: this.repoPath }
+        );
+        if (debugCommits.trim()) {
+          console.log(
+            `   Nearby commits: ${debugCommits.trim().split("\n")[0]}`
+          );
+        }
+      } catch {
+        // Ignore debug errors
+      }
+
+      // First, try to get commit before or on the date (with explicit date format)
       let { stdout } = await execAsync(
-        `git log --until="${date}" --format="%H" -1`,
+        `git log --until="${date}T23:59:59" --format="%H" -1 --all`,
         { cwd: this.repoPath }
       );
 
@@ -73,7 +124,7 @@ export class GitHandler {
 
         try {
           const { stdout: afterStdout } = await execAsync(
-            `git log --since="${date}" --format="%H" --reverse | head -1`,
+            `git log --since="${date}T00:00:00" --format="%H" --reverse --all | head -1`,
             { cwd: this.repoPath }
           );
           commitHash = afterStdout.trim();
@@ -84,7 +135,7 @@ export class GitHandler {
             `No commits found after ${date}, using first commit in repo...`
           );
           const { stdout: firstStdout } = await execAsync(
-            `git log --format="%H" --reverse | head -1`,
+            `git log --format="%H" --reverse --all | head -1`,
             { cwd: this.repoPath }
           );
           commitHash = firstStdout.trim();
@@ -102,9 +153,15 @@ export class GitHandler {
         { cwd: this.repoPath }
       );
 
-      console.log(`Using commit (${strategy}): ${commitInfo.trim()}`);
+      console.log(`📍 Using commit (${strategy}): ${commitInfo.trim()}`);
 
+      // Clean any existing state before checkout
+      await execAsync(`git reset --hard`, { cwd: this.repoPath });
+      await execAsync(`git clean -fd`, { cwd: this.repoPath });
+
+      // Checkout to the specific commit
       await execAsync(`git checkout ${commitHash}`, { cwd: this.repoPath });
+
       return commitHash;
     } catch (error) {
       console.error(
@@ -242,12 +299,34 @@ export class GitHandler {
   }
 
   cleanup() {
-    if (this.repoPath && fs.existsSync(this.repoPath)) {
+    if (this.autoCleanup && this.repoPath && fs.existsSync(this.repoPath)) {
+      console.log(`🗑️ Cleaning up repo: ${this.repoPath}`);
       fs.rmSync(this.repoPath, { recursive: true, force: true });
+    } else if (this.repoPath) {
+      console.log(`📁 Keeping repo for inspection: ${this.repoPath}`);
     }
   }
 
   getRepoPath(): string {
     return this.repoPath;
+  }
+
+  // Static method to clean all repos if needed
+  static cleanAllRepos() {
+    if (fs.existsSync(REPOS_DIR)) {
+      console.log(`🗑️ Cleaning all repos in ${REPOS_DIR}`);
+      fs.rmSync(REPOS_DIR, { recursive: true, force: true });
+    }
+  }
+
+  // Static method to list existing repos
+  static listExistingRepos(): string[] {
+    if (!fs.existsSync(REPOS_DIR)) {
+      return [];
+    }
+    return fs
+      .readdirSync(REPOS_DIR, { withFileTypes: true })
+      .filter((dirent) => dirent.isDirectory())
+      .map((dirent) => dirent.name);
   }
 }

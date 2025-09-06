@@ -31,11 +31,17 @@ async function log(
 async function processCompany(company: any) {
   await log(company.id, "info", "start", `Processing company: ${company.name}`);
 
-  const gitHandler = new GitHandler(company.name);
+  // Use persistent repos (autoCleanup = false)
+  const gitHandler = new GitHandler(company.name, false);
 
   try {
-    // Clone repository
-    await log(company.id, "info", "clone", `Cloning ${company.githubLink}`);
+    // Clone repository (or reuse existing)
+    await log(
+      company.id,
+      "info",
+      "clone",
+      `Cloning/reusing ${company.githubLink}`
+    );
     const repoPath = await gitHandler.cloneRepo(company.githubLink);
 
     // Get all funding rounds for this company
@@ -173,7 +179,7 @@ async function processCompany(company: any) {
       { error: (error as Error).stack }
     );
   } finally {
-    // Always clean up
+    // Keep repos for debugging - no cleanup unless explicitly requested
     gitHandler.cleanup();
   }
 }
@@ -182,8 +188,28 @@ async function main() {
   console.log("🚀 Starting Startup Technical Debt Analysis with Qlty");
   console.log("=".repeat(50));
 
+  // Check for existing repos
+  const existingRepos = GitHandler.listExistingRepos();
+  if (existingRepos.length > 0) {
+    console.log(
+      `📁 Found ${existingRepos.length} existing repos: ${existingRepos
+        .slice(0, 3)
+        .join(", ")}${existingRepos.length > 3 ? "..." : ""}`
+    );
+    console.log(
+      "💡 Repos will be reused to save time. Use --clean to start fresh."
+    );
+  }
+
   // Import CSV if provided
   const csvPath = process.argv[2] || "./data/startup_seed_data.csv";
+
+  // Check for --clean flag
+  if (process.argv.includes("--clean")) {
+    console.log("🗑️ Cleaning all existing repos...");
+    GitHandler.cleanAllRepos();
+  }
+
   if (csvPath && fs.existsSync(csvPath)) {
     console.log(`📊 Importing data from ${csvPath}...`);
     await importCSV(csvPath);
@@ -266,18 +292,22 @@ async function main() {
   }
 
   console.log(`\n💾 Data saved to: data/analysis.db`);
+  console.log(`📁 Repos kept in: ./repos/ (for debugging)`);
   console.log(`📋 Check analysis_log table for detailed logs`);
   console.log(`🔍 Use 'bun run studio' to explore the data`);
+  console.log(`🗑️ Use 'bun run start --clean' to clean repos and start fresh`);
 }
 
-// Handle graceful shutdown
+// Handle graceful shutdown - but don't auto-cleanup repos
 process.on("SIGINT", () => {
   console.log("\n🛑 Received SIGINT, shutting down gracefully...");
+  console.log("📁 Repos preserved in ./repos/ for debugging");
   process.exit(0);
 });
 
 process.on("SIGTERM", () => {
   console.log("\n🛑 Received SIGTERM, shutting down gracefully...");
+  console.log("📁 Repos preserved in ./repos/ for debugging");
   process.exit(0);
 });
 

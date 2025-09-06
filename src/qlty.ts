@@ -2,6 +2,8 @@ import fs from "fs";
 import path from "path";
 import { exec } from "child_process";
 import { promisify } from "util";
+import { createReadStream } from "fs";
+import { createInterface } from "readline";
 
 const execAsync = promisify(exec);
 
@@ -29,21 +31,33 @@ export interface QltyMetrics {
 }
 
 export class QltyAnalyzer {
-  constructor(private repoPath: string) {}
+  private tempDir: string;
+
+  constructor(private repoPath: string) {
+    this.tempDir = path.join(this.repoPath, ".qlty-temp");
+  }
 
   async runAnalysis(): Promise<QltyMetrics> {
     try {
+      // Create temp directory
+      this.ensureTempDir();
+
       // Ensure Qlty is installed and get version
       const qltyVersion = await this.ensureQltyInstalled();
 
       // Initialize Qlty in the repository
       await this.initializeQlty();
 
-      // Run code smells analysis
-      const smells = await this.getCodeSmells();
+      // Run analyses and save to files
+      await this.runCodeSmellsToFile();
+      await this.runMetricsToFile();
 
-      // Run metrics analysis
-      const metrics = await this.getMetrics();
+      // Parse results from files
+      const smells = await this.parseCodeSmellsFile();
+      const metrics = await this.parseMetricsFile();
+
+      // Clean up temp files
+      this.cleanup();
 
       // Combine and return results
       return {
@@ -70,7 +84,24 @@ export class QltyAnalyzer {
       };
     } catch (error) {
       console.error("Qlty analysis failed:", error);
+      this.cleanup();
       return this.createFailedMetrics((error as Error).message);
+    }
+  }
+
+  private ensureTempDir(): void {
+    if (!fs.existsSync(this.tempDir)) {
+      fs.mkdirSync(this.tempDir, { recursive: true });
+    }
+  }
+
+  private cleanup(): void {
+    try {
+      if (fs.existsSync(this.tempDir)) {
+        fs.rmSync(this.tempDir, { recursive: true, force: true });
+      }
+    } catch (error) {
+      console.warn("Failed to cleanup temp directory:", error);
     }
   }
 
@@ -98,76 +129,154 @@ export class QltyAnalyzer {
 
   private async initializeQlty(): Promise<void> {
     try {
-      // Check if .qlty directory already exists
       const qltyDir = path.join(this.repoPath, ".qlty");
       if (!fs.existsSync(qltyDir)) {
         console.log("🔧 Initializing Qlty configuration...");
         await execAsync("qlty init", {
           cwd: this.repoPath,
-          env: { ...process.env, TERM: "dumb" }, // Set non-interactive terminal
+          env: { ...process.env, TERM: "dumb" },
         });
       }
     } catch (error) {
-      // Check if initialization actually succeeded despite the error
       const qltyDir = path.join(this.repoPath, ".qlty");
       if (fs.existsSync(qltyDir)) {
-        console.log(
-          "✅ Qlty configuration created successfully (ignoring terminal warning)"
-        );
+        console.log("✅ Qlty configuration created successfully");
       } else {
         console.warn(
-          "⚠️ Qlty initialization failed, proceeding without config:",
-          (error as Error).message
+          "⚠️ Qlty initialization failed, proceeding without config"
         );
       }
     }
   }
 
-  private async getCodeSmells(): Promise<Partial<QltyMetrics>> {
+  private async runCodeSmellsToFile(): Promise<void> {
+    const outputFile = path.join(this.tempDir, "smells.txt");
+    console.log("🔍 Running code smells analysis...");
+
     try {
-      console.log("🔍 Running code smells analysis...");
-      const { stdout } = await execAsync("qlty smells --all --quiet", {
+      await execAsync(`qlty smells --all --quiet > "${outputFile}" 2>&1`, {
         cwd: this.repoPath,
+        shell: "/bin/bash",
         timeout: 300000, // 5 minute timeout
       });
+    } catch (error) {
+      // Even if command "fails", there might be useful output in the file
+      console.warn(
+        "Code smells command had issues, but checking output file..."
+      );
+    }
 
-      // Parse the output to count different types of smells
-      const lines = stdout.split("\n").filter((line) => line.trim());
+    // Verify file was created
+    if (!fs.existsSync(outputFile)) {
+      fs.writeFileSync(outputFile, "# No smells output generated\n");
+    }
+  }
 
-      let duplicatedCode = 0;
-      let similarCode = 0;
-      let highComplexityFunctions = 0;
-      let highComplexityFiles = 0;
-      let manyParameterFunctions = 0;
-      let complexBooleanLogic = 0;
-      let deeplyNestedCode = 0;
-      let manyReturnStatements = 0;
+  private async runMetricsToFile(): Promise<void> {
+    const outputFile = path.join(this.tempDir, "metrics.txt");
+    const debugFile = path.join(this.tempDir, "metrics-debug.txt");
+    console.log("📊 Running metrics analysis...");
 
-      for (const line of lines) {
-        const lowerLine = line.toLowerCase();
+    try {
+      // Try running without --quiet first to see what qlty is doing
+      console.log("  Running qlty metrics with verbose output...");
+      const { stdout: verboseOutput, stderr: verboseError } = await execAsync(
+        "qlty metrics --all",
+        {
+          cwd: this.repoPath,
+          timeout: 300000,
+        }
+      );
 
+      fs.writeFileSync(
+        debugFile,
+        `VERBOSE OUTPUT:\n${verboseOutput}\n\nVERBOSE STDERR:\n${verboseError}\n`
+      );
+
+      // Now try with --quiet
+      const { stdout, stderr } = await execAsync("qlty metrics --all --quiet", {
+        cwd: this.repoPath,
+        timeout: 300000,
+      });
+
+      const output = stdout + (stderr ? `\n# STDERR:\n${stderr}` : "");
+      fs.writeFileSync(outputFile, output);
+
+      console.log(`  Metrics output length: ${stdout.length} chars`);
+      if (stdout.length < 10) {
+        console.log(`  Short output content: "${stdout}"`);
+      }
+    } catch (error) {
+      const execError = error as any;
+      const output =
+        (execError.stdout || "") +
+        (execError.stderr ? `\n# STDERR:\n${execError.stderr}` : "");
+      fs.writeFileSync(outputFile, output || "# No metrics output generated\n");
+
+      // Also save debug info
+      fs.writeFileSync(
+        debugFile,
+        `ERROR: ${execError.message}\nSTDOUT: ${execError.stdout}\nSTDERR: ${execError.stderr}`
+      );
+      console.warn("Metrics command failed:", execError.message);
+    }
+  }
+
+  private async parseCodeSmellsFile(): Promise<Partial<QltyMetrics>> {
+    const filePath = path.join(this.tempDir, "smells.txt");
+
+    if (!fs.existsSync(filePath)) {
+      return this.getEmptySmells();
+    }
+
+    let duplicatedCode = 0;
+    let similarCode = 0;
+    let highComplexityFunctions = 0;
+    let highComplexityFiles = 0;
+    let manyParameterFunctions = 0;
+    let complexBooleanLogic = 0;
+    let deeplyNestedCode = 0;
+    let manyReturnStatements = 0;
+
+    try {
+      const fileStream = createReadStream(filePath);
+      const rl = createInterface({
+        input: fileStream,
+        crlfDelay: Infinity, // Handle Windows line endings
+      });
+
+      for await (const line of rl) {
+        const trimmedLine = line.trim();
+        if (!trimmedLine || trimmedLine.startsWith("#")) continue;
+
+        const lowerLine = trimmedLine.toLowerCase();
+
+        // More specific pattern matching for different smell types
         if (
-          lowerLine.includes("identical code") ||
-          lowerLine.includes("duplicate")
+          lowerLine.includes("identical") ||
+          lowerLine.includes("duplicated")
         ) {
           duplicatedCode++;
-        } else if (lowerLine.includes("similar code")) {
+        } else if (lowerLine.includes("similar")) {
           similarCode++;
         } else if (
-          lowerLine.includes("function complexity") ||
-          lowerLine.includes("method complexity")
+          lowerLine.includes("complex") &&
+          (lowerLine.includes("function") || lowerLine.includes("method"))
         ) {
           highComplexityFunctions++;
-        } else if (lowerLine.includes("file complexity")) {
+        } else if (
+          lowerLine.includes("complex") &&
+          lowerLine.includes("file")
+        ) {
           highComplexityFiles++;
         } else if (
-          lowerLine.includes("many parameters") ||
-          lowerLine.includes("parameter count")
+          lowerLine.includes("parameter") &&
+          lowerLine.includes("many")
         ) {
           manyParameterFunctions++;
         } else if (
-          lowerLine.includes("boolean logic") ||
-          lowerLine.includes("complex condition")
+          lowerLine.includes("boolean") ||
+          lowerLine.includes("condition")
         ) {
           complexBooleanLogic++;
         } else if (
@@ -175,10 +284,7 @@ export class QltyAnalyzer {
           lowerLine.includes("nesting")
         ) {
           deeplyNestedCode++;
-        } else if (
-          lowerLine.includes("return statement") ||
-          lowerLine.includes("many returns")
-        ) {
+        } else if (lowerLine.includes("return") && lowerLine.includes("many")) {
           manyReturnStatements++;
         }
       }
@@ -205,73 +311,73 @@ export class QltyAnalyzer {
         totalCodeSmells,
       };
     } catch (error) {
-      console.warn("Warning: Code smells analysis failed:", error);
-      return {
-        duplicatedCode: 0,
-        similarCode: 0,
-        highComplexityFunctions: 0,
-        highComplexityFiles: 0,
-        manyParameterFunctions: 0,
-        complexBooleanLogic: 0,
-        deeplyNestedCode: 0,
-        manyReturnStatements: 0,
-        totalCodeSmells: 0,
-      };
+      console.warn("Error parsing smells file:", error);
+      return this.getEmptySmells();
     }
   }
 
-  private async getMetrics(): Promise<Partial<QltyMetrics>> {
+  private async parseMetricsFile(): Promise<Partial<QltyMetrics>> {
+    const filePath = path.join(this.tempDir, "metrics.txt");
+
+    if (!fs.existsSync(filePath)) {
+      return this.getEmptyMetrics();
+    }
+
+    let linesOfCode = 0;
+    let complexity = 0;
+    let cognitiveComplexity = 0;
+    let totalFunctions = 0;
+    let totalClasses = 0;
+    let maxComplexity = 0;
+    let complexityValues: number[] = [];
+
     try {
-      console.log("📊 Running metrics analysis...");
-      const { stdout } = await execAsync("qlty metrics --all --quiet", {
-        cwd: this.repoPath,
-        timeout: 300000, // 5 minute timeout
+      const fileStream = createReadStream(filePath);
+      const rl = createInterface({
+        input: fileStream,
+        crlfDelay: Infinity,
       });
 
-      // Parse the metrics output
-      let linesOfCode = 0;
-      let complexity = 0;
-      let cognitiveComplexity = 0;
-      let totalFunctions = 0;
-      let totalClasses = 0;
-      let maxComplexity = 0;
-      let complexitySum = 0;
-      let complexityCount = 0;
+      for await (const line of rl) {
+        const trimmedLine = line.trim();
+        if (!trimmedLine || trimmedLine.startsWith("#")) continue;
 
-      const lines = stdout.split("\n").filter((line) => line.trim());
+        // Look for numeric values in the line
+        const numbers = trimmedLine.match(/\b\d+(?:\.\d+)?\b/g);
+        if (!numbers || numbers.length === 0) continue;
 
-      for (const line of lines) {
-        // Try to extract numeric values from the output
-        // This is a basic parser - Qlty's output format may vary
-        const numbers = line.match(/\d+/g);
-        if (!numbers) continue;
+        const lowerLine = trimmedLine.toLowerCase();
+        const firstNumber = parseFloat(numbers[0]);
 
-        const lowerLine = line.toLowerCase();
-
-        if (lowerLine.includes("lines") && lowerLine.includes("code")) {
-          linesOfCode += parseInt(numbers[0] || "0");
+        // Parse different metric types
+        if (
+          lowerLine.includes("lines") &&
+          (lowerLine.includes("code") || lowerLine.includes("loc"))
+        ) {
+          linesOfCode += firstNumber;
         } else if (lowerLine.includes("complexity")) {
-          const complexityValue = parseInt(numbers[0] || "0");
-          complexity += complexityValue;
-          maxComplexity = Math.max(maxComplexity, complexityValue);
-          complexitySum += complexityValue;
-          complexityCount++;
-        } else if (lowerLine.includes("function")) {
-          totalFunctions += parseInt(numbers[0] || "0");
+          complexity += firstNumber;
+          complexityValues.push(firstNumber);
+          maxComplexity = Math.max(maxComplexity, firstNumber);
+        } else if (
+          lowerLine.includes("function") &&
+          !lowerLine.includes("complexity")
+        ) {
+          totalFunctions += firstNumber;
         } else if (lowerLine.includes("class")) {
-          totalClasses += parseInt(numbers[0] || "0");
+          totalClasses += firstNumber;
         }
       }
 
+      // Calculate average complexity
       const averageComplexity =
-        complexityCount > 0 ? complexitySum / complexityCount : 0;
+        complexityValues.length > 0
+          ? complexityValues.reduce((a, b) => a + b, 0) /
+            complexityValues.length
+          : 0;
 
-      // For cognitive complexity, use the same value as complexity for now
-      // Qlty may provide this separately in future versions
+      // Use complexity value for cognitive complexity if not separately provided
       cognitiveComplexity = complexity;
-
-      // Estimate duplication percentage (this would need to be refined based on actual Qlty output)
-      const duplicatedLinesPercentage = 0; // Would need to parse duplication output specifically
 
       return {
         linesOfCode,
@@ -281,21 +387,39 @@ export class QltyAnalyzer {
         maxComplexity,
         totalFunctions,
         totalClasses,
-        duplicatedLinesPercentage,
+        duplicatedLinesPercentage: 0, // Would need specific duplication analysis
       };
     } catch (error) {
-      console.warn("Warning: Metrics analysis failed:", error);
-      return {
-        linesOfCode: 0,
-        complexity: 0,
-        cognitiveComplexity: 0,
-        averageComplexity: 0,
-        maxComplexity: 0,
-        totalFunctions: 0,
-        totalClasses: 0,
-        duplicatedLinesPercentage: 0,
-      };
+      console.warn("Error parsing metrics file:", error);
+      return this.getEmptyMetrics();
     }
+  }
+
+  private getEmptySmells(): Partial<QltyMetrics> {
+    return {
+      duplicatedCode: 0,
+      similarCode: 0,
+      highComplexityFunctions: 0,
+      highComplexityFiles: 0,
+      manyParameterFunctions: 0,
+      complexBooleanLogic: 0,
+      deeplyNestedCode: 0,
+      manyReturnStatements: 0,
+      totalCodeSmells: 0,
+    };
+  }
+
+  private getEmptyMetrics(): Partial<QltyMetrics> {
+    return {
+      linesOfCode: 0,
+      complexity: 0,
+      cognitiveComplexity: 0,
+      averageComplexity: 0,
+      maxComplexity: 0,
+      totalFunctions: 0,
+      totalClasses: 0,
+      duplicatedLinesPercentage: 0,
+    };
   }
 
   private createFailedMetrics(errorMessage: string): QltyMetrics {
