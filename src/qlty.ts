@@ -51,6 +51,30 @@ export class QltyAnalyzer {
     this.ensureOutputDir();
   }
 
+  /**
+   * Strip ANSI escape codes from text
+   */
+  private stripAnsiCodes(text: string): string {
+    // Remove ANSI escape sequences
+    return text.replace(/\x1b\[[0-9;]*[mGKH]/g, "");
+  }
+
+  /**
+   * Get environment variables that disable color output
+   */
+  private getNoColorEnv() {
+    return {
+      ...process.env,
+      // Disable colors and terminal detection
+      NO_COLOR: "1",
+      TERM: "dumb",
+      CI: "true",
+      FORCE_COLOR: "0",
+      // Ensure PATH is preserved
+      PATH: process.env.PATH,
+    };
+  }
+
   async runAnalysis(): Promise<QltyMetrics> {
     try {
       // Ensure Qlty is installed and get version
@@ -104,16 +128,20 @@ export class QltyAnalyzer {
 
   private async ensureQltyInstalled(): Promise<string> {
     try {
-      const { stdout } = await execAsync("qlty --version");
-      const version = stdout.trim();
+      const { stdout } = await execAsync("qlty --version", {
+        env: this.getNoColorEnv(),
+      });
+      const version = this.stripAnsiCodes(stdout.trim());
       console.log(`✅ Qlty version: ${version}`);
       return version;
     } catch (error) {
       console.log("📦 Installing Qlty CLI...");
       try {
         await execAsync("curl -sSL https://qlty.sh | sh");
-        const { stdout } = await execAsync("qlty --version");
-        const version = stdout.trim();
+        const { stdout } = await execAsync("qlty --version", {
+          env: this.getNoColorEnv(),
+        });
+        const version = this.stripAnsiCodes(stdout.trim());
         console.log(`✅ Qlty installed: ${version}`);
         return version;
       } catch (installError) {
@@ -129,17 +157,13 @@ export class QltyAnalyzer {
       console.log("🔧 Initializing Qlty configuration (always)...");
       const { stdout, stderr } = await execAsync("qlty init -n", {
         cwd: this.repoPath,
-        env: {
-          ...process.env,
-          PATH: process.env.PATH,
-          CI: "true",
-        },
+        env: this.getNoColorEnv(),
       });
       if (stdout.trim()) {
-        console.log("qlty init stdout:", stdout.trim());
+        console.log("qlty init stdout:", this.stripAnsiCodes(stdout.trim()));
       }
       if (stderr.trim()) {
-        console.warn("qlty init stderr:", stderr.trim());
+        console.warn("qlty init stderr:", this.stripAnsiCodes(stderr.trim()));
       }
       const qltyDir = path.join(this.repoPath, ".qlty");
       if (fs.existsSync(qltyDir)) {
@@ -167,21 +191,33 @@ export class QltyAnalyzer {
     console.log("🔍 Running code smells analysis...");
 
     try {
-      // Run and capture output directly, ensure TERM and PATH are set
+      // Run and capture output directly, with no-color environment
       const { stdout, stderr } = await execAsync("qlty smells --all --quiet", {
         cwd: this.repoPath,
-        env: { ...process.env, PATH: process.env.PATH },
+        env: this.getNoColorEnv(),
         timeout: 300000,
       });
-      const output = stdout + (stderr ? `\n# STDERR:\n${stderr}` : "");
-      fs.writeFileSync(outputFile, output);
+
+      // Strip ANSI codes before saving
+      const cleanOutput =
+        this.stripAnsiCodes(stdout) +
+        (stderr ? `\n# STDERR:\n${this.stripAnsiCodes(stderr)}` : "");
+
+      fs.writeFileSync(outputFile, cleanOutput);
+      console.log(`  Code smells output saved (${cleanOutput.length} chars)`);
     } catch (error) {
       // Even if command "fails", there might be useful output
       const execError = error as any;
-      const output =
-        (execError.stdout || "") +
-        (execError.stderr ? `\n# STDERR:\n${execError.stderr}` : "");
-      fs.writeFileSync(outputFile, output || "# No smells output generated\n");
+      const cleanOutput =
+        this.stripAnsiCodes(execError.stdout || "") +
+        (execError.stderr
+          ? `\n# STDERR:\n${this.stripAnsiCodes(execError.stderr)}`
+          : "");
+
+      fs.writeFileSync(
+        outputFile,
+        cleanOutput || "# No smells output generated\n"
+      );
       console.warn(
         "Code smells command had issues, but checking output file..."
       );
@@ -205,41 +241,56 @@ export class QltyAnalyzer {
         "qlty metrics --all",
         {
           cwd: this.repoPath,
-          env: { ...process.env, PATH: process.env.PATH },
+          env: this.getNoColorEnv(),
           timeout: 300000,
         }
       );
 
+      const cleanVerboseOutput = this.stripAnsiCodes(verboseOutput);
+      const cleanVerboseError = this.stripAnsiCodes(verboseError);
+
       fs.writeFileSync(
         debugFile,
-        `VERBOSE OUTPUT:\n${verboseOutput}\n\nVERBOSE STDERR:\n${verboseError}\n`
+        `VERBOSE OUTPUT:\n${cleanVerboseOutput}\n\nVERBOSE STDERR:\n${cleanVerboseError}\n`
       );
 
       // Now try with --quiet
       const { stdout, stderr } = await execAsync("qlty metrics --all --quiet", {
         cwd: this.repoPath,
-        env: { ...process.env, PATH: process.env.PATH },
+        env: this.getNoColorEnv(),
         timeout: 300000,
       });
 
-      const output = stdout + (stderr ? `\n# STDERR:\n${stderr}` : "");
-      fs.writeFileSync(outputFile, output);
+      // Strip ANSI codes before saving
+      const cleanOutput =
+        this.stripAnsiCodes(stdout) +
+        (stderr ? `\n# STDERR:\n${this.stripAnsiCodes(stderr)}` : "");
 
-      console.log(`  Metrics output length: ${stdout.length} chars`);
-      if (stdout.length < 10) {
-        console.log(`  Short output content: "${stdout}"`);
+      fs.writeFileSync(outputFile, cleanOutput);
+
+      console.log(`  Metrics output length: ${cleanOutput.length} chars`);
+      if (cleanOutput.length < 100) {
+        console.log(`  Output preview: "${cleanOutput.substring(0, 200)}..."`);
       }
     } catch (error) {
       const execError = error as any;
-      const output =
-        (execError.stdout || "") +
-        (execError.stderr ? `\n# STDERR:\n${execError.stderr}` : "");
-      fs.writeFileSync(outputFile, output || "# No metrics output generated\n");
+      const cleanOutput =
+        this.stripAnsiCodes(execError.stdout || "") +
+        (execError.stderr
+          ? `\n# STDERR:\n${this.stripAnsiCodes(execError.stderr)}`
+          : "");
+
+      fs.writeFileSync(
+        outputFile,
+        cleanOutput || "# No metrics output generated\n"
+      );
 
       // Also save debug info
       fs.writeFileSync(
         debugFile,
-        `ERROR: ${execError.message}\nSTDOUT: ${execError.stdout}\nSTDERR: ${execError.stderr}`
+        `ERROR: ${execError.message}\nSTDOUT: ${this.stripAnsiCodes(
+          execError.stdout || ""
+        )}\nSTDERR: ${this.stripAnsiCodes(execError.stderr || "")}`
       );
       console.warn("Metrics command failed:", execError.message);
     }
@@ -269,19 +320,20 @@ export class QltyAnalyzer {
       });
 
       for await (const line of rl) {
-        const trimmedLine = line.trim();
-        if (!trimmedLine || trimmedLine.startsWith("#")) continue;
+        // Strip any remaining ANSI codes and trim
+        const cleanLine = this.stripAnsiCodes(line).trim();
+        if (!cleanLine || cleanLine.startsWith("#")) continue;
 
-        const lowerLine = trimmedLine.toLowerCase();
+        const lowerLine = cleanLine.toLowerCase();
 
-        // More specific pattern matching for different smell types
-        if (
-          lowerLine.includes("identical") ||
-          lowerLine.includes("duplicated")
+        // Look for smell patterns in the text
+        if (lowerLine.includes("found") && lowerLine.includes("similar code")) {
+          similarCode++;
+        } else if (
+          lowerLine.includes("found") &&
+          (lowerLine.includes("identical") || lowerLine.includes("duplicate"))
         ) {
           duplicatedCode++;
-        } else if (lowerLine.includes("similar")) {
-          similarCode++;
         } else if (
           lowerLine.includes("complex") &&
           (lowerLine.includes("function") || lowerLine.includes("method"))
@@ -322,6 +374,10 @@ export class QltyAnalyzer {
         deeplyNestedCode +
         manyReturnStatements;
 
+      console.log(
+        `  Parsed smells: ${totalCodeSmells} total (similar: ${similarCode}, duplicated: ${duplicatedCode})`
+      );
+
       return {
         duplicatedCode,
         similarCode,
@@ -361,34 +417,68 @@ export class QltyAnalyzer {
         crlfDelay: Infinity,
       });
 
+      let foundHeader = false;
+      let isDataRow = false;
+
       for await (const line of rl) {
-        const trimmedLine = line.trim();
-        if (!trimmedLine || trimmedLine.startsWith("#")) continue;
+        // Strip any remaining ANSI codes and trim
+        const cleanLine = this.stripAnsiCodes(line).trim();
+        if (!cleanLine || cleanLine.startsWith("#")) continue;
 
-        // Look for numeric values in the line
-        const numbers = trimmedLine.match(/\b\d+(?:\.\d+)?\b/g);
-        if (!numbers || numbers.length === 0) continue;
-
-        const lowerLine = trimmedLine.toLowerCase();
-        const firstNumber = parseFloat(numbers[0]);
-
-        // Parse different metric types
+        // Check if this looks like a table header
         if (
-          lowerLine.includes("lines") &&
-          (lowerLine.includes("code") || lowerLine.includes("loc"))
+          cleanLine.includes("name") &&
+          cleanLine.includes("classes") &&
+          cleanLine.includes("funcs")
         ) {
-          linesOfCode += firstNumber;
-        } else if (lowerLine.includes("complexity")) {
-          complexity += firstNumber;
-          complexityValues.push(firstNumber);
-          maxComplexity = Math.max(maxComplexity, firstNumber);
-        } else if (
-          lowerLine.includes("function") &&
-          !lowerLine.includes("complexity")
-        ) {
-          totalFunctions += firstNumber;
-        } else if (lowerLine.includes("class")) {
-          totalClasses += firstNumber;
+          foundHeader = true;
+          console.log("  Found metrics table header");
+          continue;
+        }
+
+        // Check if this is a separator line (dashes and plus signs)
+        if (foundHeader && cleanLine.match(/^[-+|]+$/)) {
+          isDataRow = true;
+          continue;
+        }
+
+        // Parse data rows if we've found the table structure
+        if (isDataRow && cleanLine.includes("|")) {
+          // Split by | and clean up values
+          const columns = cleanLine.split("|").map((col) => col.trim());
+
+          if (columns.length >= 9) {
+            // Should have at least: name, classes, funcs, fields, cyclo, complex, LCOM, lines, LOC
+            try {
+              const classesCol = parseInt(columns[1] || "0") || 0;
+              const funcsCol = parseInt(columns[2] || "0") || 0;
+              const cycloCol = parseInt(columns[4] || "0") || 0;
+              const complexCol = parseInt(columns[5] || "0") || 0;
+              const linesCol = parseInt(columns[7] || "0") || 0;
+              const locCol = parseInt(columns[8] || "0") || 0;
+
+              totalClasses += classesCol;
+              totalFunctions += funcsCol;
+              complexity += cycloCol;
+              linesOfCode += locCol; // Use LOC (lines of code) rather than total lines
+
+              if (cycloCol > 0) {
+                complexityValues.push(cycloCol);
+                maxComplexity = Math.max(maxComplexity, cycloCol);
+              }
+
+              console.log(
+                `    Parsed row: ${columns[0]?.substring(
+                  0,
+                  30
+                )}... -> classes:${classesCol}, funcs:${funcsCol}, cyclo:${cycloCol}, loc:${locCol}`
+              );
+            } catch (parseError) {
+              console.warn(
+                `    Failed to parse row: ${cleanLine.substring(0, 50)}...`
+              );
+            }
+          }
         }
       }
 
@@ -401,6 +491,10 @@ export class QltyAnalyzer {
 
       // Use complexity value for cognitive complexity if not separately provided
       cognitiveComplexity = complexity;
+
+      console.log(
+        `  Parsed metrics: LOC=${linesOfCode}, classes=${totalClasses}, funcs=${totalFunctions}, complexity=${complexity}`
+      );
 
       return {
         linesOfCode,
