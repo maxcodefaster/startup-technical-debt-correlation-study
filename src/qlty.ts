@@ -31,33 +31,41 @@ export interface QltyMetrics {
 }
 
 export class QltyAnalyzer {
-  private tempDir: string;
+  private outputDir: string;
+  private repoName: string;
+  private analysisDate: string;
 
-  constructor(private repoPath: string) {
-    this.tempDir = path.join(this.repoPath, ".qlty-temp");
+  /**
+   * @param repoPath Path to the repo to analyze
+   * @param outputBaseDir Base directory to save results (e.g. ./data/analysis_results)
+   * @param analysisDate Date string (e.g. funding date or commit date)
+   */
+  constructor(
+    private repoPath: string,
+    outputBaseDir: string,
+    analysisDate: string
+  ) {
+    this.repoName = path.basename(this.repoPath);
+    this.analysisDate = analysisDate;
+    this.outputDir = path.join(outputBaseDir, this.repoName, this.analysisDate);
+    this.ensureOutputDir();
   }
 
   async runAnalysis(): Promise<QltyMetrics> {
     try {
-      // Create temp directory
-      this.ensureTempDir();
-
       // Ensure Qlty is installed and get version
       const qltyVersion = await this.ensureQltyInstalled();
 
-      // Initialize Qlty in the repository
+      // Always re-initialize Qlty config before each analysis (after commit checkout)
       await this.initializeQlty();
 
-      // Run analyses and save to files
+      // Run analyses and save to files in outputDir
       await this.runCodeSmellsToFile();
       await this.runMetricsToFile();
 
       // Parse results from files
       const smells = await this.parseCodeSmellsFile();
       const metrics = await this.parseMetricsFile();
-
-      // Clean up temp files
-      this.cleanup();
 
       // Combine and return results
       return {
@@ -84,24 +92,13 @@ export class QltyAnalyzer {
       };
     } catch (error) {
       console.error("Qlty analysis failed:", error);
-      this.cleanup();
       return this.createFailedMetrics((error as Error).message);
     }
   }
 
-  private ensureTempDir(): void {
-    if (!fs.existsSync(this.tempDir)) {
-      fs.mkdirSync(this.tempDir, { recursive: true });
-    }
-  }
-
-  private cleanup(): void {
-    try {
-      if (fs.existsSync(this.tempDir)) {
-        fs.rmSync(this.tempDir, { recursive: true, force: true });
-      }
-    } catch (error) {
-      console.warn("Failed to cleanup temp directory:", error);
+  private ensureOutputDir(): void {
+    if (!fs.existsSync(this.outputDir)) {
+      fs.mkdirSync(this.outputDir, { recursive: true });
     }
   }
 
@@ -129,38 +126,62 @@ export class QltyAnalyzer {
 
   private async initializeQlty(): Promise<void> {
     try {
-      const qltyDir = path.join(this.repoPath, ".qlty");
-      if (!fs.existsSync(qltyDir)) {
-        console.log("🔧 Initializing Qlty configuration...");
-        await execAsync("qlty init", {
-          cwd: this.repoPath,
-          env: { ...process.env, TERM: "dumb" },
-        });
+      console.log("🔧 Initializing Qlty configuration (always)...");
+      const { stdout, stderr } = await execAsync("qlty init -n", {
+        cwd: this.repoPath,
+        env: {
+          ...process.env,
+          PATH: process.env.PATH,
+          CI: "true",
+        },
+      });
+      if (stdout.trim()) {
+        console.log("qlty init stdout:", stdout.trim());
       }
-    } catch (error) {
+      if (stderr.trim()) {
+        console.warn("qlty init stderr:", stderr.trim());
+      }
       const qltyDir = path.join(this.repoPath, ".qlty");
       if (fs.existsSync(qltyDir)) {
         console.log("✅ Qlty configuration created successfully");
       } else {
         console.warn(
-          "⚠️ Qlty initialization failed, proceeding without config"
+          "⚠️ Qlty initialization failed, .qlty not found after init"
+        );
+      }
+    } catch (error) {
+      console.error("❌ Qlty init failed:", (error as Error).message);
+      const qltyDir = path.join(this.repoPath, ".qlty");
+      if (fs.existsSync(qltyDir)) {
+        console.log("✅ Qlty configuration created successfully (after error)");
+      } else {
+        console.warn(
+          "⚠️ Qlty initialization failed, .qlty not found after error"
         );
       }
     }
   }
 
   private async runCodeSmellsToFile(): Promise<void> {
-    const outputFile = path.join(this.tempDir, "smells.txt");
+    const outputFile = path.join(this.outputDir, "smells.txt");
     console.log("🔍 Running code smells analysis...");
 
     try {
-      await execAsync(`qlty smells --all --quiet > "${outputFile}" 2>&1`, {
+      // Run and capture output directly, ensure TERM and PATH are set
+      const { stdout, stderr } = await execAsync("qlty smells --all --quiet", {
         cwd: this.repoPath,
-        shell: "/bin/bash",
-        timeout: 300000, // 5 minute timeout
+        env: { ...process.env, PATH: process.env.PATH },
+        timeout: 300000,
       });
+      const output = stdout + (stderr ? `\n# STDERR:\n${stderr}` : "");
+      fs.writeFileSync(outputFile, output);
     } catch (error) {
-      // Even if command "fails", there might be useful output in the file
+      // Even if command "fails", there might be useful output
+      const execError = error as any;
+      const output =
+        (execError.stdout || "") +
+        (execError.stderr ? `\n# STDERR:\n${execError.stderr}` : "");
+      fs.writeFileSync(outputFile, output || "# No smells output generated\n");
       console.warn(
         "Code smells command had issues, but checking output file..."
       );
@@ -173,8 +194,8 @@ export class QltyAnalyzer {
   }
 
   private async runMetricsToFile(): Promise<void> {
-    const outputFile = path.join(this.tempDir, "metrics.txt");
-    const debugFile = path.join(this.tempDir, "metrics-debug.txt");
+    const outputFile = path.join(this.outputDir, "metrics.txt");
+    const debugFile = path.join(this.outputDir, "metrics-debug.txt");
     console.log("📊 Running metrics analysis...");
 
     try {
@@ -184,6 +205,7 @@ export class QltyAnalyzer {
         "qlty metrics --all",
         {
           cwd: this.repoPath,
+          env: { ...process.env, PATH: process.env.PATH },
           timeout: 300000,
         }
       );
@@ -196,6 +218,7 @@ export class QltyAnalyzer {
       // Now try with --quiet
       const { stdout, stderr } = await execAsync("qlty metrics --all --quiet", {
         cwd: this.repoPath,
+        env: { ...process.env, PATH: process.env.PATH },
         timeout: 300000,
       });
 
@@ -223,7 +246,7 @@ export class QltyAnalyzer {
   }
 
   private async parseCodeSmellsFile(): Promise<Partial<QltyMetrics>> {
-    const filePath = path.join(this.tempDir, "smells.txt");
+    const filePath = path.join(this.outputDir, "smells.txt");
 
     if (!fs.existsSync(filePath)) {
       return this.getEmptySmells();
@@ -317,7 +340,7 @@ export class QltyAnalyzer {
   }
 
   private async parseMetricsFile(): Promise<Partial<QltyMetrics>> {
-    const filePath = path.join(this.tempDir, "metrics.txt");
+    const filePath = path.join(this.outputDir, "metrics.txt");
 
     if (!fs.existsSync(filePath)) {
       return this.getEmptyMetrics();

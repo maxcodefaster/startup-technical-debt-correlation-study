@@ -42,3 +42,4 @@ drizzle
 
 # Qlty analysis results (temporary)
 .qlty
+data/analysis_results

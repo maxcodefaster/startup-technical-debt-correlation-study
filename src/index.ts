@@ -118,7 +118,11 @@ async function processCompany(company: any) {
         .returning();
 
       // Run Qlty analysis
-      const qltyAnalyzer = new QltyAnalyzer(repoPath);
+      const qltyAnalyzer = new QltyAnalyzer(
+        repoPath,
+        "./data/analysis_results",
+        round.roundDate
+      );
       const qltyMetrics = await qltyAnalyzer.runAnalysis();
 
       // Insert code snapshot
