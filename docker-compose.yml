@@ -20,6 +20,20 @@ services:
         soft: 65536
         hard: 65536
 
+  sonar-scanner:
+    image: sonarsource/sonar-scanner-cli:latest
+    container_name: sonar-scanner
+    working_dir: /usr/src
+    volumes:
+      - ./repos:/usr/src
+    environment:
+      - SONAR_HOST_URL=http://sonarqube:9000
+    depends_on:
+      - sonarqube
+    profiles:
+      - scanner
+    command: ["tail", "-f", "/dev/null"] # Keep container running
+
   postgres:
     image: postgres:13
     container_name: postgres_sonar

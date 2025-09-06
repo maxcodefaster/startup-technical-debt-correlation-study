@@ -5,10 +5,15 @@ import { promisify } from "util";
 
 const execAsync = promisify(exec);
 
-// Configuration
-const SONAR_URL = "http://localhost:9000";
-const SONAR_TOKEN = "squ_d0f7a14ca8c269fb5e81f10d1791ff5e4c81285c"; // Update this with your actual token
-const SONAR_SCANNER_PATH = "sonar-scanner"; // Assumes sonar-scanner is in PATH
+// Configuration from environment
+const SONAR_URL = process.env.SONAR_URL || "http://localhost:9000";
+const SONAR_TOKEN = process.env.SONAR_TOKEN;
+
+if (!SONAR_TOKEN) {
+  console.error("❌ SONAR_TOKEN environment variable is required!");
+  console.error("Please set your SonarQube token in .env file");
+  process.exit(1);
+}
 
 export interface SonarMetrics {
   ncloc: number;
@@ -40,15 +45,23 @@ export class SonarAnalyzer {
 
   async runAnalysis(projectKey: string): Promise<SonarMetrics> {
     try {
+      // Ensure scanner container is running
+      await this.ensureScannerContainer();
+
       // Create sonar-project.properties
       await this.createSonarProperties(projectKey);
 
-      // Run SonarQube analysis
+      // Get relative path for Docker volume mount
+      const relativePath = path.relative("./repos", this.repoPath);
+
+      // Run SonarQube analysis via Docker
       console.log(`Running SonarQube analysis for ${projectKey}...`);
-      await execAsync(`${SONAR_SCANNER_PATH}`, {
-        cwd: this.repoPath,
-        timeout: 300000, // 5 minute timeout
-      });
+      await execAsync(
+        `docker exec sonar-scanner sonar-scanner -Dproject.settings=/usr/src/${relativePath}/sonar-project.properties`,
+        {
+          timeout: 300000, // 5 minute timeout
+        }
+      );
 
       // Wait for analysis to complete on server
       await this.waitForAnalysisCompletion(projectKey);
@@ -68,13 +81,58 @@ export class SonarAnalyzer {
     }
   }
 
+  private async ensureScannerContainer() {
+    try {
+      // Ensure repos directory exists for volume mount
+      if (!fs.existsSync("./repos")) {
+        fs.mkdirSync("./repos", { recursive: true });
+        console.log("📁 Created repos directory for Docker volume mount");
+      }
+
+      // Check if scanner container exists and is running
+      const { stdout } = await execAsync(
+        "docker ps --filter name=sonar-scanner --filter status=running --format '{{.Names}}'"
+      );
+
+      if (!stdout.includes("sonar-scanner")) {
+        console.log("🚀 Starting SonarQube scanner container...");
+        try {
+          await execAsync("docker-compose up -d sonar-scanner", {
+            timeout: 30000,
+          });
+
+          // Wait a moment for container to be ready
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+          console.log("✅ Scanner container started successfully");
+        } catch (composeError) {
+          console.error(
+            "❌ Failed to start scanner with docker-compose, trying direct docker run..."
+          );
+
+          // Fallback: try to run scanner container directly
+          await execAsync(
+            `docker run -d --name sonar-scanner --network master-thesis_default -v ${process.cwd()}/repos:/usr/src sonarsource/sonar-scanner-cli:latest tail -f /dev/null`,
+            { timeout: 30000 }
+          );
+          console.log("✅ Scanner container started with direct docker run");
+        }
+      } else {
+        console.log("✅ Scanner container already running");
+      }
+    } catch (error) {
+      console.error("❌ Failed to start scanner container:", error);
+      console.log("💡 Try running: docker-compose up -d sonar-scanner");
+      throw new Error("SonarQube scanner container not available");
+    }
+  }
+
   private async createSonarProperties(projectKey: string) {
     const sonarProps = `
 sonar.projectKey=${projectKey}
 sonar.projectName=${projectKey}
 sonar.projectVersion=1.0
 sonar.sources=.
-sonar.host.url=${SONAR_URL}
+sonar.host.url=http://sonarqube:9000
 sonar.token=${SONAR_TOKEN}
 
 # Exclusions for common non-source directories

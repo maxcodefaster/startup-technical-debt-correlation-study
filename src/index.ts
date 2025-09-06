@@ -1,4 +1,4 @@
-import { db } from "./db/db";
+import { db, importCSV } from "./db/db";
 import {
   companies,
   fundingRounds,
@@ -7,7 +7,6 @@ import {
   analysisLog,
 } from "./db/schema";
 import { eq } from "drizzle-orm";
-import { importCSV } from "./db/import";
 import { GitHandler } from "./git";
 import { SonarAnalyzer } from "./sonar";
 import fs from "fs";
