@@ -39,3 +39,6 @@ repos
 
 # Drizzle
 drizzle
+
+# Qlty analysis results (temporary)
+.qlty

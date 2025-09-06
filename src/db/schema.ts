@@ -73,45 +73,37 @@ export const codeSnapshots = sqliteTable("code_snapshots", {
   snapshotDate: text("snapshot_date").notNull(),
   commitHash: text("commit_hash").notNull(),
 
-  // Core Technical Debt Metrics (SonarQube Community Edition)
-  ncloc: integer("ncloc"), // Lines of code
-  sqaleIndex: integer("sqale_index"), // Technical debt in minutes
-  sqaleRating: text("sqale_rating"), // Maintainability rating A-E
-  sqaleDebtRatio: real("sqale_debt_ratio"), // Technical debt ratio %
-
-  // Quality Issues
-  codeSmells: integer("code_smells"),
-  bugs: integer("bugs"),
-  vulnerabilities: integer("vulnerabilities"),
-  securityHotspots: integer("security_hotspots"),
-
-  // Code Structure
-  duplicatedLinesDensity: real("duplicated_lines_density"),
+  // Core Metrics from Qlty
+  linesOfCode: integer("lines_of_code"),
   complexity: integer("complexity"),
   cognitiveComplexity: integer("cognitive_complexity"),
 
-  // Test Coverage (if available)
-  coverage: real("coverage"),
-  lineCoverage: real("line_coverage"),
+  // Code Smells from Qlty
+  duplicatedCode: integer("duplicated_code"), // Count of duplicate blocks
+  similarCode: integer("similar_code"), // Count of similar blocks
+  highComplexityFunctions: integer("high_complexity_functions"),
+  highComplexityFiles: integer("high_complexity_files"),
+  manyParameterFunctions: integer("many_parameter_functions"),
+  complexBooleanLogic: integer("complex_boolean_logic"),
+  deeplyNestedCode: integer("deeply_nested_code"),
+  manyReturnStatements: integer("many_return_statements"),
 
-  // Quality Ratings
-  reliabilityRating: text("reliability_rating"),
-  securityRating: text("security_rating"),
-  maintainabilityRating: text("maintainability_rating"),
+  // Aggregated Quality Metrics
+  totalCodeSmells: integer("total_code_smells"),
+  duplicatedLinesPercentage: real("duplicated_lines_percentage"),
+  averageComplexity: real("average_complexity"),
+  maxComplexity: integer("max_complexity"),
 
-  // Quality Gate
-  alertStatus: text("alert_status"),
-
-  // Calculated metrics
-  tdDensity: real("td_density"), // TD per 1K LOC
-  qualityScore: real("quality_score"), // Composite 0-100
+  // File-level metrics
+  totalFunctions: integer("total_functions"),
+  totalClasses: integer("total_classes"),
 
   // Analysis metadata
-  sonarProjectKey: text("sonar_project_key"),
   analysisSuccess: integer("analysis_success", { mode: "boolean" }).default(
     true
   ),
   analysisErrors: text("analysis_errors"), // JSON array of any errors
+  qltyVersion: text("qlty_version"),
   analysisDate: text("analysis_date").default(sql`CURRENT_TIMESTAMP`),
 });
 
@@ -119,7 +111,7 @@ export const analysisLog = sqliteTable("analysis_log", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   companyId: integer("company_id").references(() => companies.id),
   level: text("level").notNull(), // 'info', 'warning', 'error'
-  stage: text("stage").notNull(), // 'clone', 'checkout', 'sonar', 'metrics'
+  stage: text("stage").notNull(), // 'clone', 'checkout', 'qlty', 'metrics'
   message: text("message").notNull(),
   details: text("details"), // JSON for additional context
   timestamp: text("timestamp").default(sql`CURRENT_TIMESTAMP`),

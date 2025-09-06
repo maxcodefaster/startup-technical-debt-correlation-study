@@ -1,13 +1,10 @@
 {
-  "name": "master-thesis",
+  "name": "startup-technical-debt-analysis",
   "main": "src/index.ts",
   "scripts": {
     "start": "bun run src/index.ts",
     "generate": "bunx drizzle-kit generate --dialect sqlite --schema ./src/db/schema.ts",
-    "studio": "bunx drizzle-kit studio",
-    "sonar:up": "docker-compose up -d",
-    "sonar:down": "docker-compose down",
-    "sonar:logs": "docker-compose logs -f sonarqube"
+    "studio": "bunx drizzle-kit studio"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",

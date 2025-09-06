@@ -5,6 +5,11 @@ import { eq } from "drizzle-orm";
 import fs from "fs";
 import { companies, fundingRounds } from "./schema";
 
+// Ensure data directory exists
+if (!fs.existsSync("data")) {
+  fs.mkdirSync("data", { recursive: true });
+}
+
 // Initialize database with auto-migration
 const sqlite = new Database("data/analysis.db");
 export const db = drizzle(sqlite);

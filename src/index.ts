@@ -8,7 +8,7 @@ import {
 } from "./db/schema";
 import { eq } from "drizzle-orm";
 import { GitHandler } from "./git";
-import { SonarAnalyzer } from "./sonar";
+import { QltyAnalyzer } from "./qlty";
 import fs from "fs";
 
 async function log(
@@ -111,12 +111,9 @@ async function processCompany(company: any) {
         })
         .returning();
 
-      // Run SonarQube analysis
-      const projectKey = `${company.name.replace(/[^a-zA-Z0-9]/g, "_")}_${
-        round.roundType
-      }_${round.roundDate.replace(/-/g, "")}`;
-      const sonarAnalyzer = new SonarAnalyzer(repoPath);
-      const sonarMetrics = await sonarAnalyzer.runAnalysis(projectKey);
+      // Run Qlty analysis
+      const qltyAnalyzer = new QltyAnalyzer(repoPath);
+      const qltyMetrics = await qltyAnalyzer.runAnalysis();
 
       // Insert code snapshot
       await db.insert(codeSnapshots).values({
@@ -125,28 +122,26 @@ async function processCompany(company: any) {
         repositoryInfoId: repositoryInfoRecord!.id,
         snapshotDate: round.roundDate,
         commitHash,
-        ncloc: sonarMetrics.ncloc,
-        sqaleIndex: sonarMetrics.sqaleIndex,
-        sqaleRating: sonarMetrics.sqaleRating,
-        sqaleDebtRatio: sonarMetrics.sqaleDebtRatio,
-        codeSmells: sonarMetrics.codeSmells,
-        bugs: sonarMetrics.bugs,
-        vulnerabilities: sonarMetrics.vulnerabilities,
-        securityHotspots: sonarMetrics.securityHotspots,
-        duplicatedLinesDensity: sonarMetrics.duplicatedLinesDensity,
-        complexity: sonarMetrics.complexity,
-        cognitiveComplexity: sonarMetrics.cognitiveComplexity,
-        coverage: sonarMetrics.coverage,
-        lineCoverage: sonarMetrics.lineCoverage,
-        reliabilityRating: sonarMetrics.reliabilityRating,
-        securityRating: sonarMetrics.securityRating,
-        maintainabilityRating: sonarMetrics.maintainabilityRating,
-        alertStatus: sonarMetrics.alertStatus,
-        tdDensity: sonarMetrics.tdDensity,
-        qualityScore: sonarMetrics.qualityScore,
-        sonarProjectKey: sonarMetrics.sonarProjectKey,
-        analysisSuccess: sonarMetrics.analysisSuccess,
-        analysisErrors: sonarMetrics.analysisErrors,
+        linesOfCode: qltyMetrics.linesOfCode,
+        complexity: qltyMetrics.complexity,
+        cognitiveComplexity: qltyMetrics.cognitiveComplexity,
+        duplicatedCode: qltyMetrics.duplicatedCode,
+        similarCode: qltyMetrics.similarCode,
+        highComplexityFunctions: qltyMetrics.highComplexityFunctions,
+        highComplexityFiles: qltyMetrics.highComplexityFiles,
+        manyParameterFunctions: qltyMetrics.manyParameterFunctions,
+        complexBooleanLogic: qltyMetrics.complexBooleanLogic,
+        deeplyNestedCode: qltyMetrics.deeplyNestedCode,
+        manyReturnStatements: qltyMetrics.manyReturnStatements,
+        totalCodeSmells: qltyMetrics.totalCodeSmells,
+        duplicatedLinesPercentage: qltyMetrics.duplicatedLinesPercentage,
+        averageComplexity: qltyMetrics.averageComplexity,
+        maxComplexity: qltyMetrics.maxComplexity,
+        totalFunctions: qltyMetrics.totalFunctions,
+        totalClasses: qltyMetrics.totalClasses,
+        analysisSuccess: qltyMetrics.analysisSuccess,
+        analysisErrors: qltyMetrics.analysisErrors,
+        qltyVersion: qltyMetrics.qltyVersion,
       });
 
       await log(
@@ -156,9 +151,9 @@ async function processCompany(company: any) {
         `Completed analysis for ${round.roundType}`,
         {
           commit: commitHash,
-          ncloc: sonarMetrics.ncloc,
-          tdDensity: sonarMetrics.tdDensity,
-          qualityScore: sonarMetrics.qualityScore,
+          linesOfCode: qltyMetrics.linesOfCode,
+          totalCodeSmells: qltyMetrics.totalCodeSmells,
+          complexity: qltyMetrics.complexity,
         }
       );
     }
@@ -184,7 +179,7 @@ async function processCompany(company: any) {
 }
 
 async function main() {
-  console.log("🚀 Starting Startup Technical Debt Analysis");
+  console.log("🚀 Starting Startup Technical Debt Analysis with Qlty");
   console.log("=".repeat(50));
 
   // Import CSV if provided
@@ -202,7 +197,7 @@ async function main() {
     console.log(
       "❌ No companies found in database. Please import CSV data first."
     );
-    console.log("Usage: bun run index.ts <csv-file>");
+    console.log("Usage: bun run start <csv-file>");
     process.exit(1);
   }
 
@@ -219,10 +214,10 @@ async function main() {
 
     await processCompany(company);
 
-    // Small delay between companies to be respectful to SonarQube
+    // Small delay between companies to avoid overwhelming the system
     if (i < allCompanies.length - 1) {
-      console.log("⏳ Waiting 5 seconds before next company...");
-      await new Promise((resolve) => setTimeout(resolve, 5000));
+      console.log("⏳ Waiting 3 seconds before next company...");
+      await new Promise((resolve) => setTimeout(resolve, 3000));
     }
   }
 
@@ -244,8 +239,35 @@ async function main() {
     ).toFixed(1)}%`
   );
 
-  console.log(`\n💾 Data saved to: analysis.db`);
+  // Additional metrics summary
+  if (successfulAnalyses.length > 0) {
+    const totalLOC = successfulAnalyses.reduce(
+      (sum, s) => sum + (s.linesOfCode || 0),
+      0
+    );
+    const totalCodeSmells = successfulAnalyses.reduce(
+      (sum, s) => sum + (s.totalCodeSmells || 0),
+      0
+    );
+    const avgComplexity =
+      successfulAnalyses.reduce(
+        (sum, s) => sum + (s.averageComplexity || 0),
+        0
+      ) / successfulAnalyses.length;
+
+    console.log(`\n📈 Code Quality Summary:`);
+    console.log(
+      `   Total lines of code analyzed: ${totalLOC.toLocaleString()}`
+    );
+    console.log(
+      `   Total code smells found: ${totalCodeSmells.toLocaleString()}`
+    );
+    console.log(`   Average complexity: ${avgComplexity.toFixed(2)}`);
+  }
+
+  console.log(`\n💾 Data saved to: data/analysis.db`);
   console.log(`📋 Check analysis_log table for detailed logs`);
+  console.log(`🔍 Use 'bun run studio' to explore the data`);
 }
 
 // Handle graceful shutdown
