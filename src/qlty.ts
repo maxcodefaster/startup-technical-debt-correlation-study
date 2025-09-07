@@ -185,9 +185,10 @@ export class QltyAnalyzer {
   }
 
   private removeSnippetProperties(jsonString: string): string {
+    // Regex that removes both "snippet" and "snippetWithContext" properties to save space
     return jsonString.replace(
-      /"snippet".*?"effortMinutes"/gs,
-      '"effortMinutes"'
+      /"(?:snippet|snippetWithContext)"\s*:\s*"(?:[^"\\]|\\.)*"\s*,?\s*/g,
+      ""
     );
   }
 
