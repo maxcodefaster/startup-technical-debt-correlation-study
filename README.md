@@ -9,7 +9,12 @@ Automated analysis of technical debt in startup repositories using Qlty CLI for 
 bun install
 ```
 
-### 2. Run Analysis
+### 2. Create and seed sqlite
+```bash
+bun run generate
+```
+
+### 3. Run Analysis
 ```bash
 bun run start
 ```

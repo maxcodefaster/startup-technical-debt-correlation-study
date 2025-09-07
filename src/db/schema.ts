@@ -73,14 +73,33 @@ export const codeSnapshots = sqliteTable("code_snapshots", {
   snapshotDate: text("snapshot_date").notNull(),
   commitHash: text("commit_hash").notNull(),
 
-  // Core Metrics from Qlty
-  linesOfCode: integer("lines_of_code"),
-  complexity: integer("complexity"),
-  cognitiveComplexity: integer("cognitive_complexity"),
+  // Core Metrics from Qlty metrics.txt
+  linesOfCode: integer("lines_of_code"), // LOC column
+  totalLines: integer("total_lines"), // lines column (includes comments/whitespace)
+  complexity: integer("complexity"), // cyclo column
+  cognitiveComplexity: integer("cognitive_complexity"), // complex column
+  totalFunctions: integer("total_functions"), // funcs column
+  totalClasses: integer("total_classes"), // classes column
+  totalFields: integer("total_fields"), // fields column
+  lackOfCohesion: integer("lack_of_cohesion"), // LCOM column
 
-  // Code Smells from Qlty
-  duplicatedCode: integer("duplicated_code"), // Count of duplicate blocks
-  similarCode: integer("similar_code"), // Count of similar blocks
+  // Code Smells Aggregations from smells.json
+  totalIssues: integer("total_issues"),
+  totalEffortMinutes: integer("total_effort_minutes"), // Sum of all effortMinutes
+  averageEffortPerIssue: real("average_effort_per_issue"),
+
+  // Issues by category (JSON: {CATEGORY_DUPLICATION: count, CATEGORY_STRUCTURE: count})
+  issuesByCategory: text("issues_by_category"),
+
+  // Issues by level (JSON: {LEVEL_HIGH: count, LEVEL_MEDIUM: count, LEVEL_LOW: count})
+  issuesByLevel: text("issues_by_level"),
+
+  // Issues by language (JSON: {LANGUAGE_PYTHON: count, LANGUAGE_JAVA: count, ...})
+  issuesByLanguage: text("issues_by_language"),
+
+  // Legacy fields for backward compatibility
+  duplicatedCode: integer("duplicated_code"),
+  similarCode: integer("similar_code"),
   highComplexityFunctions: integer("high_complexity_functions"),
   highComplexityFiles: integer("high_complexity_files"),
   manyParameterFunctions: integer("many_parameter_functions"),
@@ -88,15 +107,15 @@ export const codeSnapshots = sqliteTable("code_snapshots", {
   deeplyNestedCode: integer("deeply_nested_code"),
   manyReturnStatements: integer("many_return_statements"),
 
-  // Aggregated Quality Metrics
+  // Derived Quality Metrics for Technical Debt Calculation
   totalCodeSmells: integer("total_code_smells"),
   duplicatedLinesPercentage: real("duplicated_lines_percentage"),
   averageComplexity: real("average_complexity"),
   maxComplexity: integer("max_complexity"),
-
-  // File-level metrics
-  totalFunctions: integer("total_functions"),
-  totalClasses: integer("total_classes"),
+  complexityDensity: real("complexity_density"), // complexity per 1000 LOC
+  issuesDensity: real("issues_density"), // issues per 1000 LOC
+  technicalDebtMinutes: real("technical_debt_minutes"), // totalEffortMinutes
+  technicalDebtRatio: real("technical_debt_ratio"), // effort minutes / development hours estimate
 
   // Analysis metadata
   analysisSuccess: integer("analysis_success", { mode: "boolean" }).default(

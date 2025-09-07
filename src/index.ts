@@ -132,9 +132,26 @@ async function processCompany(company: any) {
         repositoryInfoId: repositoryInfoRecord!.id,
         snapshotDate: round.roundDate,
         commitHash,
+
+        // Core metrics from metrics.txt
         linesOfCode: qltyMetrics.linesOfCode,
+        totalLines: qltyMetrics.totalLines,
         complexity: qltyMetrics.complexity,
         cognitiveComplexity: qltyMetrics.cognitiveComplexity,
+        totalFunctions: qltyMetrics.totalFunctions,
+        totalClasses: qltyMetrics.totalClasses,
+        totalFields: qltyMetrics.totalFields,
+        lackOfCohesion: qltyMetrics.lackOfCohesion,
+
+        // Aggregated smells data
+        totalIssues: qltyMetrics.totalIssues,
+        totalEffortMinutes: qltyMetrics.totalEffortMinutes,
+        averageEffortPerIssue: qltyMetrics.averageEffortPerIssue,
+        issuesByCategory: qltyMetrics.issuesByCategory,
+        issuesByLevel: qltyMetrics.issuesByLevel,
+        issuesByLanguage: qltyMetrics.issuesByLanguage,
+
+        // Legacy fields for backward compatibility
         duplicatedCode: qltyMetrics.duplicatedCode,
         similarCode: qltyMetrics.similarCode,
         highComplexityFunctions: qltyMetrics.highComplexityFunctions,
@@ -143,12 +160,18 @@ async function processCompany(company: any) {
         complexBooleanLogic: qltyMetrics.complexBooleanLogic,
         deeplyNestedCode: qltyMetrics.deeplyNestedCode,
         manyReturnStatements: qltyMetrics.manyReturnStatements,
+
+        // Derived quality metrics
         totalCodeSmells: qltyMetrics.totalCodeSmells,
         duplicatedLinesPercentage: qltyMetrics.duplicatedLinesPercentage,
         averageComplexity: qltyMetrics.averageComplexity,
         maxComplexity: qltyMetrics.maxComplexity,
-        totalFunctions: qltyMetrics.totalFunctions,
-        totalClasses: qltyMetrics.totalClasses,
+        complexityDensity: qltyMetrics.complexityDensity,
+        issuesDensity: qltyMetrics.issuesDensity,
+        technicalDebtMinutes: qltyMetrics.technicalDebtMinutes,
+        technicalDebtRatio: qltyMetrics.technicalDebtRatio,
+
+        // Analysis metadata
         analysisSuccess: qltyMetrics.analysisSuccess,
         analysisErrors: qltyMetrics.analysisErrors,
         qltyVersion: qltyMetrics.qltyVersion,

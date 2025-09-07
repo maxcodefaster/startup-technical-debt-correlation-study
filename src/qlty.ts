@@ -6,9 +6,25 @@ import { promisify } from "util";
 const execAsync = promisify(exec);
 
 export interface QltyMetrics {
+  // Core metrics from metrics.txt
   linesOfCode: number;
+  totalLines: number;
   complexity: number;
   cognitiveComplexity: number;
+  totalFunctions: number;
+  totalClasses: number;
+  totalFields: number;
+  lackOfCohesion: number;
+
+  // Aggregated smells data
+  totalIssues: number;
+  totalEffortMinutes: number;
+  averageEffortPerIssue: number;
+  issuesByCategory: string; // JSON
+  issuesByLevel: string; // JSON
+  issuesByLanguage: string; // JSON
+
+  // Legacy fields for backward compatibility
   duplicatedCode: number;
   similarCode: number;
   highComplexityFunctions: number;
@@ -17,12 +33,18 @@ export interface QltyMetrics {
   complexBooleanLogic: number;
   deeplyNestedCode: number;
   manyReturnStatements: number;
+
+  // Derived quality metrics
   totalCodeSmells: number;
   duplicatedLinesPercentage: number;
   averageComplexity: number;
   maxComplexity: number;
-  totalFunctions: number;
-  totalClasses: number;
+  complexityDensity: number;
+  issuesDensity: number;
+  technicalDebtMinutes: number;
+  technicalDebtRatio: number;
+
+  // Metadata
   analysisSuccess: boolean;
   analysisErrors: string | null;
   qltyVersion: string;
@@ -33,11 +55,6 @@ export class QltyAnalyzer {
   private repoName: string;
   private analysisDate: string;
 
-  /**
-   * @param repoPath Path to the repo to analyze
-   * @param outputBaseDir Base directory to save results (e.g. ./data/analysis_results)
-   * @param analysisDate Date string (e.g. funding date or commit date)
-   */
   constructor(
     private repoPath: string,
     outputBaseDir: string,
@@ -51,39 +68,71 @@ export class QltyAnalyzer {
 
   async runAnalysis(): Promise<QltyMetrics> {
     try {
-      // Ensure Qlty is installed and get version
       const qltyVersion = await this.ensureQltyInstalled();
-
-      // Always re-initialize Qlty config before each analysis
       await this.initializeQlty();
-
-      // Run analyses and save JSON to files
       await this.runCodeSmellsToFile();
       await this.runMetricsToFile();
 
-      // Parse JSON results from files
       const smells = await this.parseCodeSmellsFile();
       const metrics = await this.parseMetricsFile();
 
-      // Combine and return results
+      // Calculate derived metrics
+      const linesOfCode = metrics.linesOfCode || 0;
+      const totalIssues = smells.totalIssues || 0;
+      const totalEffortMinutes = smells.totalEffortMinutes || 0;
+      const complexity = metrics.complexity || 0;
+
+      const complexityDensity =
+        linesOfCode > 0 ? (complexity / linesOfCode) * 1000 : 0;
+      const issuesDensity =
+        linesOfCode > 0 ? (totalIssues / linesOfCode) * 1000 : 0;
+
+      // Estimate technical debt ratio: effort minutes / estimated development time
+      // Rough estimate: 1 LOC = 0.5 minutes of development time
+      const estimatedDevMinutes = linesOfCode * 0.5;
+      const technicalDebtRatio =
+        estimatedDevMinutes > 0 ? totalEffortMinutes / estimatedDevMinutes : 0;
+
       return {
-        linesOfCode: metrics.linesOfCode ?? 0,
-        complexity: metrics.complexity ?? 0,
-        cognitiveComplexity: metrics.cognitiveComplexity ?? 0,
-        duplicatedCode: smells.duplicatedCode ?? 0,
-        similarCode: smells.similarCode ?? 0,
-        highComplexityFunctions: smells.highComplexityFunctions ?? 0,
-        highComplexityFiles: smells.highComplexityFiles ?? 0,
-        manyParameterFunctions: smells.manyParameterFunctions ?? 0,
-        complexBooleanLogic: smells.complexBooleanLogic ?? 0,
-        deeplyNestedCode: smells.deeplyNestedCode ?? 0,
-        manyReturnStatements: smells.manyReturnStatements ?? 0,
-        totalCodeSmells: smells.totalCodeSmells ?? 0,
-        duplicatedLinesPercentage: metrics.duplicatedLinesPercentage ?? 0,
-        averageComplexity: metrics.averageComplexity ?? 0,
-        maxComplexity: metrics.maxComplexity ?? 0,
-        totalFunctions: metrics.totalFunctions ?? 0,
-        totalClasses: metrics.totalClasses ?? 0,
+        // Core metrics
+        linesOfCode,
+        totalLines: metrics.totalLines || 0,
+        complexity,
+        cognitiveComplexity: metrics.cognitiveComplexity || 0,
+        totalFunctions: metrics.totalFunctions || 0,
+        totalClasses: metrics.totalClasses || 0,
+        totalFields: metrics.totalFields || 0,
+        lackOfCohesion: metrics.lackOfCohesion || 0,
+
+        // Smells aggregations
+        totalIssues,
+        totalEffortMinutes,
+        averageEffortPerIssue: smells.averageEffortPerIssue || 0,
+        issuesByCategory: smells.issuesByCategory || "{}",
+        issuesByLevel: smells.issuesByLevel || "{}",
+        issuesByLanguage: smells.issuesByLanguage || "{}",
+
+        // Legacy fields
+        duplicatedCode: smells.duplicatedCode || 0,
+        similarCode: smells.similarCode || 0,
+        highComplexityFunctions: smells.highComplexityFunctions || 0,
+        highComplexityFiles: smells.highComplexityFiles || 0,
+        manyParameterFunctions: smells.manyParameterFunctions || 0,
+        complexBooleanLogic: smells.complexBooleanLogic || 0,
+        deeplyNestedCode: smells.deeplyNestedCode || 0,
+        manyReturnStatements: smells.manyReturnStatements || 0,
+
+        // Derived metrics
+        totalCodeSmells: smells.totalCodeSmells || 0,
+        duplicatedLinesPercentage: metrics.duplicatedLinesPercentage || 0,
+        averageComplexity: metrics.averageComplexity || 0,
+        maxComplexity: metrics.maxComplexity || 0,
+        complexityDensity,
+        issuesDensity,
+        technicalDebtMinutes: totalEffortMinutes,
+        technicalDebtRatio,
+
+        // Metadata
         analysisSuccess: true,
         analysisErrors: null,
         qltyVersion,
@@ -141,7 +190,7 @@ export class QltyAnalyzer {
     try {
       const { stdout } = await execAsync("qlty smells --all --quiet --json", {
         cwd: this.repoPath,
-        maxBuffer: 200 * 1024 * 1024, // 200MB buffer instead of default 1MB
+        maxBuffer: 200 * 1024 * 1024,
       });
 
       const cleanedOutput = this.removeSnippetProperties(stdout);
@@ -157,7 +206,6 @@ export class QltyAnalyzer {
   }
 
   private removeSnippetProperties(jsonString: string): string {
-    // Remove everything from "snippet" through "snippetWithContext" up to "effortMinutes" to reduce size
     return jsonString.replace(
       /"snippet".*?"effortMinutes"/gs,
       '"effortMinutes"'
@@ -189,7 +237,6 @@ export class QltyAnalyzer {
   }
 
   private stripAnsiCodes(text: string): string {
-    // Remove ANSI escape sequences
     return text.replace(/\x1b\[[0-9;]*[mGKH]/g, "");
   }
 
@@ -200,6 +247,7 @@ export class QltyAnalyzer {
       .replace(/^ TOTAL\s+(?=\|)/m, " TOTAL  ") // Adjust TOTAL to 8 chars total
       .replace(/(\+[-+]+\n).*?\n( TOTAL)/s, "$1$2"); // Remove everything between separator and TOTAL
   }
+
   private async parseCodeSmellsFile(): Promise<Partial<QltyMetrics>> {
     const filePath = path.join(this.outputDir, "smells.json");
 
@@ -211,8 +259,15 @@ export class QltyAnalyzer {
       const jsonContent = fs.readFileSync(filePath, "utf8");
       const data = JSON.parse(jsonContent);
 
-      // Count different types of code smells from the JSON structure
-      const smellCounts = {
+      const issues = Array.isArray(data)
+        ? data
+        : data.issues || data.smells || [];
+
+      // Initialize counters
+      const categoryCount: Record<string, number> = {};
+      const levelCount: Record<string, number> = {};
+      const languageCount: Record<string, number> = {};
+      const legacySmells = {
         duplicatedCode: 0,
         similarCode: 0,
         highComplexityFunctions: 0,
@@ -223,61 +278,83 @@ export class QltyAnalyzer {
         manyReturnStatements: 0,
       };
 
-      // Handle different possible JSON structures from qlty
-      const issues = Array.isArray(data)
-        ? data
-        : data.issues || data.smells || [];
+      let totalEffortMinutes = 0;
+      let totalIssues = issues.length;
 
-      console.log(`  Found ${issues.length} issues in smells JSON`);
+      console.log(`  Found ${totalIssues} issues in smells JSON`);
 
-      // Parse the issues array and categorize by ruleKey
+      // Process each issue
       for (const issue of issues) {
-        const ruleKey = issue.ruleKey || issue.rule_key || "";
+        // Aggregate effort minutes
+        const effortMinutes = issue.effortMinutes || 0;
+        totalEffortMinutes += effortMinutes;
 
+        // Count by category
+        const category = issue.category || "UNKNOWN";
+        categoryCount[category] = (categoryCount[category] || 0) + 1;
+
+        // Count by level
+        const level = issue.level || "UNKNOWN";
+        levelCount[level] = (levelCount[level] || 0) + 1;
+
+        // Count by language
+        const language = issue.language || "UNKNOWN";
+        languageCount[language] = (languageCount[language] || 0) + 1;
+
+        // Legacy rule-based counting
+        const ruleKey = issue.ruleKey || "";
         switch (ruleKey) {
           case "identical-code":
-            smellCounts.duplicatedCode++;
+            legacySmells.duplicatedCode++;
             break;
           case "similar-code":
-            smellCounts.similarCode++;
+            legacySmells.similarCode++;
             break;
           case "function-complexity":
-            smellCounts.highComplexityFunctions++;
+            legacySmells.highComplexityFunctions++;
             break;
           case "file-complexity":
-            smellCounts.highComplexityFiles++;
+            legacySmells.highComplexityFiles++;
             break;
           case "function-parameters":
-            smellCounts.manyParameterFunctions++;
+            legacySmells.manyParameterFunctions++;
             break;
           case "boolean-logic":
-            smellCounts.complexBooleanLogic++;
+            legacySmells.complexBooleanLogic++;
             break;
           case "nested-control-flow":
-            smellCounts.deeplyNestedCode++;
+            legacySmells.deeplyNestedCode++;
             break;
           case "return-statements":
-            smellCounts.manyReturnStatements++;
+            legacySmells.manyReturnStatements++;
             break;
         }
       }
 
-      const totalCodeSmells = Object.values(smellCounts).reduce(
+      const averageEffortPerIssue =
+        totalIssues > 0 ? totalEffortMinutes / totalIssues : 0;
+      const totalCodeSmells = Object.values(legacySmells).reduce(
         (a, b) => a + b,
         0
       );
 
-      console.log(`  Parsed ${totalCodeSmells} code smells from JSON`);
       console.log(
-        `  Breakdown: duplicated=${smellCounts.duplicatedCode}, similar=${
-          smellCounts.similarCode
-        }, complexity=${
-          smellCounts.highComplexityFunctions + smellCounts.highComplexityFiles
+        `  Parsed: ${totalIssues} issues, ${totalEffortMinutes} effort minutes`
+      );
+      console.log(
+        `  Categories: ${Object.keys(categoryCount).length}, Languages: ${
+          Object.keys(languageCount).length
         }`
       );
 
       return {
-        ...smellCounts,
+        totalIssues,
+        totalEffortMinutes,
+        averageEffortPerIssue,
+        issuesByCategory: JSON.stringify(categoryCount),
+        issuesByLevel: JSON.stringify(levelCount),
+        issuesByLanguage: JSON.stringify(languageCount),
+        ...legacySmells,
         totalCodeSmells,
       };
     } catch (error) {
@@ -287,94 +364,79 @@ export class QltyAnalyzer {
   }
 
   private async parseMetricsFile(): Promise<Partial<QltyMetrics>> {
-    const filePath = path.join(this.outputDir, "metrics.json");
+    const filePath = path.join(this.outputDir, "metrics.txt");
 
     if (!fs.existsSync(filePath)) {
       return this.getEmptyMetrics();
     }
 
     try {
-      const jsonContent = fs.readFileSync(filePath, "utf8");
-      const metrics = JSON.parse(jsonContent);
+      const content = fs.readFileSync(filePath, "utf8");
 
-      let linesOfCode = 0;
-      let complexity = 0;
-      let cognitiveComplexity = 0;
-      let totalFunctions = 0;
-      let totalClasses = 0;
-      let maxComplexity = 0;
-      const complexityValues: number[] = [];
+      // Look for the TOTAL row in the table format
+      // Expected format: " TOTAL  |     773 |  3529 |   1322 |  5161 |    4399 |  364 | 74594 | 49475"
+      const totalLineMatch = content.match(/^\s*TOTAL\s*\|(.+)$/m);
 
-      // Parse metrics from JSON structure
-      if (Array.isArray(metrics)) {
-        for (const metric of metrics) {
-          // Sum up various metrics based on common field names
-          linesOfCode +=
-            metric.lines_of_code || metric.loc || metric.lines || 0;
-          complexity +=
-            metric.cyclomatic_complexity ||
-            metric.complexity ||
-            metric.cyclo ||
-            0;
-          cognitiveComplexity +=
-            metric.cognitive_complexity || metric.cognitive || 0;
-          totalFunctions +=
-            metric.functions || metric.funcs || metric.methods || 0;
-          totalClasses += metric.classes || 0;
-
-          const fileComplexity =
-            metric.cyclomatic_complexity || metric.complexity || 0;
-          if (fileComplexity > 0) {
-            complexityValues.push(fileComplexity);
-            maxComplexity = Math.max(maxComplexity, fileComplexity);
-          }
-        }
-      } else if (typeof metrics === "object" && metrics !== null) {
-        // Handle case where metrics is a single object rather than array
-        linesOfCode =
-          metrics.lines_of_code || metrics.loc || metrics.lines || 0;
-        complexity =
-          metrics.cyclomatic_complexity ||
-          metrics.complexity ||
-          metrics.cyclo ||
-          0;
-        cognitiveComplexity =
-          metrics.cognitive_complexity || metrics.cognitive || complexity;
-        totalFunctions =
-          metrics.functions || metrics.funcs || metrics.methods || 0;
-        totalClasses = metrics.classes || 0;
-        maxComplexity = complexity;
-        if (complexity > 0) complexityValues.push(complexity);
+      if (!totalLineMatch) {
+        console.warn("Could not find TOTAL row in metrics.txt");
+        return this.getEmptyMetrics();
       }
 
+      // Split the values and clean them
+      const values = totalLineMatch[1]
+        .split("|")
+        .map((v) => v.trim())
+        .filter((v) => v.length > 0)
+        .map((v) => parseInt(v.replace(/,/g, "")) || 0);
+
+      // Expected order based on header: classes | funcs | fields | cyclo | complex | LCOM | lines | LOC
+      const [
+        totalClasses = 0,
+        totalFunctions = 0,
+        totalFields = 0,
+        complexity = 0,
+        cognitiveComplexity = 0,
+        lackOfCohesion = 0,
+        totalLines = 0,
+        linesOfCode = 0,
+      ] = values;
+
+      // Calculate derived metrics
       const averageComplexity =
-        complexityValues.length > 0
-          ? complexityValues.reduce((a, b) => a + b, 0) /
-            complexityValues.length
-          : 0;
+        totalFunctions > 0 ? complexity / totalFunctions : 0;
+      const maxComplexity = complexity; // We don't have individual function data, so use total as estimate
 
       console.log(
-        `  Parsed metrics: LOC=${linesOfCode}, complexity=${complexity}, functions=${totalFunctions}`
+        `  Parsed metrics: LOC=${linesOfCode}, functions=${totalFunctions}, complexity=${complexity}`
       );
 
       return {
         linesOfCode,
+        totalLines,
         complexity,
         cognitiveComplexity,
-        averageComplexity,
-        maxComplexity,
         totalFunctions,
         totalClasses,
+        totalFields,
+        lackOfCohesion,
+        averageComplexity,
+        maxComplexity,
         duplicatedLinesPercentage: 0, // Would need specific duplication analysis
       };
     } catch (error) {
-      console.warn("Error parsing metrics JSON:", error);
+      console.warn("Error parsing metrics.txt:", error);
       return this.getEmptyMetrics();
     }
   }
 
   private getEmptySmells(): Partial<QltyMetrics> {
     return {
+      totalIssues: 0,
+      totalEffortMinutes: 0,
+      averageEffortPerIssue: 0,
+      issuesByCategory: "{}",
+      issuesByLevel: "{}",
+      issuesByLanguage: "{}",
       duplicatedCode: 0,
       similarCode: 0,
       highComplexityFunctions: 0,
@@ -390,12 +452,15 @@ export class QltyAnalyzer {
   private getEmptyMetrics(): Partial<QltyMetrics> {
     return {
       linesOfCode: 0,
+      totalLines: 0,
       complexity: 0,
       cognitiveComplexity: 0,
-      averageComplexity: 0,
-      maxComplexity: 0,
       totalFunctions: 0,
       totalClasses: 0,
+      totalFields: 0,
+      lackOfCohesion: 0,
+      averageComplexity: 0,
+      maxComplexity: 0,
       duplicatedLinesPercentage: 0,
     };
   }
@@ -403,8 +468,19 @@ export class QltyAnalyzer {
   private createFailedMetrics(errorMessage: string): QltyMetrics {
     return {
       linesOfCode: 0,
+      totalLines: 0,
       complexity: 0,
       cognitiveComplexity: 0,
+      totalFunctions: 0,
+      totalClasses: 0,
+      totalFields: 0,
+      lackOfCohesion: 0,
+      totalIssues: 0,
+      totalEffortMinutes: 0,
+      averageEffortPerIssue: 0,
+      issuesByCategory: "{}",
+      issuesByLevel: "{}",
+      issuesByLanguage: "{}",
       duplicatedCode: 0,
       similarCode: 0,
       highComplexityFunctions: 0,
@@ -417,8 +493,10 @@ export class QltyAnalyzer {
       duplicatedLinesPercentage: 0,
       averageComplexity: 0,
       maxComplexity: 0,
-      totalFunctions: 0,
-      totalClasses: 0,
+      complexityDensity: 0,
+      issuesDensity: 0,
+      technicalDebtMinutes: 0,
+      technicalDebtRatio: 0,
       analysisSuccess: false,
       analysisErrors: JSON.stringify([errorMessage]),
       qltyVersion: "unknown",
