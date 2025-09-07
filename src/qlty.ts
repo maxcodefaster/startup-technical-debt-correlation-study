@@ -177,7 +177,7 @@ export class QltyAnalyzer {
 
     const { stdout } = await execAsync("qlty smells --all --quiet --json", {
       cwd: this.repoPath,
-      maxBuffer: 200 * 1024 * 1024,
+      maxBuffer: 4 * 1024 * 1024 * 1024, // 4GB
     });
 
     const cleanedOutput = this.removeSnippetProperties(stdout);
@@ -197,7 +197,7 @@ export class QltyAnalyzer {
 
     const { stdout } = await execAsync("qlty metrics --all --quiet", {
       cwd: this.repoPath,
-      maxBuffer: 200 * 1024 * 1024,
+      maxBuffer: 4 * 1024 * 1024 * 1024, // 4GB
     });
 
     const cleanedOutput = this.stripAnsiCodes(stdout);
