@@ -4,7 +4,7 @@ Alluxio,https://github.com/Alluxio/alluxio,,,,,3/17/15,$7.5M,,,1/18/19,$8.5M,4/1
 Appsmith,https://github.com/appsmithorg/appsmith,3/1/20,$2.5M,,,10/1/21,$8M,,,6/1/22,$41M,,,,,,,,,,,,,none,
 Appwrite,https://github.com/appwrite/appwrite,3/1/21,$10M,,,4/1/22,$27M,,,,,,,,,,,,,,,,,none,
 ArangoDB,https://github.com/arangodb/arangodb,2/10/15,$1.9M,11/24/16,$2.2M,3/14/19,$10M,,,10/6/21,$27.8M,,,,,,,,,,,,,none,
-Balena,https://github.com/balena-io,,,,,4/14/15,$3M,6/27/16,$9M,7/24/19,$14.4M,,,,,,,,,,,,,none,
+Balena,https://github.com/balena-io/etcher,,,,,4/14/15,$3M,6/27/16,$9M,7/24/19,$14.4M,,,,,,,,,,,,,none,
 Bit,https://github.com/teambit/bit,3/1/15,$0.9M,,,2/1/19,$10.1M,,,11/1/21,$25M,,,,,,,,,,,,,none,
 Builder.io,https://github.com/BuilderIO/builder,3/1/20,$3.3M,,,10/1/21,$14M,,,4/1/24,$20M,,,,,,,,,,,,,none,
 Cal.com,https://github.com/calcom/cal.com,3/1/21,$7.4M,,,4/1/22,$25M,,,,,,,,,,,,,,,,,none,
@@ -21,7 +21,7 @@ Directus,https://github.com/directus/directus,7/1/21,$1M,,,11/10/22,$7M,,,,,,,,,
 Discourse,https://github.com/discourse/discourse,11/1/12,,,,8/1/21,$20M,,,,,,,,,,,,,,,,,none,
 EdgeDB,https://github.com/geldata/gel,4/1/22,$4M,,,11/1/22,$15M,,,,,,,,,,,,,,,,,none,
 Elasticsearch,https://github.com/elastic/elasticsearch,,,,,11/8/12,$10M,,,2/19/13,$24M,,,6/5/14,$70M,7/1/16,$58M,,,,,,,ipo,10/4/18
-Ethyca,https://github.com/ethyca,7/1/19,$4.2M,8/29/19,$2.3M,6/11/20,$13.5M,11/3/21,$7.5M,,,,,,,,,,,,,,,none,
+Ethyca,https://github.com/ethyca/fides,7/1/19,$4.2M,8/29/19,$2.3M,6/11/20,$13.5M,11/3/21,$7.5M,,,,,,,,,,,,,,,none,
 GitLab,https://github.com/gitlabhq/gitlabhq,7/9/15,$1.5M,,,9/15/15,$4M,,,9/27/16,$20M,,,10/10/17,$20M,9/19/18,$100M,9/17/19,$268M,,,,,ipo,10/14/21
 Gitpod,https://github.com/gitpod-io/gitpod,10/1/20,$3M,4/1/21,$13M,11/1/22,$25M,,,,,,,,,,,,,,,,,none,
 Gradle,https://github.com/gradle/gradle,12/1/15,$4.2M,,,5/25/16,$10.5M,,,10/1/18,$13M,,,11/1/21,$27M,,,,,,,,,none,
