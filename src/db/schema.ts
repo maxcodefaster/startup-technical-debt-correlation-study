@@ -30,31 +30,11 @@ export const repositoryInfo = sqliteTable("repository_info", {
   analysisDate: text("analysis_date").notNull(),
 
   // Repository characteristics
-  detectedLanguages: text("detected_languages"), // JSON array of languages
-  primaryLanguage: text("primary_language"),
   totalFiles: integer("total_files"),
   repoSizeMB: real("repo_size_mb"),
   commitCount: integer("commit_count"),
   firstCommitDate: text("first_commit_date"),
   lastCommitDate: text("last_commit_date"),
-
-  // Build/Framework detection
-  hasPackageJson: integer("has_package_json", { mode: "boolean" }).default(
-    false
-  ),
-  hasPomXml: integer("has_pom_xml", { mode: "boolean" }).default(false),
-  hasCargoToml: integer("has_cargo_toml", { mode: "boolean" }).default(false),
-  hasGoMod: integer("has_go_mod", { mode: "boolean" }).default(false),
-  hasRequirementsTxt: integer("has_requirements_txt", {
-    mode: "boolean",
-  }).default(false),
-  hasGemfile: integer("has_gemfile", { mode: "boolean" }).default(false),
-  hasComposerJson: integer("has_composer_json", { mode: "boolean" }).default(
-    false
-  ),
-
-  // Framework indicators
-  detectedFrameworks: text("detected_frameworks"), // JSON array
 
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
@@ -109,7 +89,6 @@ export const codeSnapshots = sqliteTable("code_snapshots", {
 
   // Derived Quality Metrics for Technical Debt Calculation
   totalCodeSmells: integer("total_code_smells"),
-  duplicatedLinesPercentage: real("duplicated_lines_percentage"),
   averageComplexity: real("average_complexity"),
   maxComplexity: integer("max_complexity"),
   complexityDensity: real("complexity_density"), // complexity per 1000 LOC
@@ -121,19 +100,9 @@ export const codeSnapshots = sqliteTable("code_snapshots", {
   analysisSuccess: integer("analysis_success", { mode: "boolean" }).default(
     true
   ),
-  analysisErrors: text("analysis_errors"), // JSON array of any errors
+  analysisErrors: text("analysis_errors"),
   qltyVersion: text("qlty_version"),
   analysisDate: text("analysis_date").default(sql`CURRENT_TIMESTAMP`),
-});
-
-export const analysisLog = sqliteTable("analysis_log", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  companyId: integer("company_id").references(() => companies.id),
-  level: text("level").notNull(), // 'info', 'warning', 'error'
-  stage: text("stage").notNull(), // 'clone', 'checkout', 'qlty', 'metrics'
-  message: text("message").notNull(),
-  details: text("details"), // JSON for additional context
-  timestamp: text("timestamp").default(sql`CURRENT_TIMESTAMP`),
 });
 
 // Type exports for TypeScript
@@ -145,5 +114,3 @@ export type RepositoryInfo = typeof repositoryInfo.$inferSelect;
 export type NewRepositoryInfo = typeof repositoryInfo.$inferInsert;
 export type CodeSnapshot = typeof codeSnapshots.$inferSelect;
 export type NewCodeSnapshot = typeof codeSnapshots.$inferInsert;
-export type AnalysisLog = typeof analysisLog.$inferSelect;
-export type NewAnalysisLog = typeof analysisLog.$inferInsert;

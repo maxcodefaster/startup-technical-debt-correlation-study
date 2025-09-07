@@ -4,44 +4,19 @@ import {
   fundingRounds,
   repositoryInfo,
   codeSnapshots,
-  analysisLog,
 } from "./db/schema";
 import { eq } from "drizzle-orm";
 import { GitHandler } from "./git";
 import { QltyAnalyzer } from "./qlty";
 import fs from "fs";
 
-async function log(
-  companyId: number | null,
-  level: string,
-  stage: string,
-  message: string,
-  details?: any
-) {
-  console.log(`[${level.toUpperCase()}] ${stage}: ${message}`);
-  await db.insert(analysisLog).values({
-    companyId,
-    level,
-    stage,
-    message,
-    details: details ? JSON.stringify(details) : null,
-  });
-}
-
 async function processCompany(company: any) {
-  await log(company.id, "info", "start", `Processing company: ${company.name}`);
+  console.log(`\n📈 Processing: ${company.name}`);
 
-  // Use persistent repos (autoCleanup = false)
   const gitHandler = new GitHandler(company.name, false);
 
   try {
-    // Clone repository (or reuse existing)
-    await log(
-      company.id,
-      "info",
-      "clone",
-      `Cloning/reusing ${company.githubLink}`
-    );
+    console.log(`📥 Cloning/reusing ${company.githubLink}`);
     const repoPath = await gitHandler.cloneRepo(company.githubLink);
 
     // Get all funding rounds for this company
@@ -71,22 +46,12 @@ async function processCompany(company: any) {
     );
 
     for (const round of analysisPoints) {
-      await log(
-        company.id,
-        "info",
-        "checkout",
-        `Analyzing ${round.roundType} at ${round.roundDate}`
-      );
+      console.log(`  📍 Analyzing ${round.roundType} at ${round.roundDate}`);
 
       // Checkout to date
       const commitHash = await gitHandler.checkoutDate(round.roundDate);
       if (!commitHash) {
-        await log(
-          company.id,
-          "warning",
-          "checkout",
-          `Failed to checkout ${round.roundDate}, skipping...`
-        );
+        console.log(`  ⚠️ Failed to checkout ${round.roundDate}, skipping...`);
         continue;
       }
 
@@ -99,29 +64,21 @@ async function processCompany(company: any) {
         .values({
           companyId: company.id,
           analysisDate: round.roundDate,
-          detectedLanguages: JSON.stringify(repoInfo.detectedLanguages),
-          primaryLanguage: repoInfo.primaryLanguage,
           totalFiles: repoInfo.totalFiles,
           repoSizeMB: repoInfo.repoSizeMB,
           commitCount: repoInfo.commitCount,
           firstCommitDate: repoInfo.firstCommitDate,
           lastCommitDate: repoInfo.lastCommitDate,
-          hasPackageJson: repoInfo.frameworks.hasPackageJson,
-          hasPomXml: repoInfo.frameworks.hasPomXml,
-          hasCargoToml: repoInfo.frameworks.hasCargoToml,
-          hasGoMod: repoInfo.frameworks.hasGoMod,
-          hasRequirementsTxt: repoInfo.frameworks.hasRequirementsTxt,
-          hasGemfile: repoInfo.frameworks.hasGemfile,
-          hasComposerJson: repoInfo.frameworks.hasComposerJson,
-          detectedFrameworks: JSON.stringify(repoInfo.detectedFrameworks),
         })
         .returning();
 
-      // Run Qlty analysis
+      // Run Qlty analysis with company name and round type
       const qltyAnalyzer = new QltyAnalyzer(
         repoPath,
         "./data/analysis_results",
-        round.roundDate
+        company.name,
+        round.roundDate,
+        round.roundType
       );
       const qltyMetrics = await qltyAnalyzer.runAnalysis();
 
@@ -163,7 +120,6 @@ async function processCompany(company: any) {
 
         // Derived quality metrics
         totalCodeSmells: qltyMetrics.totalCodeSmells,
-        duplicatedLinesPercentage: qltyMetrics.duplicatedLinesPercentage,
         averageComplexity: qltyMetrics.averageComplexity,
         maxComplexity: qltyMetrics.maxComplexity,
         complexityDensity: qltyMetrics.complexityDensity,
@@ -177,52 +133,30 @@ async function processCompany(company: any) {
         qltyVersion: qltyMetrics.qltyVersion,
       });
 
-      await log(
-        company.id,
-        "info",
-        "analysis",
-        `Completed analysis for ${round.roundType}`,
-        {
-          commit: commitHash,
-          linesOfCode: qltyMetrics.linesOfCode,
-          totalCodeSmells: qltyMetrics.totalCodeSmells,
-          complexity: qltyMetrics.complexity,
-        }
+      console.log(
+        `  ✅ Completed ${round.roundType} (LOC: ${qltyMetrics.linesOfCode}, Issues: ${qltyMetrics.totalCodeSmells})`
       );
     }
 
-    await log(
-      company.id,
-      "info",
-      "complete",
-      `Completed all analyses for ${company.name}`
-    );
+    console.log(`✅ Completed all analyses for ${company.name}`);
   } catch (error) {
-    await log(
-      company.id,
-      "error",
-      "process",
-      `Failed to process company: ${(error as Error).message}`,
-      { error: (error as Error).stack }
+    console.error(
+      `❌ Failed to process ${company.name}:`,
+      (error as Error).message
     );
   } finally {
-    // Keep repos for debugging - no cleanup unless explicitly requested
     gitHandler.cleanup();
   }
 }
 
 async function main() {
-  console.log("🚀 Starting Startup Technical Debt Analysis with Qlty");
+  console.log("🚀 Starting Startup Technical Debt Analysis");
   console.log("=".repeat(50));
 
   // Check for existing repos
   const existingRepos = GitHandler.listExistingRepos();
   if (existingRepos.length > 0) {
-    console.log(
-      `📁 Found ${existingRepos.length} existing repos: ${existingRepos
-        .slice(0, 3)
-        .join(", ")}${existingRepos.length > 3 ? "..." : ""}`
-    );
+    console.log(`📁 Found ${existingRepos.length} existing repos`);
     console.log(
       "💡 Repos will be reused to save time. Use --clean to start fresh."
     );
@@ -255,19 +189,15 @@ async function main() {
   }
 
   console.log(`🏢 Processing ${allCompanies.length} companies...`);
-  console.log();
 
   // Process each company sequentially
   for (let i = 0; i < allCompanies.length; i++) {
     const company = allCompanies[i];
-    console.log(
-      `\n📈 [${i + 1}/${allCompanies.length}] Processing: ${company!.name}`
-    );
-    console.log("-".repeat(40));
+    console.log(`\n[${i + 1}/${allCompanies.length}]`);
 
     await processCompany(company);
 
-    // Small delay between companies to avoid overwhelming the system
+    // Small delay between companies
     if (i < allCompanies.length - 1) {
       console.log("⏳ Waiting 3 seconds before next company...");
       await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -319,13 +249,13 @@ async function main() {
   }
 
   console.log(`\n💾 Data saved to: data/analysis.db`);
+  console.log(`📁 Analysis results in: ./data/analysis_results/`);
   console.log(`📁 Repos kept in: ./repos/ (for debugging)`);
-  console.log(`📋 Check analysis_log table for detailed logs`);
   console.log(`🔍 Use 'bun run studio' to explore the data`);
   console.log(`🗑️ Use 'bun run start --clean' to clean repos and start fresh`);
 }
 
-// Handle graceful shutdown - but don't auto-cleanup repos
+// Handle graceful shutdown
 process.on("SIGINT", () => {
   console.log("\n🛑 Received SIGINT, shutting down gracefully...");
   console.log("📁 Repos preserved in ./repos/ for debugging");

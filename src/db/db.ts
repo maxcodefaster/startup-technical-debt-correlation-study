@@ -103,7 +103,6 @@ export async function importCSV(filePath: string) {
   const headers = lines[0]!.split(",").map((h) => h.trim());
 
   let importedCount = 0;
-  let skippedCount = 0;
   let updatedCount = 0;
 
   for (let i = 1; i < lines.length; i++) {
@@ -117,7 +116,6 @@ export async function importCSV(filePath: string) {
     });
 
     if (!row["Company Name"] || !row["GitHub Link"]) {
-      console.log(`⚠️ Skipping row ${i}: Missing company name or GitHub link`);
       continue;
     }
 
@@ -149,7 +147,6 @@ export async function importCSV(filePath: string) {
           .where(eq(fundingRounds.companyId, company!.id));
 
         updatedCount++;
-        console.log(`🔄 Updated: ${company!.name}`);
       } else {
         // Insert new company
         [company] = await db
@@ -163,7 +160,6 @@ export async function importCSV(filePath: string) {
           .returning();
 
         importedCount++;
-        console.log(`✅ Imported: ${company!.name}`);
       }
 
       // Insert funding rounds
@@ -236,16 +232,14 @@ export async function importCSV(filePath: string) {
       }
     } catch (error) {
       console.error(
-        `❌ Failed to import row ${i}: ${row["Company Name"]}`,
+        `❌ Failed to import: ${row["Company Name"]}`,
         (error as Error).message
       );
-      skippedCount++;
     }
   }
 
-  console.log(`\n📈 Import Summary:`);
+  console.log(`📈 Import Summary:`);
   console.log(`   ✅ New companies: ${importedCount}`);
   console.log(`   🔄 Updated companies: ${updatedCount}`);
-  console.log(`   ⚠️ Skipped/Failed: ${skippedCount}`);
   console.log(`   📊 Total processed: ${importedCount + updatedCount}`);
 }
