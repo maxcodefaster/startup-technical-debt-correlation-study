@@ -2,8 +2,6 @@ import fs from "fs";
 import path from "path";
 import { exec } from "child_process";
 import { promisify } from "util";
-import { createReadStream } from "fs";
-import { createInterface } from "readline";
 
 const execAsync = promisify(exec);
 
@@ -51,43 +49,19 @@ export class QltyAnalyzer {
     this.ensureOutputDir();
   }
 
-  /**
-   * Strip ANSI escape codes from text
-   */
-  private stripAnsiCodes(text: string): string {
-    // Remove ANSI escape sequences
-    return text.replace(/\x1b\[[0-9;]*[mGKH]/g, "");
-  }
-
-  /**
-   * Get environment variables that disable color output
-   */
-  private getNoColorEnv() {
-    return {
-      ...process.env,
-      // Disable colors and terminal detection
-      NO_COLOR: "1",
-      TERM: "dumb",
-      CI: "true",
-      FORCE_COLOR: "0",
-      // Ensure PATH is preserved
-      PATH: process.env.PATH,
-    };
-  }
-
   async runAnalysis(): Promise<QltyMetrics> {
     try {
       // Ensure Qlty is installed and get version
       const qltyVersion = await this.ensureQltyInstalled();
 
-      // Always re-initialize Qlty config before each analysis (after commit checkout)
+      // Always re-initialize Qlty config before each analysis
       await this.initializeQlty();
 
-      // Run analyses and save to files in outputDir
+      // Run analyses and save JSON to files
       await this.runCodeSmellsToFile();
       await this.runMetricsToFile();
 
-      // Parse results from files
+      // Parse JSON results from files
       const smells = await this.parseCodeSmellsFile();
       const metrics = await this.parseMetricsFile();
 
@@ -128,20 +102,16 @@ export class QltyAnalyzer {
 
   private async ensureQltyInstalled(): Promise<string> {
     try {
-      const { stdout } = await execAsync("qlty --version", {
-        env: this.getNoColorEnv(),
-      });
-      const version = this.stripAnsiCodes(stdout.trim());
+      const { stdout } = await execAsync("qlty --version");
+      const version = stdout.trim();
       console.log(`✅ Qlty version: ${version}`);
       return version;
     } catch (error) {
       console.log("📦 Installing Qlty CLI...");
       try {
         await execAsync("curl -sSL https://qlty.sh | sh");
-        const { stdout } = await execAsync("qlty --version", {
-          env: this.getNoColorEnv(),
-        });
-        const version = this.stripAnsiCodes(stdout.trim());
+        const { stdout } = await execAsync("qlty --version");
+        const version = stdout.trim();
         console.log(`✅ Qlty installed: ${version}`);
         return version;
       } catch (installError) {
@@ -154,346 +124,209 @@ export class QltyAnalyzer {
 
   private async initializeQlty(): Promise<void> {
     try {
-      console.log("🔧 Initializing Qlty configuration (always)...");
-      const { stdout, stderr } = await execAsync("qlty init -n", {
+      console.log("🔧 Initializing Qlty configuration...");
+      await execAsync("qlty init -n", {
         cwd: this.repoPath,
-        env: this.getNoColorEnv(),
       });
-      if (stdout.trim()) {
-        console.log("qlty init stdout:", this.stripAnsiCodes(stdout.trim()));
-      }
-      if (stderr.trim()) {
-        console.warn("qlty init stderr:", this.stripAnsiCodes(stderr.trim()));
-      }
-      const qltyDir = path.join(this.repoPath, ".qlty");
-      if (fs.existsSync(qltyDir)) {
-        console.log("✅ Qlty configuration created successfully");
-      } else {
-        console.warn(
-          "⚠️ Qlty initialization failed, .qlty not found after init"
-        );
-      }
+      console.log("✅ Qlty configuration created successfully");
     } catch (error) {
-      console.error("❌ Qlty init failed:", (error as Error).message);
-      const qltyDir = path.join(this.repoPath, ".qlty");
-      if (fs.existsSync(qltyDir)) {
-        console.log("✅ Qlty configuration created successfully (after error)");
-      } else {
-        console.warn(
-          "⚠️ Qlty initialization failed, .qlty not found after error"
-        );
-      }
+      console.warn("⚠️ Qlty init had warnings, but continuing...");
     }
   }
 
   private async runCodeSmellsToFile(): Promise<void> {
-    const outputFile = path.join(this.outputDir, "smells.txt");
+    const outputFile = path.join(this.outputDir, "smells.json");
     console.log("🔍 Running code smells analysis...");
 
     try {
-      // Run and capture output directly, with no-color environment
-      const { stdout, stderr } = await execAsync("qlty smells --all --quiet", {
+      const { stdout } = await execAsync("qlty smells --all --quiet --json", {
         cwd: this.repoPath,
-        env: this.getNoColorEnv(),
-        timeout: 300000,
+        maxBuffer: 200 * 1024 * 1024, // 200MB buffer instead of default 1MB
       });
 
-      // Strip ANSI codes before saving
-      const cleanOutput =
-        this.stripAnsiCodes(stdout) +
-        (stderr ? `\n# STDERR:\n${this.stripAnsiCodes(stderr)}` : "");
-
-      fs.writeFileSync(outputFile, cleanOutput);
-      console.log(`  Code smells output saved (${cleanOutput.length} chars)`);
+      fs.writeFileSync(outputFile, stdout);
+      console.log(`  Code smells JSON saved (${stdout.length} chars)`);
     } catch (error) {
-      // Even if command "fails", there might be useful output
       const execError = error as any;
-      const cleanOutput =
-        this.stripAnsiCodes(execError.stdout || "") +
-        (execError.stderr
-          ? `\n# STDERR:\n${this.stripAnsiCodes(execError.stderr)}`
-          : "");
-
-      fs.writeFileSync(
-        outputFile,
-        cleanOutput || "# No smells output generated\n"
-      );
-      console.warn(
-        "Code smells command had issues, but checking output file..."
-      );
-    }
-
-    // Verify file was created
-    if (!fs.existsSync(outputFile)) {
-      fs.writeFileSync(outputFile, "# No smells output generated\n");
+      const output = execError.stdout || "[]";
+      fs.writeFileSync(outputFile, output);
+      console.warn("Code smells command had issues, using partial output");
     }
   }
 
   private async runMetricsToFile(): Promise<void> {
-    const outputFile = path.join(this.outputDir, "metrics.txt");
-    const debugFile = path.join(this.outputDir, "metrics-debug.txt");
+    const outputFile = path.join(this.outputDir, "metrics.json");
     console.log("📊 Running metrics analysis...");
 
     try {
-      // Try running without --quiet first to see what qlty is doing
-      console.log("  Running qlty metrics with verbose output...");
-      const { stdout: verboseOutput, stderr: verboseError } = await execAsync(
-        "qlty metrics --all",
-        {
-          cwd: this.repoPath,
-          env: this.getNoColorEnv(),
-          timeout: 300000,
-        }
-      );
-
-      const cleanVerboseOutput = this.stripAnsiCodes(verboseOutput);
-      const cleanVerboseError = this.stripAnsiCodes(verboseError);
-
-      fs.writeFileSync(
-        debugFile,
-        `VERBOSE OUTPUT:\n${cleanVerboseOutput}\n\nVERBOSE STDERR:\n${cleanVerboseError}\n`
-      );
-
-      // Now try with --quiet
-      const { stdout, stderr } = await execAsync("qlty metrics --all --quiet", {
+      const { stdout } = await execAsync("qlty metrics --all --quiet --json", {
         cwd: this.repoPath,
-        env: this.getNoColorEnv(),
-        timeout: 300000,
+        maxBuffer: 200 * 1024 * 1024, // 200MB buffer instead of default 1MB
       });
 
-      // Strip ANSI codes before saving
-      const cleanOutput =
-        this.stripAnsiCodes(stdout) +
-        (stderr ? `\n# STDERR:\n${this.stripAnsiCodes(stderr)}` : "");
-
-      fs.writeFileSync(outputFile, cleanOutput);
-
-      console.log(`  Metrics output length: ${cleanOutput.length} chars`);
-      if (cleanOutput.length < 100) {
-        console.log(`  Output preview: "${cleanOutput.substring(0, 200)}..."`);
-      }
+      fs.writeFileSync(outputFile, stdout);
+      console.log(`  Metrics JSON saved (${stdout.length} chars)`);
     } catch (error) {
       const execError = error as any;
-      const cleanOutput =
-        this.stripAnsiCodes(execError.stdout || "") +
-        (execError.stderr
-          ? `\n# STDERR:\n${this.stripAnsiCodes(execError.stderr)}`
-          : "");
-
-      fs.writeFileSync(
-        outputFile,
-        cleanOutput || "# No metrics output generated\n"
-      );
-
-      // Also save debug info
-      fs.writeFileSync(
-        debugFile,
-        `ERROR: ${execError.message}\nSTDOUT: ${this.stripAnsiCodes(
-          execError.stdout || ""
-        )}\nSTDERR: ${this.stripAnsiCodes(execError.stderr || "")}`
-      );
-      console.warn("Metrics command failed:", execError.message);
+      const output = execError.stdout || "[]";
+      fs.writeFileSync(outputFile, output);
+      console.warn("Metrics command had issues, using partial output");
     }
   }
 
   private async parseCodeSmellsFile(): Promise<Partial<QltyMetrics>> {
-    const filePath = path.join(this.outputDir, "smells.txt");
+    const filePath = path.join(this.outputDir, "smells.json");
 
     if (!fs.existsSync(filePath)) {
       return this.getEmptySmells();
     }
 
-    let duplicatedCode = 0;
-    let similarCode = 0;
-    let highComplexityFunctions = 0;
-    let highComplexityFiles = 0;
-    let manyParameterFunctions = 0;
-    let complexBooleanLogic = 0;
-    let deeplyNestedCode = 0;
-    let manyReturnStatements = 0;
-
     try {
-      const fileStream = createReadStream(filePath);
-      const rl = createInterface({
-        input: fileStream,
-        crlfDelay: Infinity, // Handle Windows line endings
-      });
+      const jsonContent = fs.readFileSync(filePath, "utf8");
+      const data = JSON.parse(jsonContent);
 
-      for await (const line of rl) {
-        // Strip any remaining ANSI codes and trim
-        const cleanLine = this.stripAnsiCodes(line).trim();
-        if (!cleanLine || cleanLine.startsWith("#")) continue;
+      // Count different types of code smells from the JSON structure
+      const smellCounts = {
+        duplicatedCode: 0,
+        similarCode: 0,
+        highComplexityFunctions: 0,
+        highComplexityFiles: 0,
+        manyParameterFunctions: 0,
+        complexBooleanLogic: 0,
+        deeplyNestedCode: 0,
+        manyReturnStatements: 0,
+      };
 
-        const lowerLine = cleanLine.toLowerCase();
+      // Handle different possible JSON structures from qlty
+      const issues = data.issues || data.smells || data;
+      const issuesArray = Array.isArray(issues) ? issues : [];
 
-        // Look for smell patterns in the text
-        if (lowerLine.includes("found") && lowerLine.includes("similar code")) {
-          similarCode++;
+      console.log(`  Found ${issuesArray.length} issues in smells JSON`);
+
+      // Parse the issues array and categorize by rule or type
+      for (const issue of issuesArray) {
+        const rule = (
+          issue.rule_key ||
+          issue.rule ||
+          issue.type ||
+          ""
+        ).toLowerCase();
+        const message = (issue.message || "").toLowerCase();
+
+        if (rule.includes("duplicate") || message.includes("duplicate")) {
+          smellCounts.duplicatedCode++;
+        } else if (rule.includes("similar") || message.includes("similar")) {
+          smellCounts.similarCode++;
         } else if (
-          lowerLine.includes("found") &&
-          (lowerLine.includes("identical") || lowerLine.includes("duplicate"))
+          rule.includes("complexity") &&
+          (rule.includes("function") || message.includes("function"))
         ) {
-          duplicatedCode++;
+          smellCounts.highComplexityFunctions++;
         } else if (
-          lowerLine.includes("complex") &&
-          (lowerLine.includes("function") || lowerLine.includes("method"))
+          rule.includes("complexity") &&
+          (rule.includes("file") || message.includes("file"))
         ) {
-          highComplexityFunctions++;
+          smellCounts.highComplexityFiles++;
         } else if (
-          lowerLine.includes("complex") &&
-          lowerLine.includes("file")
+          rule.includes("parameter") ||
+          message.includes("parameter")
         ) {
-          highComplexityFiles++;
-        } else if (
-          lowerLine.includes("parameter") &&
-          lowerLine.includes("many")
-        ) {
-          manyParameterFunctions++;
-        } else if (
-          lowerLine.includes("boolean") ||
-          lowerLine.includes("condition")
-        ) {
-          complexBooleanLogic++;
-        } else if (
-          lowerLine.includes("nested") ||
-          lowerLine.includes("nesting")
-        ) {
-          deeplyNestedCode++;
-        } else if (lowerLine.includes("return") && lowerLine.includes("many")) {
-          manyReturnStatements++;
+          smellCounts.manyParameterFunctions++;
+        } else if (rule.includes("boolean") || message.includes("boolean")) {
+          smellCounts.complexBooleanLogic++;
+        } else if (rule.includes("nested") || message.includes("nested")) {
+          smellCounts.deeplyNestedCode++;
+        } else if (rule.includes("return") || message.includes("return")) {
+          smellCounts.manyReturnStatements++;
         }
       }
 
-      const totalCodeSmells =
-        duplicatedCode +
-        similarCode +
-        highComplexityFunctions +
-        highComplexityFiles +
-        manyParameterFunctions +
-        complexBooleanLogic +
-        deeplyNestedCode +
-        manyReturnStatements;
-
-      console.log(
-        `  Parsed smells: ${totalCodeSmells} total (similar: ${similarCode}, duplicated: ${duplicatedCode})`
+      const totalCodeSmells = Object.values(smellCounts).reduce(
+        (a, b) => a + b,
+        0
       );
 
+      console.log(`  Parsed ${totalCodeSmells} code smells from JSON`);
+
       return {
-        duplicatedCode,
-        similarCode,
-        highComplexityFunctions,
-        highComplexityFiles,
-        manyParameterFunctions,
-        complexBooleanLogic,
-        deeplyNestedCode,
-        manyReturnStatements,
+        ...smellCounts,
         totalCodeSmells,
       };
     } catch (error) {
-      console.warn("Error parsing smells file:", error);
+      console.warn("Error parsing smells JSON:", error);
       return this.getEmptySmells();
     }
   }
 
   private async parseMetricsFile(): Promise<Partial<QltyMetrics>> {
-    const filePath = path.join(this.outputDir, "metrics.txt");
+    const filePath = path.join(this.outputDir, "metrics.json");
 
     if (!fs.existsSync(filePath)) {
       return this.getEmptyMetrics();
     }
 
-    let linesOfCode = 0;
-    let complexity = 0;
-    let cognitiveComplexity = 0;
-    let totalFunctions = 0;
-    let totalClasses = 0;
-    let maxComplexity = 0;
-    let complexityValues: number[] = [];
-
     try {
-      const fileStream = createReadStream(filePath);
-      const rl = createInterface({
-        input: fileStream,
-        crlfDelay: Infinity,
-      });
+      const jsonContent = fs.readFileSync(filePath, "utf8");
+      const metrics = JSON.parse(jsonContent);
 
-      let foundHeader = false;
-      let isDataRow = false;
+      let linesOfCode = 0;
+      let complexity = 0;
+      let cognitiveComplexity = 0;
+      let totalFunctions = 0;
+      let totalClasses = 0;
+      let maxComplexity = 0;
+      const complexityValues: number[] = [];
 
-      for await (const line of rl) {
-        // Strip any remaining ANSI codes and trim
-        const cleanLine = this.stripAnsiCodes(line).trim();
-        if (!cleanLine || cleanLine.startsWith("#")) continue;
+      // Parse metrics from JSON structure
+      if (Array.isArray(metrics)) {
+        for (const metric of metrics) {
+          // Sum up various metrics based on common field names
+          linesOfCode +=
+            metric.lines_of_code || metric.loc || metric.lines || 0;
+          complexity +=
+            metric.cyclomatic_complexity ||
+            metric.complexity ||
+            metric.cyclo ||
+            0;
+          cognitiveComplexity +=
+            metric.cognitive_complexity || metric.cognitive || 0;
+          totalFunctions +=
+            metric.functions || metric.funcs || metric.methods || 0;
+          totalClasses += metric.classes || 0;
 
-        // Check if this looks like a table header
-        if (
-          cleanLine.includes("name") &&
-          cleanLine.includes("classes") &&
-          cleanLine.includes("funcs")
-        ) {
-          foundHeader = true;
-          console.log("  Found metrics table header");
-          continue;
-        }
-
-        // Check if this is a separator line (dashes and plus signs)
-        if (foundHeader && cleanLine.match(/^[-+|]+$/)) {
-          isDataRow = true;
-          continue;
-        }
-
-        // Parse data rows if we've found the table structure
-        if (isDataRow && cleanLine.includes("|")) {
-          // Split by | and clean up values
-          const columns = cleanLine.split("|").map((col) => col.trim());
-
-          if (columns.length >= 9) {
-            // Should have at least: name, classes, funcs, fields, cyclo, complex, LCOM, lines, LOC
-            try {
-              const classesCol = parseInt(columns[1] || "0") || 0;
-              const funcsCol = parseInt(columns[2] || "0") || 0;
-              const cycloCol = parseInt(columns[4] || "0") || 0;
-              const complexCol = parseInt(columns[5] || "0") || 0;
-              const linesCol = parseInt(columns[7] || "0") || 0;
-              const locCol = parseInt(columns[8] || "0") || 0;
-
-              totalClasses += classesCol;
-              totalFunctions += funcsCol;
-              complexity += cycloCol;
-              linesOfCode += locCol; // Use LOC (lines of code) rather than total lines
-
-              if (cycloCol > 0) {
-                complexityValues.push(cycloCol);
-                maxComplexity = Math.max(maxComplexity, cycloCol);
-              }
-
-              console.log(
-                `    Parsed row: ${columns[0]?.substring(
-                  0,
-                  30
-                )}... -> classes:${classesCol}, funcs:${funcsCol}, cyclo:${cycloCol}, loc:${locCol}`
-              );
-            } catch (parseError) {
-              console.warn(
-                `    Failed to parse row: ${cleanLine.substring(0, 50)}...`
-              );
-            }
+          const fileComplexity =
+            metric.cyclomatic_complexity || metric.complexity || 0;
+          if (fileComplexity > 0) {
+            complexityValues.push(fileComplexity);
+            maxComplexity = Math.max(maxComplexity, fileComplexity);
           }
         }
+      } else if (typeof metrics === "object" && metrics !== null) {
+        // Handle case where metrics is a single object rather than array
+        linesOfCode =
+          metrics.lines_of_code || metrics.loc || metrics.lines || 0;
+        complexity =
+          metrics.cyclomatic_complexity ||
+          metrics.complexity ||
+          metrics.cyclo ||
+          0;
+        cognitiveComplexity =
+          metrics.cognitive_complexity || metrics.cognitive || complexity;
+        totalFunctions =
+          metrics.functions || metrics.funcs || metrics.methods || 0;
+        totalClasses = metrics.classes || 0;
+        maxComplexity = complexity;
+        if (complexity > 0) complexityValues.push(complexity);
       }
 
-      // Calculate average complexity
       const averageComplexity =
         complexityValues.length > 0
           ? complexityValues.reduce((a, b) => a + b, 0) /
             complexityValues.length
           : 0;
 
-      // Use complexity value for cognitive complexity if not separately provided
-      cognitiveComplexity = complexity;
-
       console.log(
-        `  Parsed metrics: LOC=${linesOfCode}, classes=${totalClasses}, funcs=${totalFunctions}, complexity=${complexity}`
+        `  Parsed metrics: LOC=${linesOfCode}, complexity=${complexity}, functions=${totalFunctions}`
       );
 
       return {
@@ -507,7 +340,7 @@ export class QltyAnalyzer {
         duplicatedLinesPercentage: 0, // Would need specific duplication analysis
       };
     } catch (error) {
-      console.warn("Error parsing metrics file:", error);
+      console.warn("Error parsing metrics JSON:", error);
       return this.getEmptyMetrics();
     }
   }
