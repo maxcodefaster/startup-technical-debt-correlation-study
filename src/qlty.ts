@@ -144,34 +144,51 @@ export class QltyAnalyzer {
         maxBuffer: 200 * 1024 * 1024, // 200MB buffer instead of default 1MB
       });
 
-      fs.writeFileSync(outputFile, stdout);
-      console.log(`  Code smells JSON saved (${stdout.length} chars)`);
+      const cleanedOutput = this.removeSnippetProperties(stdout);
+      fs.writeFileSync(outputFile, cleanedOutput);
+      console.log(`  Code smells JSON saved (${cleanedOutput.length} chars)`);
     } catch (error) {
       const execError = error as any;
       const output = execError.stdout || "[]";
-      fs.writeFileSync(outputFile, output);
+      const cleanedOutput = this.removeSnippetProperties(output);
+      fs.writeFileSync(outputFile, cleanedOutput);
       console.warn("Code smells command had issues, using partial output");
     }
   }
 
+  private removeSnippetProperties(jsonString: string): string {
+    // Remove everything from "snippet" through "snippetWithContext" up to "effortMinutes" to reduce size
+    return jsonString.replace(
+      /"snippet".*?"effortMinutes"/gs,
+      '"effortMinutes"'
+    );
+  }
+
   private async runMetricsToFile(): Promise<void> {
-    const outputFile = path.join(this.outputDir, "metrics.json");
+    const outputFile = path.join(this.outputDir, "metrics.txt");
     console.log("📊 Running metrics analysis...");
 
     try {
-      const { stdout } = await execAsync("qlty metrics --all --quiet --json", {
+      const { stdout } = await execAsync("qlty metrics --all --quiet", {
         cwd: this.repoPath,
         maxBuffer: 200 * 1024 * 1024, // 200MB buffer instead of default 1MB
       });
 
-      fs.writeFileSync(outputFile, stdout);
-      console.log(`  Metrics JSON saved (${stdout.length} chars)`);
+      const cleanedOutput = this.stripAnsiCodes(stdout);
+      fs.writeFileSync(outputFile, cleanedOutput);
+      console.log(`  Metrics.txt saved (${cleanedOutput.length} chars)`);
     } catch (error) {
       const execError = error as any;
       const output = execError.stdout || "[]";
-      fs.writeFileSync(outputFile, output);
+      const cleanedOutput = this.stripAnsiCodes(output);
+      fs.writeFileSync(outputFile, cleanedOutput);
       console.warn("Metrics command had issues, using partial output");
     }
+  }
+
+  private stripAnsiCodes(text: string): string {
+    // Remove ANSI escape sequences
+    return text.replace(/\x1b\[[0-9;]*[mGKH]/g, "");
   }
 
   private async parseCodeSmellsFile(): Promise<Partial<QltyMetrics>> {
@@ -198,46 +215,41 @@ export class QltyAnalyzer {
       };
 
       // Handle different possible JSON structures from qlty
-      const issues = data.issues || data.smells || data;
-      const issuesArray = Array.isArray(issues) ? issues : [];
+      const issues = Array.isArray(data)
+        ? data
+        : data.issues || data.smells || [];
 
-      console.log(`  Found ${issuesArray.length} issues in smells JSON`);
+      console.log(`  Found ${issues.length} issues in smells JSON`);
 
-      // Parse the issues array and categorize by rule or type
-      for (const issue of issuesArray) {
-        const rule = (
-          issue.rule_key ||
-          issue.rule ||
-          issue.type ||
-          ""
-        ).toLowerCase();
-        const message = (issue.message || "").toLowerCase();
+      // Parse the issues array and categorize by ruleKey
+      for (const issue of issues) {
+        const ruleKey = issue.ruleKey || issue.rule_key || "";
 
-        if (rule.includes("duplicate") || message.includes("duplicate")) {
-          smellCounts.duplicatedCode++;
-        } else if (rule.includes("similar") || message.includes("similar")) {
-          smellCounts.similarCode++;
-        } else if (
-          rule.includes("complexity") &&
-          (rule.includes("function") || message.includes("function"))
-        ) {
-          smellCounts.highComplexityFunctions++;
-        } else if (
-          rule.includes("complexity") &&
-          (rule.includes("file") || message.includes("file"))
-        ) {
-          smellCounts.highComplexityFiles++;
-        } else if (
-          rule.includes("parameter") ||
-          message.includes("parameter")
-        ) {
-          smellCounts.manyParameterFunctions++;
-        } else if (rule.includes("boolean") || message.includes("boolean")) {
-          smellCounts.complexBooleanLogic++;
-        } else if (rule.includes("nested") || message.includes("nested")) {
-          smellCounts.deeplyNestedCode++;
-        } else if (rule.includes("return") || message.includes("return")) {
-          smellCounts.manyReturnStatements++;
+        switch (ruleKey) {
+          case "identical-code":
+            smellCounts.duplicatedCode++;
+            break;
+          case "similar-code":
+            smellCounts.similarCode++;
+            break;
+          case "function-complexity":
+            smellCounts.highComplexityFunctions++;
+            break;
+          case "file-complexity":
+            smellCounts.highComplexityFiles++;
+            break;
+          case "function-parameters":
+            smellCounts.manyParameterFunctions++;
+            break;
+          case "boolean-logic":
+            smellCounts.complexBooleanLogic++;
+            break;
+          case "nested-control-flow":
+            smellCounts.deeplyNestedCode++;
+            break;
+          case "return-statements":
+            smellCounts.manyReturnStatements++;
+            break;
         }
       }
 
@@ -247,6 +259,13 @@ export class QltyAnalyzer {
       );
 
       console.log(`  Parsed ${totalCodeSmells} code smells from JSON`);
+      console.log(
+        `  Breakdown: duplicated=${smellCounts.duplicatedCode}, similar=${
+          smellCounts.similarCode
+        }, complexity=${
+          smellCounts.highComplexityFunctions + smellCounts.highComplexityFiles
+        }`
+      );
 
       return {
         ...smellCounts,
