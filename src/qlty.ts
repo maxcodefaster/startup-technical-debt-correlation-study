@@ -175,13 +175,15 @@ export class QltyAnalyzer {
       });
 
       const cleanedOutput = this.stripAnsiCodes(stdout);
-      fs.writeFileSync(outputFile, cleanedOutput);
-      console.log(`  Metrics.txt saved (${cleanedOutput.length} chars)`);
+      const filteredOutput = this.filterMetricsOutput(cleanedOutput);
+      fs.writeFileSync(outputFile, filteredOutput);
+      console.log(`  Metrics.txt saved (${filteredOutput.length} chars)`);
     } catch (error) {
       const execError = error as any;
       const output = execError.stdout || "[]";
       const cleanedOutput = this.stripAnsiCodes(output);
-      fs.writeFileSync(outputFile, cleanedOutput);
+      const filteredOutput = this.filterMetricsOutput(cleanedOutput);
+      fs.writeFileSync(outputFile, filteredOutput);
       console.warn("Metrics command had issues, using partial output");
     }
   }
@@ -191,6 +193,13 @@ export class QltyAnalyzer {
     return text.replace(/\x1b\[[0-9;]*[mGKH]/g, "");
   }
 
+  private filterMetricsOutput(output: string): string {
+    return output
+      .replace(/^[-]+(?=\+)/m, "--------") // Shorten first dash sequence (under name column) to 8
+      .replace(/^ name\s+(?=\|)/m, " name   ") // Adjust name header to 8 chars total
+      .replace(/^ TOTAL\s+(?=\|)/m, " TOTAL  ") // Adjust TOTAL to 8 chars total
+      .replace(/(\+[-+]+\n).*?\n( TOTAL)/s, "$1$2"); // Remove everything between separator and TOTAL
+  }
   private async parseCodeSmellsFile(): Promise<Partial<QltyMetrics>> {
     const filePath = path.join(this.outputDir, "smells.json");
 
