@@ -1,0 +1,42 @@
+{
+  "summary": {
+    "totalCompanies": 74,
+    "totalSnapshots": 259,
+    "avgTechDebt": 495.7217234513756,
+    "seriesBSuccessRate": 71.62162162162163,
+    "correlationMatrix": {
+      "seriesBCorrelation": 0.12707557524260674,
+      "timeCorrelation": 0.06037545829744479,
+      "amountCorrelation": -0.014285404790276238
+    },
+    "keyInsights": [
+      "74 companies analyzed with 259 successful code snapshots",
+      "Average technical debt ratio: 495.7%",
+      "Series B success rate: 71.6%",
+      "Technical debt correlation with Series B success: 0.127 (weak)",
+      "Time-to-funding correlation: 0.060 (weak)"
+    ]
+  },
+  "keyFindings": {
+    "seriesAVsSeriesB": [
+      "71.6% of Series A companies reached Series B",
+      "Companies that reached Series B had 751.9% average technical debt",
+      "Companies that stopped at Series A had 422.5% average technical debt",
+      "Difference: 329.4 percentage points lower for companies that didn't reach Series B"
+    ],
+    "exitSuccess": [
+      "None: 396.0% avg technical debt (65 companies)",
+      "Acquired: 727.6% avg technical debt (7 companies)",
+      "Ipo: 219.4% avg technical debt (2 companies)"
+    ],
+    "timeGap": [
+      "Correlation between technical debt and time to next round: 0.060 (weak)",
+      "No significant correlation between technical debt and time between funding rounds"
+    ],
+    "fundingAmount": [
+      "Correlation with log(funding amount): -0.014 (weak)",
+      "No significant correlation between technical debt and funding amount"
+    ]
+  },
+  "exportDate": "2025-09-08T08:52:42.474Z"
+}

@@ -16317,7 +16317,4111 @@
       "createdAt": "2025-09-07 15:42:18"
     }
   ],
-  "exportDate": "2025-09-08T08:38:00.831Z",
-  "totalCompanies": 74,
-  "totalSnapshots": 259
+  "coreAnalysis": {
+    "seriesAVsSeriesB": {
+      "scatterData": [
+        {
+          "companyId": 1,
+          "companyName": "Airbyte",
+          "technicalDebtRatio": 1.3889034866093988,
+          "complexityDensity": 104.31531076301162,
+          "totalCodeSmells": 240,
+          "linesOfCode": 49475,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 2,
+          "companyName": "Alluxio",
+          "technicalDebtRatio": 11.537971511261297,
+          "complexityDensity": 231.38611780303643,
+          "totalCodeSmells": 552,
+          "linesOfCode": 61849,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 3,
+          "companyName": "Appsmith",
+          "technicalDebtRatio": 1.6042389661265941,
+          "complexityDensity": 113.55362047307798,
+          "totalCodeSmells": 732,
+          "linesOfCode": 187876,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 4,
+          "companyName": "Appwrite",
+          "technicalDebtRatio": 4.066268052617055,
+          "complexityDensity": 224.1192162634532,
+          "totalCodeSmells": 446,
+          "linesOfCode": 54355,
+          "reachedSeriesB": false
+        },
+        {
+          "companyId": 5,
+          "companyName": "ArangoDB",
+          "technicalDebtRatio": 4.521771623342217,
+          "complexityDensity": 196.87779262785787,
+          "totalCodeSmells": 4093,
+          "linesOfCode": 505796,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 6,
+          "companyName": "Balena",
+          "technicalDebtRatio": 0,
+          "complexityDensity": 115.38461538461539,
+          "totalCodeSmells": 0,
+          "linesOfCode": 338,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 7,
+          "companyName": "Bit",
+          "technicalDebtRatio": 0.608270692261498,
+          "complexityDensity": 127.33221511254686,
+          "totalCodeSmells": 178,
+          "linesOfCode": 48291,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 8,
+          "companyName": "Builder.io",
+          "technicalDebtRatio": 4.204999067338183,
+          "complexityDensity": 156.61723559037495,
+          "totalCodeSmells": 378,
+          "linesOfCode": 42888,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 9,
+          "companyName": "Cal.com",
+          "technicalDebtRatio": 10.04025044722719,
+          "complexityDensity": 137.74597495527726,
+          "totalCodeSmells": 68,
+          "linesOfCode": 2236,
+          "reachedSeriesB": false
+        },
+        {
+          "companyId": 10,
+          "companyName": "Cloud9 IDE",
+          "technicalDebtRatio": 18.153571657788333,
+          "complexityDensity": 425.4412425389898,
+          "totalCodeSmells": 1101,
+          "linesOfCode": 77905,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 11,
+          "companyName": "Cockroach Labs",
+          "technicalDebtRatio": 13.862182116488926,
+          "complexityDensity": 359.03746240087503,
+          "totalCodeSmells": 1331,
+          "linesOfCode": 98739,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 12,
+          "companyName": "Convex",
+          "technicalDebtRatio": 0.8317947325549824,
+          "complexityDensity": 141.34197664947055,
+          "totalCodeSmells": 536,
+          "linesOfCode": 176784,
+          "reachedSeriesB": false
+        },
+        {
+          "companyId": 13,
+          "companyName": "Crate.io",
+          "technicalDebtRatio": 0.971426062521953,
+          "complexityDensity": 150.25465402177733,
+          "totalCodeSmells": 571,
+          "linesOfCode": 113880,
+          "reachedSeriesB": false
+        },
+        {
+          "companyId": 14,
+          "companyName": "CrowdSec",
+          "technicalDebtRatio": 6.769169987632266,
+          "complexityDensity": 246.63322797856262,
+          "totalCodeSmells": 817,
+          "linesOfCode": 58216,
+          "reachedSeriesB": false
+        },
+        {
+          "companyId": 15,
+          "companyName": "Dagster",
+          "technicalDebtRatio": 3.2042984500425407,
+          "complexityDensity": 60.21899160285577,
+          "totalCodeSmells": 1261,
+          "linesOfCode": 270330,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 16,
+          "companyName": "dbt Labs",
+          "technicalDebtRatio": 0.809502703661023,
+          "complexityDensity": 93.25414413615813,
+          "totalCodeSmells": 45,
+          "linesOfCode": 22562,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 17,
+          "companyName": "Deepset",
+          "technicalDebtRatio": 4.030705219360615,
+          "complexityDensity": 99.91046505503766,
+          "totalCodeSmells": 448,
+          "linesOfCode": 37974,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 18,
+          "companyName": "Dgraph",
+          "technicalDebtRatio": 7.675350701402806,
+          "complexityDensity": 309.68980213949027,
+          "totalCodeSmells": 443,
+          "linesOfCode": 35429,
+          "reachedSeriesB": false
+        },
+        {
+          "companyId": 19,
+          "companyName": "Directus",
+          "technicalDebtRatio": 3.8920426221335993,
+          "complexityDensity": 210.1196410767697,
+          "totalCodeSmells": 511,
+          "linesOfCode": 64192,
+          "reachedSeriesB": false
+        },
+        {
+          "companyId": 20,
+          "companyName": "Discourse",
+          "technicalDebtRatio": 11.246176929274116,
+          "complexityDensity": 517.1289829042772,
+          "totalCodeSmells": 1597,
+          "linesOfCode": 135297,
+          "reachedSeriesB": false
+        },
+        {
+          "companyId": 21,
+          "companyName": "EdgeDB",
+          "technicalDebtRatio": 5.597450411891941,
+          "complexityDensity": 124.32693635234018,
+          "totalCodeSmells": 1259,
+          "linesOfCode": 130374,
+          "reachedSeriesB": false
+        },
+        {
+          "companyId": 22,
+          "companyName": "Elasticsearch",
+          "technicalDebtRatio": 4.769550967423547,
+          "complexityDensity": 231.61305203757047,
+          "totalCodeSmells": 1970,
+          "linesOfCode": 186423,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 23,
+          "companyName": "Ethyca",
+          "technicalDebtRatio": 0,
+          "complexityDensity": 0,
+          "totalCodeSmells": 0,
+          "linesOfCode": 0,
+          "reachedSeriesB": false
+        },
+        {
+          "companyId": 24,
+          "companyName": "GitLab",
+          "technicalDebtRatio": 0.587777645801164,
+          "complexityDensity": 178.3169022449222,
+          "totalCodeSmells": 45,
+          "linesOfCode": 33676,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 25,
+          "companyName": "Gitpod",
+          "technicalDebtRatio": 4.211174682301403,
+          "complexityDensity": 177.24654921731906,
+          "totalCodeSmells": 1824,
+          "linesOfCode": 264795,
+          "reachedSeriesB": false
+        },
+        {
+          "companyId": 26,
+          "companyName": "Gradle",
+          "technicalDebtRatio": 1.0094083447927726,
+          "complexityDensity": 154.332538425386,
+          "totalCodeSmells": 752,
+          "linesOfCode": 229796,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 27,
+          "companyName": "Grafana Labs",
+          "technicalDebtRatio": 2.123115050996092,
+          "complexityDensity": 195.14504495917134,
+          "totalCodeSmells": 883,
+          "linesOfCode": 157365,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 28,
+          "companyName": "Harness",
+          "technicalDebtRatio": 3.4606481481481484,
+          "complexityDensity": 146.25420875420875,
+          "totalCodeSmells": 158,
+          "linesOfCode": 19008,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 29,
+          "companyName": "Hasura",
+          "technicalDebtRatio": 7.727463983535331,
+          "complexityDensity": 302.68313133622985,
+          "totalCodeSmells": 1323,
+          "linesOfCode": 131190,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 30,
+          "companyName": "Hazelcast",
+          "technicalDebtRatio": 2.701311794426925,
+          "complexityDensity": 197.7069974092353,
+          "totalCodeSmells": 446,
+          "linesOfCode": 85303,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 31,
+          "companyName": "HumanSignal",
+          "technicalDebtRatio": 9.712417013061208,
+          "complexityDensity": 339.3353164831268,
+          "totalCodeSmells": 504,
+          "linesOfCode": 50761,
+          "reachedSeriesB": false
+        },
+        {
+          "companyId": 32,
+          "companyName": "InfluxData",
+          "technicalDebtRatio": 78.47165706973769,
+          "complexityDensity": 2696.4811260396673,
+          "totalCodeSmells": 639,
+          "linesOfCode": 7815,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 33,
+          "companyName": "Ionic",
+          "technicalDebtRatio": 13.354842231684682,
+          "complexityDensity": 437.547767223496,
+          "totalCodeSmells": 283,
+          "linesOfCode": 18318,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 34,
+          "companyName": "Jito Labs",
+          "technicalDebtRatio": 2.2038574739123926,
+          "complexityDensity": 102.19403465649617,
+          "totalCodeSmells": 1940,
+          "linesOfCode": 441014,
+          "reachedSeriesB": false
+        },
+        {
+          "companyId": 35,
+          "companyName": "Kong",
+          "technicalDebtRatio": 0,
+          "complexityDensity": 0,
+          "totalCodeSmells": 0,
+          "linesOfCode": 0,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 36,
+          "companyName": "Liquibase",
+          "technicalDebtRatio": 2.6798323036187113,
+          "complexityDensity": 253.97175639894087,
+          "totalCodeSmells": 352,
+          "linesOfCode": 45320,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 37,
+          "companyName": "Logical Clocks",
+          "technicalDebtRatio": 2.8487157081143617,
+          "complexityDensity": 227.76335060491562,
+          "totalCodeSmells": 1103,
+          "linesOfCode": 162502,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 38,
+          "companyName": "Mattermost",
+          "technicalDebtRatio": 5.012988542985893,
+          "complexityDensity": 286.6707900136463,
+          "totalCodeSmells": 999,
+          "linesOfCode": 101859,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 39,
+          "companyName": "Mautic",
+          "technicalDebtRatio": 12.326870585586853,
+          "complexityDensity": 413.1147013776386,
+          "totalCodeSmells": 3696,
+          "linesOfCode": 248759,
+          "reachedSeriesB": false
+        },
+        {
+          "companyId": 40,
+          "companyName": "MeiliSearch",
+          "technicalDebtRatio": 0.77538686933431,
+          "complexityDensity": 101.08964380551231,
+          "totalCodeSmells": 94,
+          "linesOfCode": 21842,
+          "reachedSeriesB": false
+        },
+        {
+          "companyId": 41,
+          "companyName": "Metabase",
+          "technicalDebtRatio": 1.5863823390539329,
+          "complexityDensity": 187.60418975302812,
+          "totalCodeSmells": 391,
+          "linesOfCode": 103777,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 42,
+          "companyName": "MinIO",
+          "technicalDebtRatio": 3.1088982006408674,
+          "complexityDensity": 245.05792457480896,
+          "totalCodeSmells": 357,
+          "linesOfCode": 40570,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 43,
+          "companyName": "n8n",
+          "technicalDebtRatio": 5.295895457743615,
+          "complexityDensity": 79.95177366148928,
+          "totalCodeSmells": 2580,
+          "linesOfCode": 282833,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 44,
+          "companyName": "Ockam",
+          "technicalDebtRatio": 0.8278007057838388,
+          "complexityDensity": 121.29912076081105,
+          "totalCodeSmells": 109,
+          "linesOfCode": 33438,
+          "reachedSeriesB": false
+        },
+        {
+          "companyId": 45,
+          "companyName": "Oro",
+          "technicalDebtRatio": 9.448155678187627,
+          "complexityDensity": 379.9012489108336,
+          "totalCodeSmells": 37,
+          "linesOfCode": 3443,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 46,
+          "companyName": "Pachyderm",
+          "technicalDebtRatio": 20.66896839373436,
+          "complexityDensity": 390.3744554638984,
+          "totalCodeSmells": 1589,
+          "linesOfCode": 86312,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 47,
+          "companyName": "Pimcore",
+          "technicalDebtRatio": 11.940941763500064,
+          "complexityDensity": 410.9750779463112,
+          "totalCodeSmells": 5288,
+          "linesOfCode": 337091,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 48,
+          "companyName": "PingCAP",
+          "technicalDebtRatio": 4.82080222881023,
+          "complexityDensity": 276.172447047898,
+          "totalCodeSmells": 605,
+          "linesOfCode": 55994,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 49,
+          "companyName": "Posthog",
+          "technicalDebtRatio": 0.9706916764361079,
+          "complexityDensity": 169.98827667057446,
+          "totalCodeSmells": 6,
+          "linesOfCode": 2559,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 50,
+          "companyName": "Prefect",
+          "technicalDebtRatio": 2.021933191498695,
+          "complexityDensity": 82.11786897111399,
+          "totalCodeSmells": 311,
+          "linesOfCode": 45593,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 51,
+          "companyName": "PrestaShop",
+          "technicalDebtRatio": 10.529403669878734,
+          "complexityDensity": 492.9666810991512,
+          "totalCodeSmells": 3785,
+          "linesOfCode": 297939,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 52,
+          "companyName": "ProcessMaker",
+          "technicalDebtRatio": 1.381549066232066,
+          "complexityDensity": 136.15111277351784,
+          "totalCodeSmells": 203,
+          "linesOfCode": 37429,
+          "reachedSeriesB": false
+        },
+        {
+          "companyId": 53,
+          "companyName": "Reaction Commerce",
+          "technicalDebtRatio": 1.0464396284829722,
+          "complexityDensity": 147.82078634562635,
+          "totalCodeSmells": 222,
+          "linesOfCode": 62339,
+          "reachedSeriesB": false
+        },
+        {
+          "companyId": 54,
+          "companyName": "Rocket.Chat",
+          "technicalDebtRatio": 1.2752735272454112,
+          "complexityDensity": 177.58418005238846,
+          "totalCodeSmells": 1047,
+          "linesOfCode": 205007,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 55,
+          "companyName": "Rudderstack",
+          "technicalDebtRatio": 3.876627947905667,
+          "complexityDensity": 193.72580077437522,
+          "totalCodeSmells": 318,
+          "linesOfCode": 45456,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 56,
+          "companyName": "Sentry",
+          "technicalDebtRatio": 2.506873297476315,
+          "complexityDensity": 67.310913216324,
+          "totalCodeSmells": 397,
+          "linesOfCode": 158221,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 57,
+          "companyName": "Serverless",
+          "technicalDebtRatio": 1.4530085197018103,
+          "complexityDensity": 184.03887113951012,
+          "totalCodeSmells": 82,
+          "linesOfCode": 15024,
+          "reachedSeriesB": false
+        },
+        {
+          "companyId": 58,
+          "companyName": "Smallstep",
+          "technicalDebtRatio": 3.4231833555396127,
+          "complexityDensity": 288.81828430870144,
+          "totalCodeSmells": 346,
+          "linesOfCode": 29271,
+          "reachedSeriesB": false
+        },
+        {
+          "companyId": 59,
+          "companyName": "Spree Commerce",
+          "technicalDebtRatio": 0.28133768104951845,
+          "complexityDensity": 220.67187381512096,
+          "totalCodeSmells": 19,
+          "linesOfCode": 13187,
+          "reachedSeriesB": false
+        },
+        {
+          "companyId": 60,
+          "companyName": "Starburst",
+          "technicalDebtRatio": 1.2371711167062251,
+          "complexityDensity": 151.2484399010194,
+          "totalCodeSmells": 2344,
+          "linesOfCode": 415839,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 61,
+          "companyName": "Strapi",
+          "technicalDebtRatio": 1.104770374134536,
+          "complexityDensity": 145.52499523597788,
+          "totalCodeSmells": 315,
+          "linesOfCode": 78715,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 62,
+          "companyName": "Streamlit",
+          "technicalDebtRatio": 3.2689681438559264,
+          "complexityDensity": 81.53105361952174,
+          "totalCodeSmells": 124,
+          "linesOfCode": 36759,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 63,
+          "companyName": "Supabase",
+          "technicalDebtRatio": 0.9446313857448762,
+          "complexityDensity": 89.56867543591312,
+          "totalCodeSmells": 53,
+          "linesOfCode": 16345,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 64,
+          "companyName": "Sysdig",
+          "technicalDebtRatio": 0,
+          "complexityDensity": 0,
+          "totalCodeSmells": 0,
+          "linesOfCode": 0,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 65,
+          "companyName": "Teleport",
+          "technicalDebtRatio": 5.431390821471884,
+          "complexityDensity": 261.6454969043212,
+          "totalCodeSmells": 747,
+          "linesOfCode": 78335,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 66,
+          "companyName": "Temporal",
+          "technicalDebtRatio": 11.593694330552806,
+          "complexityDensity": 291.865780668269,
+          "totalCodeSmells": 3138,
+          "linesOfCode": 212190,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 67,
+          "companyName": "Tier IV",
+          "technicalDebtRatio": 37.301587301587304,
+          "complexityDensity": 1016.2421557770396,
+          "totalCodeSmells": 91,
+          "linesOfCode": 2709,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 68,
+          "companyName": "Tigera",
+          "technicalDebtRatio": 0,
+          "complexityDensity": 214.9532710280374,
+          "totalCodeSmells": 0,
+          "linesOfCode": 107,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 69,
+          "companyName": "Timescale",
+          "technicalDebtRatio": 0,
+          "complexityDensity": 0,
+          "totalCodeSmells": 0,
+          "linesOfCode": 0,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 70,
+          "companyName": "Treeverse",
+          "technicalDebtRatio": 4.211142246966311,
+          "complexityDensity": 151.4313577838952,
+          "totalCodeSmells": 799,
+          "linesOfCode": 81007,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 71,
+          "companyName": "Tyk",
+          "technicalDebtRatio": 4.215261336732835,
+          "complexityDensity": 211.46291333871008,
+          "totalCodeSmells": 226,
+          "linesOfCode": 38437,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 72,
+          "companyName": "Unstructured",
+          "technicalDebtRatio": 2.302021403091558,
+          "complexityDensity": 125.34680935394371,
+          "totalCodeSmells": 92,
+          "linesOfCode": 10092,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 73,
+          "companyName": "Weaviate",
+          "technicalDebtRatio": 6.241438683757414,
+          "complexityDensity": 219.52256446230047,
+          "totalCodeSmells": 576,
+          "linesOfCode": 47043,
+          "reachedSeriesB": true
+        },
+        {
+          "companyId": 74,
+          "companyName": "Yugabyte",
+          "technicalDebtRatio": 53.93992932862191,
+          "complexityDensity": 2019.4346289752652,
+          "totalCodeSmells": 36,
+          "linesOfCode": 566,
+          "reachedSeriesB": true
+        }
+      ],
+      "successRate": 71.62162162162163,
+      "avgTechDebtSeriesB": 751.9180776054361,
+      "avgTechDebtStopped": 422.53788346781863,
+      "difference": -329.38019413761754,
+      "correlation": 0.12707557524260674,
+      "correlationStrength": "weak",
+      "insights": [
+        "71.6% of Series A companies reached Series B",
+        "Companies that reached Series B had 751.9% average technical debt",
+        "Companies that stopped at Series A had 422.5% average technical debt",
+        "Difference: 329.4 percentage points lower for companies that didn't reach Series B"
+      ]
+    },
+    "exitSuccessAnalysis": {
+      "exitCounts": {
+        "none": 65,
+        "acquired": 7,
+        "ipo": 2
+      },
+      "exitTechDebtData": [
+        {
+          "exitState": "none",
+          "avgTechnicalDebt": 3.9603430228203558,
+          "companyCount": 65,
+          "companies": [
+            "Airbyte",
+            "Alluxio",
+            "Appsmith",
+            "Appwrite",
+            "ArangoDB",
+            "Balena",
+            "Bit",
+            "Builder.io",
+            "Cal.com",
+            "Cockroach Labs",
+            "Convex",
+            "Crate.io",
+            "CrowdSec",
+            "Dagster",
+            "dbt Labs",
+            "Deepset",
+            "Dgraph",
+            "Directus",
+            "Discourse",
+            "EdgeDB",
+            "Ethyca",
+            "Gitpod",
+            "Gradle",
+            "Grafana Labs",
+            "Harness",
+            "Hasura",
+            "Hazelcast",
+            "HumanSignal",
+            "InfluxData",
+            "Jito Labs",
+            "Kong",
+            "Liquibase",
+            "Logical Clocks",
+            "Mattermost",
+            "MeiliSearch",
+            "Metabase",
+            "MinIO",
+            "n8n",
+            "Ockam",
+            "Oro",
+            "Pimcore",
+            "PingCAP",
+            "Posthog",
+            "Prefect",
+            "PrestaShop",
+            "ProcessMaker",
+            "Rocket.Chat",
+            "Rudderstack",
+            "Sentry",
+            "Serverless",
+            "Smallstep",
+            "Starburst",
+            "Strapi",
+            "Supabase",
+            "Sysdig",
+            "Teleport",
+            "Temporal",
+            "Tier IV",
+            "Tigera",
+            "Timescale",
+            "Treeverse",
+            "Tyk",
+            "Unstructured",
+            "Weaviate",
+            "Yugabyte"
+          ]
+        },
+        {
+          "exitState": "acquired",
+          "avgTechnicalDebt": 7.276035350165386,
+          "companyCount": 7,
+          "companies": [
+            "Cloud9 IDE",
+            "Ionic",
+            "Mautic",
+            "Pachyderm",
+            "Reaction Commerce",
+            "Spree Commerce",
+            "Streamlit"
+          ]
+        },
+        {
+          "exitState": "ipo",
+          "avgTechnicalDebt": 2.1941741412461657,
+          "companyCount": 2,
+          "companies": [
+            "Elasticsearch",
+            "GitLab"
+          ]
+        }
+      ],
+      "insights": [
+        "None: 396.0% avg technical debt (65 companies)",
+        "Acquired: 727.6% avg technical debt (7 companies)",
+        "Ipo: 219.4% avg technical debt (2 companies)"
+      ]
+    },
+    "fundingTrajectoryAnalysis": {
+      "trajectoryData": [
+        {
+          "trajectory": "series_b",
+          "companyCount": 28,
+          "avgTechnicalDebt": 4.881233777567756
+        },
+        {
+          "trajectory": "series_c",
+          "companyCount": 9,
+          "avgTechnicalDebt": 11.919392539504377
+        },
+        {
+          "trajectory": "series_a",
+          "companyCount": 18,
+          "avgTechnicalDebt": 4.449232153573174
+        },
+        {
+          "trajectory": "series_f",
+          "companyCount": 1,
+          "avgTechnicalDebt": 13.862182116488926
+        },
+        {
+          "trajectory": "series_a_bridge",
+          "companyCount": 3,
+          "avgTechnicalDebt": 2.882258921308253
+        },
+        {
+          "trajectory": "series_d",
+          "companyCount": 9,
+          "avgTechnicalDebt": 2.4263805635947975
+        },
+        {
+          "trajectory": "series_e",
+          "companyCount": 4,
+          "avgTechnicalDebt": 20.391577003253794
+        },
+        {
+          "trajectory": "series_g",
+          "companyCount": 1,
+          "avgTechnicalDebt": 0
+        },
+        {
+          "trajectory": "series_b_1",
+          "companyCount": 1,
+          "avgTechnicalDebt": 37.301587301587304
+        }
+      ],
+      "insights": [
+        "Most companies reach series_b as their highest funding round",
+        "74 total companies analyzed across all stages"
+      ]
+    },
+    "timeGapAnalysis": {
+      "scatterData": [
+        {
+          "companyId": 1,
+          "companyName": "Airbyte",
+          "technicalDebtRatio": 0,
+          "timeToNextRound": 14.2,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 1,
+          "companyName": "Airbyte",
+          "technicalDebtRatio": 1.3889034866093988,
+          "timeToNextRound": 7.133333333333334,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 2,
+          "companyName": "Alluxio",
+          "technicalDebtRatio": 11.537971511261297,
+          "timeToNextRound": 46.766666666666666,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 2,
+          "companyName": "Alluxio",
+          "technicalDebtRatio": 9.168755310563913,
+          "timeToNextRound": 15.133333333333333,
+          "fromRound": "series_b",
+          "toRound": "series_b_1"
+        },
+        {
+          "companyId": 2,
+          "companyName": "Alluxio",
+          "technicalDebtRatio": 1.7554763356630236,
+          "timeToNextRound": 19.3,
+          "fromRound": "series_b_1",
+          "toRound": "series_c"
+        },
+        {
+          "companyId": 3,
+          "companyName": "Appsmith",
+          "technicalDebtRatio": 0.6711938068721989,
+          "timeToNextRound": 19.3,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 3,
+          "companyName": "Appsmith",
+          "technicalDebtRatio": 1.6042389661265941,
+          "timeToNextRound": 8.1,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 4,
+          "companyName": "Appwrite",
+          "technicalDebtRatio": 6.512138383537131,
+          "timeToNextRound": 13.2,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 5,
+          "companyName": "ArangoDB",
+          "technicalDebtRatio": 7.8284457273214,
+          "timeToNextRound": 21.766666666666666,
+          "fromRound": "seed",
+          "toRound": "seed_ext"
+        },
+        {
+          "companyId": 5,
+          "companyName": "ArangoDB",
+          "technicalDebtRatio": 4.265116218094102,
+          "timeToNextRound": 28,
+          "fromRound": "seed_ext",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 5,
+          "companyName": "ArangoDB",
+          "technicalDebtRatio": 4.521771623342217,
+          "timeToNextRound": 31.233333333333334,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 6,
+          "companyName": "Balena",
+          "technicalDebtRatio": 0,
+          "timeToNextRound": 14.666666666666666,
+          "fromRound": "series_a",
+          "toRound": "series_a_bridge"
+        },
+        {
+          "companyId": 6,
+          "companyName": "Balena",
+          "technicalDebtRatio": 1.285097192224622,
+          "timeToNextRound": 37.4,
+          "fromRound": "series_a_bridge",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 7,
+          "companyName": "Bit",
+          "technicalDebtRatio": 0,
+          "timeToNextRound": 47.766666666666666,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 7,
+          "companyName": "Bit",
+          "technicalDebtRatio": 0.608270692261498,
+          "timeToNextRound": 33.46666666666667,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 8,
+          "companyName": "Builder.io",
+          "technicalDebtRatio": 4.42345377793269,
+          "timeToNextRound": 19.3,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 8,
+          "companyName": "Builder.io",
+          "technicalDebtRatio": 4.204999067338183,
+          "timeToNextRound": 30.433333333333334,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 9,
+          "companyName": "Cal.com",
+          "technicalDebtRatio": 0,
+          "timeToNextRound": 13.2,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 10,
+          "companyName": "Cloud9 IDE",
+          "technicalDebtRatio": 18.153571657788333,
+          "timeToNextRound": 2.8666666666666667,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 10,
+          "companyName": "Cloud9 IDE",
+          "technicalDebtRatio": 18.153571657788333,
+          "timeToNextRound": 41.63333333333333,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 11,
+          "companyName": "Cockroach Labs",
+          "technicalDebtRatio": 12.950541755730818,
+          "timeToNextRound": 9.066666666666666,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 11,
+          "companyName": "Cockroach Labs",
+          "technicalDebtRatio": 13.862182116488926,
+          "timeToNextRound": 16.1,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 11,
+          "companyName": "Cockroach Labs",
+          "technicalDebtRatio": 14.119955194717694,
+          "timeToNextRound": 25.666666666666668,
+          "fromRound": "series_b",
+          "toRound": "series_c"
+        },
+        {
+          "companyId": 11,
+          "companyName": "Cockroach Labs",
+          "technicalDebtRatio": 12.183198818864078,
+          "timeToNextRound": 9.1,
+          "fromRound": "series_c",
+          "toRound": "series_d"
+        },
+        {
+          "companyId": 11,
+          "companyName": "Cockroach Labs",
+          "technicalDebtRatio": 11.93146358288889,
+          "timeToNextRound": 8.4,
+          "fromRound": "series_d",
+          "toRound": "series_e"
+        },
+        {
+          "companyId": 11,
+          "companyName": "Cockroach Labs",
+          "technicalDebtRatio": 23.579694565249337,
+          "timeToNextRound": 11.266666666666667,
+          "fromRound": "series_e",
+          "toRound": "series_f"
+        },
+        {
+          "companyId": 12,
+          "companyName": "Convex",
+          "technicalDebtRatio": 0.8317947325549824,
+          "timeToNextRound": 5.866666666666666,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 13,
+          "companyName": "Crate.io",
+          "technicalDebtRatio": 1.1174651470184802,
+          "timeToNextRound": 8.1,
+          "fromRound": "seed",
+          "toRound": "seed_ext"
+        },
+        {
+          "companyId": 13,
+          "companyName": "Crate.io",
+          "technicalDebtRatio": 1.0712656519108132,
+          "timeToNextRound": 23.333333333333332,
+          "fromRound": "seed_ext",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 13,
+          "companyName": "Crate.io",
+          "technicalDebtRatio": 0.971426062521953,
+          "timeToNextRound": 28.433333333333334,
+          "fromRound": "series_a",
+          "toRound": "series_a_bridge"
+        },
+        {
+          "companyId": 14,
+          "companyName": "CrowdSec",
+          "technicalDebtRatio": 0,
+          "timeToNextRound": 31.466666666666665,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 15,
+          "companyName": "Dagster",
+          "technicalDebtRatio": 2.8677803447663055,
+          "timeToNextRound": 16.4,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 15,
+          "companyName": "Dagster",
+          "technicalDebtRatio": 3.2042984500425407,
+          "timeToNextRound": 16.433333333333334,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 16,
+          "companyName": "dbt Labs",
+          "technicalDebtRatio": 0.809502703661023,
+          "timeToNextRound": 7.133333333333334,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 16,
+          "companyName": "dbt Labs",
+          "technicalDebtRatio": 1.0953308081702007,
+          "timeToNextRound": 7.066666666666666,
+          "fromRound": "series_b",
+          "toRound": "series_c"
+        },
+        {
+          "companyId": 16,
+          "companyName": "dbt Labs",
+          "technicalDebtRatio": 1.254069021408793,
+          "timeToNextRound": 8.166666666666666,
+          "fromRound": "series_c",
+          "toRound": "series_d"
+        },
+        {
+          "companyId": 17,
+          "companyName": "Deepset",
+          "technicalDebtRatio": 4.1436291831220124,
+          "timeToNextRound": 13.866666666666667,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 17,
+          "companyName": "Deepset",
+          "technicalDebtRatio": 4.030705219360615,
+          "timeToNextRound": 15.6,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 18,
+          "companyName": "Dgraph",
+          "technicalDebtRatio": 2.220447284345048,
+          "timeToNextRound": 21.933333333333334,
+          "fromRound": "seed",
+          "toRound": "seed_ext"
+        },
+        {
+          "companyId": 18,
+          "companyName": "Dgraph",
+          "technicalDebtRatio": 7.601328285022655,
+          "timeToNextRound": 19.633333333333333,
+          "fromRound": "seed_ext",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 18,
+          "companyName": "Dgraph",
+          "technicalDebtRatio": 7.675350701402806,
+          "timeToNextRound": 36.166666666666664,
+          "fromRound": "series_a",
+          "toRound": "series_a_bridge"
+        },
+        {
+          "companyId": 19,
+          "companyName": "Directus",
+          "technicalDebtRatio": 2.7464907494667923,
+          "timeToNextRound": 16.566666666666666,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 20,
+          "companyName": "Discourse",
+          "technicalDebtRatio": 2.2337446852639222,
+          "timeToNextRound": 106.5,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 21,
+          "companyName": "EdgeDB",
+          "technicalDebtRatio": 5.656635090954816,
+          "timeToNextRound": 7.133333333333334,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 22,
+          "companyName": "Elasticsearch",
+          "technicalDebtRatio": 4.769550967423547,
+          "timeToNextRound": 3.433333333333333,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 22,
+          "companyName": "Elasticsearch",
+          "technicalDebtRatio": 4.5409367015009865,
+          "timeToNextRound": 15.7,
+          "fromRound": "series_b",
+          "toRound": "series_c"
+        },
+        {
+          "companyId": 22,
+          "companyName": "Elasticsearch",
+          "technicalDebtRatio": 3.9973692788526067,
+          "timeToNextRound": 25.233333333333334,
+          "fromRound": "series_c",
+          "toRound": "series_d"
+        },
+        {
+          "companyId": 23,
+          "companyName": "Ethyca",
+          "technicalDebtRatio": 0,
+          "timeToNextRound": 1.9666666666666666,
+          "fromRound": "seed",
+          "toRound": "seed_ext"
+        },
+        {
+          "companyId": 23,
+          "companyName": "Ethyca",
+          "technicalDebtRatio": 0,
+          "timeToNextRound": 9.566666666666666,
+          "fromRound": "seed_ext",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 23,
+          "companyName": "Ethyca",
+          "technicalDebtRatio": 0,
+          "timeToNextRound": 17,
+          "fromRound": "series_a",
+          "toRound": "series_a_bridge"
+        },
+        {
+          "companyId": 24,
+          "companyName": "GitLab",
+          "technicalDebtRatio": 0.45888721611838945,
+          "timeToNextRound": 2.2666666666666666,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 24,
+          "companyName": "GitLab",
+          "technicalDebtRatio": 0.587777645801164,
+          "timeToNextRound": 12.6,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 24,
+          "companyName": "GitLab",
+          "technicalDebtRatio": 0.6187516530018513,
+          "timeToNextRound": 12.6,
+          "fromRound": "series_b",
+          "toRound": "series_c"
+        },
+        {
+          "companyId": 24,
+          "companyName": "GitLab",
+          "technicalDebtRatio": 0.6578416444613627,
+          "timeToNextRound": 11.466666666666667,
+          "fromRound": "series_c",
+          "toRound": "series_d"
+        },
+        {
+          "companyId": 24,
+          "companyName": "GitLab",
+          "technicalDebtRatio": 0.565851517146901,
+          "timeToNextRound": 12.1,
+          "fromRound": "series_d",
+          "toRound": "series_e"
+        },
+        {
+          "companyId": 25,
+          "companyName": "Gitpod",
+          "technicalDebtRatio": 2.3744497251363366,
+          "timeToNextRound": 6.066666666666666,
+          "fromRound": "seed",
+          "toRound": "seed_ext"
+        },
+        {
+          "companyId": 25,
+          "companyName": "Gitpod",
+          "technicalDebtRatio": 2.932489740751986,
+          "timeToNextRound": 19.3,
+          "fromRound": "seed_ext",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 26,
+          "companyName": "Gradle",
+          "technicalDebtRatio": 1.0008626922981025,
+          "timeToNextRound": 5.866666666666666,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 26,
+          "companyName": "Gradle",
+          "technicalDebtRatio": 1.0094083447927726,
+          "timeToNextRound": 28.633333333333333,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 26,
+          "companyName": "Gradle",
+          "technicalDebtRatio": 0.9329180372522954,
+          "timeToNextRound": 37.56666666666667,
+          "fromRound": "series_b",
+          "toRound": "series_c"
+        },
+        {
+          "companyId": 27,
+          "companyName": "Grafana Labs",
+          "technicalDebtRatio": 2.3578146847870918,
+          "timeToNextRound": 10.833333333333334,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 27,
+          "companyName": "Grafana Labs",
+          "technicalDebtRatio": 2.123115050996092,
+          "timeToNextRound": 9.933333333333334,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 27,
+          "companyName": "Grafana Labs",
+          "technicalDebtRatio": 1.9347933225208112,
+          "timeToNextRound": 12.4,
+          "fromRound": "series_b",
+          "toRound": "series_c"
+        },
+        {
+          "companyId": 27,
+          "companyName": "Grafana Labs",
+          "technicalDebtRatio": 1.8279951148406415,
+          "timeToNextRound": 12.266666666666667,
+          "fromRound": "series_c",
+          "toRound": "series_d"
+        },
+        {
+          "companyId": 28,
+          "companyName": "Harness",
+          "technicalDebtRatio": 3.4606481481481484,
+          "timeToNextRound": 18.233333333333334,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 28,
+          "companyName": "Harness",
+          "technicalDebtRatio": 1.2090278802183212,
+          "timeToNextRound": 8.4,
+          "fromRound": "series_b",
+          "toRound": "series_b_1"
+        },
+        {
+          "companyId": 28,
+          "companyName": "Harness",
+          "technicalDebtRatio": 1.363956686146442,
+          "timeToNextRound": 12.633333333333333,
+          "fromRound": "series_b_1",
+          "toRound": "series_c"
+        },
+        {
+          "companyId": 28,
+          "companyName": "Harness",
+          "technicalDebtRatio": 0.8105056669572799,
+          "timeToNextRound": 15.1,
+          "fromRound": "series_c",
+          "toRound": "series_d"
+        },
+        {
+          "companyId": 29,
+          "companyName": "Hasura",
+          "technicalDebtRatio": 3.8487357350637725,
+          "timeToNextRound": 23.2,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 29,
+          "companyName": "Hasura",
+          "technicalDebtRatio": 7.727463983535331,
+          "timeToNextRound": 6.5,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 29,
+          "companyName": "Hasura",
+          "technicalDebtRatio": 7.138749162227945,
+          "timeToNextRound": 17.733333333333334,
+          "fromRound": "series_b",
+          "toRound": "series_c"
+        },
+        {
+          "companyId": 30,
+          "companyName": "Hazelcast",
+          "technicalDebtRatio": 2.701311794426925,
+          "timeToNextRound": 12.133333333333333,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 30,
+          "companyName": "Hazelcast",
+          "technicalDebtRatio": 2.246859171072577,
+          "timeToNextRound": 57.8,
+          "fromRound": "series_b",
+          "toRound": "series_d"
+        },
+        {
+          "companyId": 31,
+          "companyName": "HumanSignal",
+          "technicalDebtRatio": 54.63227916516533,
+          "timeToNextRound": 16.166666666666668,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 32,
+          "companyName": "InfluxData",
+          "technicalDebtRatio": 2.9686242960579245,
+          "timeToNextRound": 18.366666666666667,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 32,
+          "companyName": "InfluxData",
+          "technicalDebtRatio": 78.47165706973769,
+          "timeToNextRound": 21.766666666666666,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 32,
+          "companyName": "InfluxData",
+          "technicalDebtRatio": 3.758205377019236,
+          "timeToNextRound": 17,
+          "fromRound": "series_b",
+          "toRound": "series_c"
+        },
+        {
+          "companyId": 32,
+          "companyName": "InfluxData",
+          "technicalDebtRatio": 1.162645461598138,
+          "timeToNextRound": 12.166666666666666,
+          "fromRound": "series_c",
+          "toRound": "series_d"
+        },
+        {
+          "companyId": 32,
+          "companyName": "InfluxData",
+          "technicalDebtRatio": 4.226784616112399,
+          "timeToNextRound": 48.5,
+          "fromRound": "series_d",
+          "toRound": "series_e"
+        },
+        {
+          "companyId": 33,
+          "companyName": "Ionic",
+          "technicalDebtRatio": 31.168826731102488,
+          "timeToNextRound": 25.4,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 33,
+          "companyName": "Ionic",
+          "technicalDebtRatio": 13.354842231684682,
+          "timeToNextRound": 34.7,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 33,
+          "companyName": "Ionic",
+          "technicalDebtRatio": 4.950802056949881,
+          "timeToNextRound": 12.633333333333333,
+          "fromRound": "series_b",
+          "toRound": "series_c"
+        },
+        {
+          "companyId": 34,
+          "companyName": "Jito Labs",
+          "technicalDebtRatio": 2.4457861789001916,
+          "timeToNextRound": 7.433333333333334,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 35,
+          "companyName": "Kong",
+          "technicalDebtRatio": 0,
+          "timeToNextRound": 27.633333333333333,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 35,
+          "companyName": "Kong",
+          "technicalDebtRatio": 0,
+          "timeToNextRound": 39.86666666666667,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 35,
+          "companyName": "Kong",
+          "technicalDebtRatio": 0,
+          "timeToNextRound": 25.233333333333334,
+          "fromRound": "series_b",
+          "toRound": "series_c"
+        },
+        {
+          "companyId": 35,
+          "companyName": "Kong",
+          "technicalDebtRatio": 0,
+          "timeToNextRound": 22.766666666666666,
+          "fromRound": "series_c",
+          "toRound": "series_d"
+        },
+        {
+          "companyId": 35,
+          "companyName": "Kong",
+          "technicalDebtRatio": 0,
+          "timeToNextRound": 46,
+          "fromRound": "series_d",
+          "toRound": "series_e"
+        },
+        {
+          "companyId": 36,
+          "companyName": "Liquibase",
+          "technicalDebtRatio": 2.7831349606616906,
+          "timeToNextRound": 10.233333333333333,
+          "fromRound": "seed",
+          "toRound": "seed_ext"
+        },
+        {
+          "companyId": 36,
+          "companyName": "Liquibase",
+          "technicalDebtRatio": 2.4818158502180045,
+          "timeToNextRound": 6.966666666666667,
+          "fromRound": "seed_ext",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 36,
+          "companyName": "Liquibase",
+          "technicalDebtRatio": 2.6798323036187113,
+          "timeToNextRound": 16.433333333333334,
+          "fromRound": "series_a",
+          "toRound": "series_a_bridge"
+        },
+        {
+          "companyId": 36,
+          "companyName": "Liquibase",
+          "technicalDebtRatio": 2.506951266212684,
+          "timeToNextRound": 8.433333333333334,
+          "fromRound": "series_a_bridge",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 36,
+          "companyName": "Liquibase",
+          "technicalDebtRatio": 2.9278971131481737,
+          "timeToNextRound": 37.56666666666667,
+          "fromRound": "series_b",
+          "toRound": "series_c"
+        },
+        {
+          "companyId": 37,
+          "companyName": "Logical Clocks",
+          "technicalDebtRatio": 3.8341292886070146,
+          "timeToNextRound": 32.43333333333333,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 37,
+          "companyName": "Logical Clocks",
+          "technicalDebtRatio": 2.8487157081143617,
+          "timeToNextRound": 23.333333333333332,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 38,
+          "companyName": "Mattermost",
+          "technicalDebtRatio": 3.078212290502793,
+          "timeToNextRound": 24,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 38,
+          "companyName": "Mattermost",
+          "technicalDebtRatio": 5.012988542985893,
+          "timeToNextRound": 4.466666666666667,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 39,
+          "companyName": "Mautic",
+          "technicalDebtRatio": 13.201864990446182,
+          "timeToNextRound": 3.533333333333333,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 40,
+          "companyName": "MeiliSearch",
+          "technicalDebtRatio": 0.5379750507687845,
+          "timeToNextRound": 8.533333333333333,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 41,
+          "companyName": "Metabase",
+          "technicalDebtRatio": 1.58303130783467,
+          "timeToNextRound": 2.466666666666667,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 41,
+          "companyName": "Metabase",
+          "technicalDebtRatio": 1.5863823390539329,
+          "timeToNextRound": 25.433333333333334,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 42,
+          "companyName": "MinIO",
+          "technicalDebtRatio": 1.4852766691834753,
+          "timeToNextRound": 27.5,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 42,
+          "companyName": "MinIO",
+          "technicalDebtRatio": 3.1088982006408674,
+          "timeToNextRound": 53,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 43,
+          "companyName": "n8n",
+          "technicalDebtRatio": 4.965229420177722,
+          "timeToNextRound": 13.2,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 43,
+          "companyName": "n8n",
+          "technicalDebtRatio": 5.295895457743615,
+          "timeToNextRound": 47.666666666666664,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 44,
+          "companyName": "Ockam",
+          "technicalDebtRatio": 0.19723865877712032,
+          "timeToNextRound": 26.966666666666665,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 45,
+          "companyName": "Oro",
+          "technicalDebtRatio": 9.448155678187627,
+          "timeToNextRound": 83.76666666666667,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 46,
+          "companyName": "Pachyderm",
+          "technicalDebtRatio": 5.001619695497246,
+          "timeToNextRound": 41.8,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 46,
+          "companyName": "Pachyderm",
+          "technicalDebtRatio": 20.66896839373436,
+          "timeToNextRound": 21.433333333333334,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 47,
+          "companyName": "Pimcore",
+          "technicalDebtRatio": 11.940941763500064,
+          "timeToNextRound": 45.666666666666664,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 48,
+          "companyName": "PingCAP",
+          "technicalDebtRatio": 2.958298704473234,
+          "timeToNextRound": 16.266666666666666,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 48,
+          "companyName": "PingCAP",
+          "technicalDebtRatio": 4.82080222881023,
+          "timeToNextRound": 10.533333333333333,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 48,
+          "companyName": "PingCAP",
+          "technicalDebtRatio": 6.082463227852371,
+          "timeToNextRound": 14.833333333333334,
+          "fromRound": "series_b",
+          "toRound": "series_c"
+        },
+        {
+          "companyId": 48,
+          "companyName": "PingCAP",
+          "technicalDebtRatio": 4.859656655974001,
+          "timeToNextRound": 26.4,
+          "fromRound": "series_c",
+          "toRound": "series_d"
+        },
+        {
+          "companyId": 49,
+          "companyName": "Posthog",
+          "technicalDebtRatio": 0.6055681531872008,
+          "timeToNextRound": 6.533333333333333,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 49,
+          "companyName": "Posthog",
+          "technicalDebtRatio": 0.9706916764361079,
+          "timeToNextRound": 5.833333333333333,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 49,
+          "companyName": "Posthog",
+          "technicalDebtRatio": 1.1548629033407953,
+          "timeToNextRound": 31.166666666666668,
+          "fromRound": "series_b",
+          "toRound": "series_c"
+        },
+        {
+          "companyId": 49,
+          "companyName": "Posthog",
+          "technicalDebtRatio": 1.974942898543606,
+          "timeToNextRound": 17.5,
+          "fromRound": "series_c",
+          "toRound": "series_d"
+        },
+        {
+          "companyId": 50,
+          "companyName": "Prefect",
+          "technicalDebtRatio": 2.328108324439701,
+          "timeToNextRound": 14.166666666666666,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 50,
+          "companyName": "Prefect",
+          "technicalDebtRatio": 2.021933191498695,
+          "timeToNextRound": 4.033333333333333,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 51,
+          "companyName": "PrestaShop",
+          "technicalDebtRatio": 10.529403669878734,
+          "timeToNextRound": 31.433333333333334,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 54,
+          "companyName": "Rocket.Chat",
+          "technicalDebtRatio": 2.574669979345646,
+          "timeToNextRound": 34.3,
+          "fromRound": "seed",
+          "toRound": "seed_ext"
+        },
+        {
+          "companyId": 54,
+          "companyName": "Rocket.Chat",
+          "technicalDebtRatio": 1.4970969873335864,
+          "timeToNextRound": 18.233333333333334,
+          "fromRound": "seed_ext",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 54,
+          "companyName": "Rocket.Chat",
+          "technicalDebtRatio": 1.2752735272454112,
+          "timeToNextRound": 32,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 55,
+          "companyName": "Rudderstack",
+          "technicalDebtRatio": 3.6489554950045413,
+          "timeToNextRound": 14.666666666666666,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 55,
+          "companyName": "Rudderstack",
+          "technicalDebtRatio": 3.876627947905667,
+          "timeToNextRound": 7.9,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 56,
+          "companyName": "Sentry",
+          "technicalDebtRatio": 3.388822495606327,
+          "timeToNextRound": 10.633333333333333,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 56,
+          "companyName": "Sentry",
+          "technicalDebtRatio": 2.506873297476315,
+          "timeToNextRound": 23.3,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 56,
+          "companyName": "Sentry",
+          "technicalDebtRatio": 3.9590290451779273,
+          "timeToNextRound": 16.3,
+          "fromRound": "series_b",
+          "toRound": "series_c"
+        },
+        {
+          "companyId": 56,
+          "companyName": "Sentry",
+          "technicalDebtRatio": 3.58394513053762,
+          "timeToNextRound": 17.1,
+          "fromRound": "series_c",
+          "toRound": "series_d"
+        },
+        {
+          "companyId": 56,
+          "companyName": "Sentry",
+          "technicalDebtRatio": 1.0426840633737184,
+          "timeToNextRound": 14.666666666666666,
+          "fromRound": "series_d",
+          "toRound": "series_e"
+        },
+        {
+          "companyId": 57,
+          "companyName": "Serverless",
+          "technicalDebtRatio": 1.0803531348196918,
+          "timeToNextRound": 21.866666666666667,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 58,
+          "companyName": "Smallstep",
+          "technicalDebtRatio": 0.40102389078498296,
+          "timeToNextRound": 68.36666666666666,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 59,
+          "companyName": "Spree Commerce",
+          "technicalDebtRatio": 8.193644818423383,
+          "timeToNextRound": 31.533333333333335,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 60,
+          "companyName": "Starburst",
+          "technicalDebtRatio": 1.2371711167062251,
+          "timeToNextRound": 7.1,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 60,
+          "companyName": "Starburst",
+          "technicalDebtRatio": 1.2693781569224563,
+          "timeToNextRound": 7.133333333333334,
+          "fromRound": "series_b",
+          "toRound": "series_c"
+        },
+        {
+          "companyId": 60,
+          "companyName": "Starburst",
+          "technicalDebtRatio": 1.3105198575404782,
+          "timeToNextRound": 13.2,
+          "fromRound": "series_c",
+          "toRound": "series_d"
+        },
+        {
+          "companyId": 61,
+          "companyName": "Strapi",
+          "technicalDebtRatio": 1.0641151038344319,
+          "timeToNextRound": 7.233333333333333,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 61,
+          "companyName": "Strapi",
+          "technicalDebtRatio": 1.104770374134536,
+          "timeToNextRound": 25.433333333333334,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 62,
+          "companyName": "Streamlit",
+          "technicalDebtRatio": 1.060437897285844,
+          "timeToNextRound": 8.633333333333333,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 62,
+          "companyName": "Streamlit",
+          "technicalDebtRatio": 3.2689681438559264,
+          "timeToNextRound": 9.833333333333334,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 63,
+          "companyName": "Supabase",
+          "technicalDebtRatio": 0.20019499512512187,
+          "timeToNextRound": 8.933333333333334,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 63,
+          "companyName": "Supabase",
+          "technicalDebtRatio": 0.9446313857448762,
+          "timeToNextRound": 8.1,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 63,
+          "companyName": "Supabase",
+          "technicalDebtRatio": 0.8917944093778178,
+          "timeToNextRound": 28.966666666666665,
+          "fromRound": "series_b",
+          "toRound": "series_c"
+        },
+        {
+          "companyId": 63,
+          "companyName": "Supabase",
+          "technicalDebtRatio": 2.206838901647408,
+          "timeToNextRound": 6.966666666666667,
+          "fromRound": "series_c",
+          "toRound": "series_d"
+        },
+        {
+          "companyId": 64,
+          "companyName": "Sysdig",
+          "technicalDebtRatio": 0,
+          "timeToNextRound": 24.8,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 64,
+          "companyName": "Sysdig",
+          "technicalDebtRatio": 0,
+          "timeToNextRound": 9.4,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 64,
+          "companyName": "Sysdig",
+          "technicalDebtRatio": 0.17543859649122806,
+          "timeToNextRound": 17.966666666666665,
+          "fromRound": "series_b",
+          "toRound": "series_c"
+        },
+        {
+          "companyId": 64,
+          "companyName": "Sysdig",
+          "technicalDebtRatio": 0.1276595744680851,
+          "timeToNextRound": 11.166666666666666,
+          "fromRound": "series_c",
+          "toRound": "series_d"
+        },
+        {
+          "companyId": 64,
+          "companyName": "Sysdig",
+          "technicalDebtRatio": 4.466292134831461,
+          "timeToNextRound": 16.566666666666666,
+          "fromRound": "series_d",
+          "toRound": "series_e"
+        },
+        {
+          "companyId": 64,
+          "companyName": "Sysdig",
+          "technicalDebtRatio": 4.416666666666667,
+          "timeToNextRound": 15.4,
+          "fromRound": "series_e",
+          "toRound": "series_f"
+        },
+        {
+          "companyId": 64,
+          "companyName": "Sysdig",
+          "technicalDebtRatio": 4.061757719714964,
+          "timeToNextRound": 7.7,
+          "fromRound": "series_f",
+          "toRound": "series_g"
+        },
+        {
+          "companyId": 65,
+          "companyName": "Teleport",
+          "technicalDebtRatio": 2.8961705831157527,
+          "timeToNextRound": 42.3,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 65,
+          "companyName": "Teleport",
+          "technicalDebtRatio": 5.431390821471884,
+          "timeToNextRound": 21.233333333333334,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 65,
+          "companyName": "Teleport",
+          "technicalDebtRatio": 15.369986175073016,
+          "timeToNextRound": 8.6,
+          "fromRound": "series_b",
+          "toRound": "series_c"
+        },
+        {
+          "companyId": 66,
+          "companyName": "Temporal",
+          "technicalDebtRatio": 10.522540438466805,
+          "timeToNextRound": 11.633333333333333,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 66,
+          "companyName": "Temporal",
+          "technicalDebtRatio": 11.593694330552806,
+          "timeToNextRound": 16.3,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 66,
+          "companyName": "Temporal",
+          "technicalDebtRatio": 10.988604067434828,
+          "timeToNextRound": 12.566666666666666,
+          "fromRound": "series_b",
+          "toRound": "series_b_1"
+        },
+        {
+          "companyId": 66,
+          "companyName": "Temporal",
+          "technicalDebtRatio": 11.05618574430191,
+          "timeToNextRound": 25.4,
+          "fromRound": "series_b_1",
+          "toRound": "series_c"
+        },
+        {
+          "companyId": 67,
+          "companyName": "Tier IV",
+          "technicalDebtRatio": 37.301587301587304,
+          "timeToNextRound": 37.13333333333333,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 67,
+          "companyName": "Tier IV",
+          "technicalDebtRatio": 0.966121344840912,
+          "timeToNextRound": 17.7,
+          "fromRound": "series_b",
+          "toRound": "series_b_1"
+        },
+        {
+          "companyId": 68,
+          "companyName": "Tigera",
+          "technicalDebtRatio": 0,
+          "timeToNextRound": 19.3,
+          "fromRound": "series_a",
+          "toRound": "series_a_bridge"
+        },
+        {
+          "companyId": 68,
+          "companyName": "Tigera",
+          "technicalDebtRatio": 0,
+          "timeToNextRound": 11.133333333333333,
+          "fromRound": "series_a_bridge",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 69,
+          "companyName": "Timescale",
+          "technicalDebtRatio": 0,
+          "timeToNextRound": 25.133333333333333,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 69,
+          "companyName": "Timescale",
+          "technicalDebtRatio": 0,
+          "timeToNextRound": 12.333333333333334,
+          "fromRound": "series_a",
+          "toRound": "series_a_bridge"
+        },
+        {
+          "companyId": 69,
+          "companyName": "Timescale",
+          "technicalDebtRatio": 0,
+          "timeToNextRound": 27.566666666666666,
+          "fromRound": "series_a_bridge",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 69,
+          "companyName": "Timescale",
+          "technicalDebtRatio": 0,
+          "timeToNextRound": 9.766666666666667,
+          "fromRound": "series_b",
+          "toRound": "series_c"
+        },
+        {
+          "companyId": 70,
+          "companyName": "Treeverse",
+          "technicalDebtRatio": 4.211142246966311,
+          "timeToNextRound": 48.733333333333334,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 71,
+          "companyName": "Tyk",
+          "technicalDebtRatio": 4.215261336732835,
+          "timeToNextRound": 26.433333333333334,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 72,
+          "companyName": "Unstructured",
+          "technicalDebtRatio": 2.302021403091558,
+          "timeToNextRound": 7.966666666666667,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 73,
+          "companyName": "Weaviate",
+          "technicalDebtRatio": 8.935423825887744,
+          "timeToNextRound": 18.3,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 73,
+          "companyName": "Weaviate",
+          "technicalDebtRatio": 6.241438683757414,
+          "timeToNextRound": 14.133333333333333,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 74,
+          "companyName": "Yugabyte",
+          "technicalDebtRatio": 6.320930679742332,
+          "timeToNextRound": 27.4,
+          "fromRound": "seed",
+          "toRound": "series_a"
+        },
+        {
+          "companyId": 74,
+          "companyName": "Yugabyte",
+          "technicalDebtRatio": 53.93992932862191,
+          "timeToNextRound": 24.366666666666667,
+          "fromRound": "series_a",
+          "toRound": "series_b"
+        },
+        {
+          "companyId": 74,
+          "companyName": "Yugabyte",
+          "technicalDebtRatio": 4.060339099835126,
+          "timeToNextRound": 9.1,
+          "fromRound": "series_b",
+          "toRound": "series_b_1"
+        },
+        {
+          "companyId": 74,
+          "companyName": "Yugabyte",
+          "technicalDebtRatio": 3.6117885430097623,
+          "timeToNextRound": 7.133333333333334,
+          "fromRound": "series_b_1",
+          "toRound": "series_c"
+        }
+      ],
+      "correlation": 0.06037545829744479,
+      "correlationStrength": "weak",
+      "categories": {
+        "fastFollowers": {
+          "count": 56,
+          "avgTechDebt": 3.7996651192545383
+        },
+        "normalPace": {
+          "count": 67,
+          "avgTechDebt": 5.519606055166193
+        },
+        "slowProgressors": {
+          "count": 53,
+          "avgTechDebt": 6.080509911905646
+        }
+      },
+      "insights": [
+        "Correlation between technical debt and time to next round: 0.060 (weak)",
+        "No significant correlation between technical debt and time between funding rounds"
+      ]
+    },
+    "fundingAmountCorrelation": {
+      "scatterData": [
+        {
+          "companyName": "Airbyte",
+          "roundType": "seed",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 5,
+          "logFundingAmount": 1.6094379124341003
+        },
+        {
+          "companyName": "Airbyte",
+          "roundType": "series_a",
+          "technicalDebtRatio": 1.3889034866093988,
+          "fundingAmount": 26,
+          "logFundingAmount": 3.258096538021482
+        },
+        {
+          "companyName": "Airbyte",
+          "roundType": "series_b",
+          "technicalDebtRatio": 0.8653123757052575,
+          "fundingAmount": 150,
+          "logFundingAmount": 5.0106352940962555
+        },
+        {
+          "companyName": "Alluxio",
+          "roundType": "series_a",
+          "technicalDebtRatio": 11.537971511261297,
+          "fundingAmount": 7.5,
+          "logFundingAmount": 2.0149030205422647
+        },
+        {
+          "companyName": "Alluxio",
+          "roundType": "series_b",
+          "technicalDebtRatio": 9.168755310563913,
+          "fundingAmount": 8.5,
+          "logFundingAmount": 2.1400661634962708
+        },
+        {
+          "companyName": "Alluxio",
+          "roundType": "series_b_1",
+          "technicalDebtRatio": 1.7554763356630236,
+          "fundingAmount": 7,
+          "logFundingAmount": 1.9459101490553132
+        },
+        {
+          "companyName": "Alluxio",
+          "roundType": "series_c",
+          "technicalDebtRatio": 1.7778367696074093,
+          "fundingAmount": 50,
+          "logFundingAmount": 3.912023005428146
+        },
+        {
+          "companyName": "Appsmith",
+          "roundType": "seed",
+          "technicalDebtRatio": 0.6711938068721989,
+          "fundingAmount": 2.5,
+          "logFundingAmount": 0.9162907318741551
+        },
+        {
+          "companyName": "Appsmith",
+          "roundType": "series_a",
+          "technicalDebtRatio": 1.6042389661265941,
+          "fundingAmount": 8,
+          "logFundingAmount": 2.0794415416798357
+        },
+        {
+          "companyName": "Appsmith",
+          "roundType": "series_b",
+          "technicalDebtRatio": 1.8990375462718139,
+          "fundingAmount": 41,
+          "logFundingAmount": 3.713572066704308
+        },
+        {
+          "companyName": "Appwrite",
+          "roundType": "seed",
+          "technicalDebtRatio": 6.512138383537131,
+          "fundingAmount": 10,
+          "logFundingAmount": 2.302585092994046
+        },
+        {
+          "companyName": "Appwrite",
+          "roundType": "series_a",
+          "technicalDebtRatio": 4.066268052617055,
+          "fundingAmount": 27,
+          "logFundingAmount": 3.295836866004329
+        },
+        {
+          "companyName": "ArangoDB",
+          "roundType": "seed",
+          "technicalDebtRatio": 7.8284457273214,
+          "fundingAmount": 1.9,
+          "logFundingAmount": 0.6418538861723947
+        },
+        {
+          "companyName": "ArangoDB",
+          "roundType": "seed_ext",
+          "technicalDebtRatio": 4.265116218094102,
+          "fundingAmount": 2.2,
+          "logFundingAmount": 0.7884573603642703
+        },
+        {
+          "companyName": "ArangoDB",
+          "roundType": "series_a",
+          "technicalDebtRatio": 4.521771623342217,
+          "fundingAmount": 10,
+          "logFundingAmount": 2.302585092994046
+        },
+        {
+          "companyName": "ArangoDB",
+          "roundType": "series_b",
+          "technicalDebtRatio": 4.084438455290556,
+          "fundingAmount": 27.8,
+          "logFundingAmount": 3.3250360206965914
+        },
+        {
+          "companyName": "Balena",
+          "roundType": "series_a",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 3,
+          "logFundingAmount": 1.0986122886681098
+        },
+        {
+          "companyName": "Balena",
+          "roundType": "series_a_bridge",
+          "technicalDebtRatio": 1.285097192224622,
+          "fundingAmount": 9,
+          "logFundingAmount": 2.1972245773362196
+        },
+        {
+          "companyName": "Balena",
+          "roundType": "series_b",
+          "technicalDebtRatio": 0.7498660953401178,
+          "fundingAmount": 14.4,
+          "logFundingAmount": 2.667228206581955
+        },
+        {
+          "companyName": "Bit",
+          "roundType": "seed",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 0.9,
+          "logFundingAmount": -0.10536051565782628
+        },
+        {
+          "companyName": "Bit",
+          "roundType": "series_a",
+          "technicalDebtRatio": 0.608270692261498,
+          "fundingAmount": 10.1,
+          "logFundingAmount": 2.312535423847214
+        },
+        {
+          "companyName": "Bit",
+          "roundType": "series_b",
+          "technicalDebtRatio": 0.876991452991453,
+          "fundingAmount": 25,
+          "logFundingAmount": 3.2188758248682006
+        },
+        {
+          "companyName": "Builder.io",
+          "roundType": "seed",
+          "technicalDebtRatio": 4.42345377793269,
+          "fundingAmount": 3.3,
+          "logFundingAmount": 1.1939224684724346
+        },
+        {
+          "companyName": "Builder.io",
+          "roundType": "series_a",
+          "technicalDebtRatio": 4.204999067338183,
+          "fundingAmount": 14,
+          "logFundingAmount": 2.6390573296152584
+        },
+        {
+          "companyName": "Builder.io",
+          "roundType": "series_b",
+          "technicalDebtRatio": 3.5323761764099744,
+          "fundingAmount": 20,
+          "logFundingAmount": 2.995732273553991
+        },
+        {
+          "companyName": "Cal.com",
+          "roundType": "seed",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 7.4,
+          "logFundingAmount": 2.0014800002101243
+        },
+        {
+          "companyName": "Cal.com",
+          "roundType": "series_a",
+          "technicalDebtRatio": 10.04025044722719,
+          "fundingAmount": 25,
+          "logFundingAmount": 3.2188758248682006
+        },
+        {
+          "companyName": "Cloud9 IDE",
+          "roundType": "seed",
+          "technicalDebtRatio": 18.153571657788333,
+          "fundingAmount": 0.75,
+          "logFundingAmount": -0.2876820724517809
+        },
+        {
+          "companyName": "Cloud9 IDE",
+          "roundType": "series_a",
+          "technicalDebtRatio": 18.153571657788333,
+          "fundingAmount": 5.6,
+          "logFundingAmount": 1.7227665977411035
+        },
+        {
+          "companyName": "Cloud9 IDE",
+          "roundType": "series_b",
+          "technicalDebtRatio": 18.153828380720107,
+          "fundingAmount": 3.1,
+          "logFundingAmount": 1.1314021114911006
+        },
+        {
+          "companyName": "Cockroach Labs",
+          "roundType": "seed",
+          "technicalDebtRatio": 12.950541755730818,
+          "fundingAmount": 6.25,
+          "logFundingAmount": 1.8325814637483102
+        },
+        {
+          "companyName": "Cockroach Labs",
+          "roundType": "series_a",
+          "technicalDebtRatio": 13.862182116488926,
+          "fundingAmount": 20,
+          "logFundingAmount": 2.995732273553991
+        },
+        {
+          "companyName": "Cockroach Labs",
+          "roundType": "series_b",
+          "technicalDebtRatio": 14.119955194717694,
+          "fundingAmount": 27,
+          "logFundingAmount": 3.295836866004329
+        },
+        {
+          "companyName": "Cockroach Labs",
+          "roundType": "series_c",
+          "technicalDebtRatio": 12.183198818864078,
+          "fundingAmount": 55,
+          "logFundingAmount": 4.007333185232471
+        },
+        {
+          "companyName": "Cockroach Labs",
+          "roundType": "series_d",
+          "technicalDebtRatio": 11.93146358288889,
+          "fundingAmount": 160,
+          "logFundingAmount": 5.075173815233827
+        },
+        {
+          "companyName": "Cockroach Labs",
+          "roundType": "series_e",
+          "technicalDebtRatio": 23.579694565249337,
+          "fundingAmount": 160,
+          "logFundingAmount": 5.075173815233827
+        },
+        {
+          "companyName": "Cockroach Labs",
+          "roundType": "series_f",
+          "technicalDebtRatio": 22.442171140243072,
+          "fundingAmount": 278,
+          "logFundingAmount": 5.627621113690637
+        },
+        {
+          "companyName": "Convex",
+          "roundType": "seed",
+          "technicalDebtRatio": 0.8317947325549824,
+          "fundingAmount": 3.5,
+          "logFundingAmount": 1.252762968495368
+        },
+        {
+          "companyName": "Convex",
+          "roundType": "series_a",
+          "technicalDebtRatio": 0.8317947325549824,
+          "fundingAmount": 26,
+          "logFundingAmount": 3.258096538021482
+        },
+        {
+          "companyName": "Crate.io",
+          "roundType": "seed",
+          "technicalDebtRatio": 1.1174651470184802,
+          "fundingAmount": 2.8,
+          "logFundingAmount": 1.0296194171811581
+        },
+        {
+          "companyName": "Crate.io",
+          "roundType": "seed_ext",
+          "technicalDebtRatio": 1.0712656519108132,
+          "fundingAmount": 2.7,
+          "logFundingAmount": 0.9932517730102834
+        },
+        {
+          "companyName": "Crate.io",
+          "roundType": "series_a",
+          "technicalDebtRatio": 0.971426062521953,
+          "fundingAmount": 11,
+          "logFundingAmount": 2.3978952727983707
+        },
+        {
+          "companyName": "Crate.io",
+          "roundType": "series_a_bridge",
+          "technicalDebtRatio": 1.7355810818966384,
+          "fundingAmount": 14,
+          "logFundingAmount": 2.6390573296152584
+        },
+        {
+          "companyName": "CrowdSec",
+          "roundType": "seed",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 2,
+          "logFundingAmount": 0.6931471805599453
+        },
+        {
+          "companyName": "CrowdSec",
+          "roundType": "series_a",
+          "technicalDebtRatio": 6.769169987632266,
+          "fundingAmount": 14,
+          "logFundingAmount": 2.6390573296152584
+        },
+        {
+          "companyName": "Dagster",
+          "roundType": "seed",
+          "technicalDebtRatio": 2.8677803447663055,
+          "fundingAmount": 1.8,
+          "logFundingAmount": 0.5877866649021191
+        },
+        {
+          "companyName": "Dagster",
+          "roundType": "series_a",
+          "technicalDebtRatio": 3.2042984500425407,
+          "fundingAmount": 14,
+          "logFundingAmount": 2.6390573296152584
+        },
+        {
+          "companyName": "Dagster",
+          "roundType": "series_b",
+          "technicalDebtRatio": 3.911083663204262,
+          "fundingAmount": 33,
+          "logFundingAmount": 3.4965075614664802
+        },
+        {
+          "companyName": "dbt Labs",
+          "roundType": "series_a",
+          "technicalDebtRatio": 0.809502703661023,
+          "fundingAmount": 12.9,
+          "logFundingAmount": 2.5572273113676265
+        },
+        {
+          "companyName": "dbt Labs",
+          "roundType": "series_b",
+          "technicalDebtRatio": 1.0953308081702007,
+          "fundingAmount": 29.5,
+          "logFundingAmount": 3.3843902633457743
+        },
+        {
+          "companyName": "dbt Labs",
+          "roundType": "series_c",
+          "technicalDebtRatio": 1.254069021408793,
+          "fundingAmount": 150,
+          "logFundingAmount": 5.0106352940962555
+        },
+        {
+          "companyName": "dbt Labs",
+          "roundType": "series_d",
+          "technicalDebtRatio": 2.262379723069702,
+          "fundingAmount": 222,
+          "logFundingAmount": 5.402677381872279
+        },
+        {
+          "companyName": "Deepset",
+          "roundType": "seed",
+          "technicalDebtRatio": 4.1436291831220124,
+          "fundingAmount": 1.6,
+          "logFundingAmount": 0.47000362924573563
+        },
+        {
+          "companyName": "Deepset",
+          "roundType": "series_a",
+          "technicalDebtRatio": 4.030705219360615,
+          "fundingAmount": 14,
+          "logFundingAmount": 2.6390573296152584
+        },
+        {
+          "companyName": "Deepset",
+          "roundType": "series_b",
+          "technicalDebtRatio": 3.405946029404196,
+          "fundingAmount": 27,
+          "logFundingAmount": 3.295836866004329
+        },
+        {
+          "companyName": "Dgraph",
+          "roundType": "seed",
+          "technicalDebtRatio": 2.220447284345048,
+          "fundingAmount": 1.1,
+          "logFundingAmount": 0.09531017980432493
+        },
+        {
+          "companyName": "Dgraph",
+          "roundType": "seed_ext",
+          "technicalDebtRatio": 7.601328285022655,
+          "fundingAmount": 1.9,
+          "logFundingAmount": 0.6418538861723947
+        },
+        {
+          "companyName": "Dgraph",
+          "roundType": "series_a",
+          "technicalDebtRatio": 7.675350701402806,
+          "fundingAmount": 11.5,
+          "logFundingAmount": 2.4423470353692043
+        },
+        {
+          "companyName": "Dgraph",
+          "roundType": "series_a_bridge",
+          "technicalDebtRatio": 6.632602288055153,
+          "fundingAmount": 6,
+          "logFundingAmount": 1.791759469228055
+        },
+        {
+          "companyName": "Directus",
+          "roundType": "seed",
+          "technicalDebtRatio": 2.7464907494667923,
+          "fundingAmount": 1,
+          "logFundingAmount": 0
+        },
+        {
+          "companyName": "Directus",
+          "roundType": "series_a",
+          "technicalDebtRatio": 3.8920426221335993,
+          "fundingAmount": 7,
+          "logFundingAmount": 1.9459101490553132
+        },
+        {
+          "companyName": "Discourse",
+          "roundType": "series_a",
+          "technicalDebtRatio": 11.246176929274116,
+          "fundingAmount": 20,
+          "logFundingAmount": 2.995732273553991
+        },
+        {
+          "companyName": "EdgeDB",
+          "roundType": "seed",
+          "technicalDebtRatio": 5.656635090954816,
+          "fundingAmount": 4,
+          "logFundingAmount": 1.3862943611198906
+        },
+        {
+          "companyName": "EdgeDB",
+          "roundType": "series_a",
+          "technicalDebtRatio": 5.597450411891941,
+          "fundingAmount": 15,
+          "logFundingAmount": 2.70805020110221
+        },
+        {
+          "companyName": "Elasticsearch",
+          "roundType": "series_a",
+          "technicalDebtRatio": 4.769550967423547,
+          "fundingAmount": 10,
+          "logFundingAmount": 2.302585092994046
+        },
+        {
+          "companyName": "Elasticsearch",
+          "roundType": "series_b",
+          "technicalDebtRatio": 4.5409367015009865,
+          "fundingAmount": 24,
+          "logFundingAmount": 3.1780538303479458
+        },
+        {
+          "companyName": "Elasticsearch",
+          "roundType": "series_c",
+          "technicalDebtRatio": 3.9973692788526067,
+          "fundingAmount": 70,
+          "logFundingAmount": 4.248495242049359
+        },
+        {
+          "companyName": "Elasticsearch",
+          "roundType": "series_d",
+          "technicalDebtRatio": 2.9856423382295825,
+          "fundingAmount": 58,
+          "logFundingAmount": 4.060443010546419
+        },
+        {
+          "companyName": "Ethyca",
+          "roundType": "seed",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 4.2,
+          "logFundingAmount": 1.4350845252893227
+        },
+        {
+          "companyName": "Ethyca",
+          "roundType": "seed_ext",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 2.3,
+          "logFundingAmount": 0.8329091229351039
+        },
+        {
+          "companyName": "Ethyca",
+          "roundType": "series_a",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 13.5,
+          "logFundingAmount": 2.6026896854443837
+        },
+        {
+          "companyName": "Ethyca",
+          "roundType": "series_a_bridge",
+          "technicalDebtRatio": 0.5336426914153132,
+          "fundingAmount": 7.5,
+          "logFundingAmount": 2.0149030205422647
+        },
+        {
+          "companyName": "GitLab",
+          "roundType": "seed",
+          "technicalDebtRatio": 0.45888721611838945,
+          "fundingAmount": 1.5,
+          "logFundingAmount": 0.4054651081081644
+        },
+        {
+          "companyName": "GitLab",
+          "roundType": "series_a",
+          "technicalDebtRatio": 0.587777645801164,
+          "fundingAmount": 4,
+          "logFundingAmount": 1.3862943611198906
+        },
+        {
+          "companyName": "GitLab",
+          "roundType": "series_b",
+          "technicalDebtRatio": 0.6187516530018513,
+          "fundingAmount": 20,
+          "logFundingAmount": 2.995732273553991
+        },
+        {
+          "companyName": "GitLab",
+          "roundType": "series_c",
+          "technicalDebtRatio": 0.6578416444613627,
+          "fundingAmount": 20,
+          "logFundingAmount": 2.995732273553991
+        },
+        {
+          "companyName": "GitLab",
+          "roundType": "series_d",
+          "technicalDebtRatio": 0.565851517146901,
+          "fundingAmount": 100,
+          "logFundingAmount": 4.605170185988092
+        },
+        {
+          "companyName": "GitLab",
+          "roundType": "series_e",
+          "technicalDebtRatio": 0.4734085319712448,
+          "fundingAmount": 268,
+          "logFundingAmount": 5.5909869805108565
+        },
+        {
+          "companyName": "Gitpod",
+          "roundType": "seed",
+          "technicalDebtRatio": 2.3744497251363366,
+          "fundingAmount": 3,
+          "logFundingAmount": 1.0986122886681098
+        },
+        {
+          "companyName": "Gitpod",
+          "roundType": "seed_ext",
+          "technicalDebtRatio": 2.932489740751986,
+          "fundingAmount": 13,
+          "logFundingAmount": 2.5649493574615367
+        },
+        {
+          "companyName": "Gitpod",
+          "roundType": "series_a",
+          "technicalDebtRatio": 4.211174682301403,
+          "fundingAmount": 25,
+          "logFundingAmount": 3.2188758248682006
+        },
+        {
+          "companyName": "Gradle",
+          "roundType": "seed",
+          "technicalDebtRatio": 1.0008626922981025,
+          "fundingAmount": 4.2,
+          "logFundingAmount": 1.4350845252893227
+        },
+        {
+          "companyName": "Gradle",
+          "roundType": "series_a",
+          "technicalDebtRatio": 1.0094083447927726,
+          "fundingAmount": 10.5,
+          "logFundingAmount": 2.3513752571634776
+        },
+        {
+          "companyName": "Gradle",
+          "roundType": "series_b",
+          "technicalDebtRatio": 0.9329180372522954,
+          "fundingAmount": 13,
+          "logFundingAmount": 2.5649493574615367
+        },
+        {
+          "companyName": "Gradle",
+          "roundType": "series_c",
+          "technicalDebtRatio": 0.9945146529772542,
+          "fundingAmount": 27,
+          "logFundingAmount": 3.295836866004329
+        },
+        {
+          "companyName": "Grafana Labs",
+          "roundType": "seed",
+          "technicalDebtRatio": 2.3578146847870918,
+          "fundingAmount": 1.2,
+          "logFundingAmount": 0.1823215567939546
+        },
+        {
+          "companyName": "Grafana Labs",
+          "roundType": "series_a",
+          "technicalDebtRatio": 2.123115050996092,
+          "fundingAmount": 24,
+          "logFundingAmount": 3.1780538303479458
+        },
+        {
+          "companyName": "Grafana Labs",
+          "roundType": "series_b",
+          "technicalDebtRatio": 1.9347933225208112,
+          "fundingAmount": 50,
+          "logFundingAmount": 3.912023005428146
+        },
+        {
+          "companyName": "Grafana Labs",
+          "roundType": "series_c",
+          "technicalDebtRatio": 1.8279951148406415,
+          "fundingAmount": 220,
+          "logFundingAmount": 5.393627546352362
+        },
+        {
+          "companyName": "Grafana Labs",
+          "roundType": "series_d",
+          "technicalDebtRatio": 2.0818932177488123,
+          "fundingAmount": 510,
+          "logFundingAmount": 6.234410725718371
+        },
+        {
+          "companyName": "Harness",
+          "roundType": "series_a",
+          "technicalDebtRatio": 3.4606481481481484,
+          "fundingAmount": 20,
+          "logFundingAmount": 2.995732273553991
+        },
+        {
+          "companyName": "Harness",
+          "roundType": "series_b",
+          "technicalDebtRatio": 1.2090278802183212,
+          "fundingAmount": 60,
+          "logFundingAmount": 4.0943445622221
+        },
+        {
+          "companyName": "Harness",
+          "roundType": "series_b_1",
+          "technicalDebtRatio": 1.363956686146442,
+          "fundingAmount": 30,
+          "logFundingAmount": 3.4011973816621555
+        },
+        {
+          "companyName": "Harness",
+          "roundType": "series_c",
+          "technicalDebtRatio": 0.8105056669572799,
+          "fundingAmount": 85,
+          "logFundingAmount": 4.442651256490317
+        },
+        {
+          "companyName": "Harness",
+          "roundType": "series_d",
+          "technicalDebtRatio": 1.5203157301259163,
+          "fundingAmount": 175,
+          "logFundingAmount": 5.1647859739235145
+        },
+        {
+          "companyName": "Hasura",
+          "roundType": "seed",
+          "technicalDebtRatio": 3.8487357350637725,
+          "fundingAmount": 1.6,
+          "logFundingAmount": 0.47000362924573563
+        },
+        {
+          "companyName": "Hasura",
+          "roundType": "series_a",
+          "technicalDebtRatio": 7.727463983535331,
+          "fundingAmount": 9.9,
+          "logFundingAmount": 2.2925347571405443
+        },
+        {
+          "companyName": "Hasura",
+          "roundType": "series_b",
+          "technicalDebtRatio": 7.138749162227945,
+          "fundingAmount": 25,
+          "logFundingAmount": 3.2188758248682006
+        },
+        {
+          "companyName": "Hasura",
+          "roundType": "series_c",
+          "technicalDebtRatio": 3.8284891600956588,
+          "fundingAmount": 100,
+          "logFundingAmount": 4.605170185988092
+        },
+        {
+          "companyName": "Hazelcast",
+          "roundType": "series_a",
+          "technicalDebtRatio": 2.701311794426925,
+          "fundingAmount": 2.6,
+          "logFundingAmount": 0.9555114450274363
+        },
+        {
+          "companyName": "Hazelcast",
+          "roundType": "series_b",
+          "technicalDebtRatio": 2.246859171072577,
+          "fundingAmount": 11,
+          "logFundingAmount": 2.3978952727983707
+        },
+        {
+          "companyName": "Hazelcast",
+          "roundType": "series_d",
+          "technicalDebtRatio": 1.5060045223582876,
+          "fundingAmount": 50,
+          "logFundingAmount": 3.912023005428146
+        },
+        {
+          "companyName": "HumanSignal",
+          "roundType": "seed",
+          "technicalDebtRatio": 54.63227916516533,
+          "fundingAmount": 4,
+          "logFundingAmount": 1.3862943611198906
+        },
+        {
+          "companyName": "HumanSignal",
+          "roundType": "series_a",
+          "technicalDebtRatio": 9.712417013061208,
+          "fundingAmount": 25,
+          "logFundingAmount": 3.2188758248682006
+        },
+        {
+          "companyName": "InfluxData",
+          "roundType": "seed",
+          "technicalDebtRatio": 2.9686242960579245,
+          "fundingAmount": 0.8,
+          "logFundingAmount": -0.2231435513142097
+        },
+        {
+          "companyName": "InfluxData",
+          "roundType": "series_a",
+          "technicalDebtRatio": 78.47165706973769,
+          "fundingAmount": 8.1,
+          "logFundingAmount": 2.0918640616783932
+        },
+        {
+          "companyName": "InfluxData",
+          "roundType": "series_b",
+          "technicalDebtRatio": 3.758205377019236,
+          "fundingAmount": 16,
+          "logFundingAmount": 2.772588722239781
+        },
+        {
+          "companyName": "InfluxData",
+          "roundType": "series_c",
+          "technicalDebtRatio": 1.162645461598138,
+          "fundingAmount": 35,
+          "logFundingAmount": 3.5553480614894135
+        },
+        {
+          "companyName": "InfluxData",
+          "roundType": "series_d",
+          "technicalDebtRatio": 4.226784616112399,
+          "fundingAmount": 60,
+          "logFundingAmount": 4.0943445622221
+        },
+        {
+          "companyName": "InfluxData",
+          "roundType": "series_e",
+          "technicalDebtRatio": 0.6500727636975299,
+          "fundingAmount": 51,
+          "logFundingAmount": 3.9318256327243257
+        },
+        {
+          "companyName": "Ionic",
+          "roundType": "seed",
+          "technicalDebtRatio": 31.168826731102488,
+          "fundingAmount": 1,
+          "logFundingAmount": 0
+        },
+        {
+          "companyName": "Ionic",
+          "roundType": "series_a",
+          "technicalDebtRatio": 13.354842231684682,
+          "fundingAmount": 8.88,
+          "logFundingAmount": 2.1838015570040787
+        },
+        {
+          "companyName": "Ionic",
+          "roundType": "series_b",
+          "technicalDebtRatio": 4.950802056949881,
+          "fundingAmount": 5.8,
+          "logFundingAmount": 1.7578579175523736
+        },
+        {
+          "companyName": "Ionic",
+          "roundType": "series_c",
+          "technicalDebtRatio": 5.4045679603897145,
+          "fundingAmount": 6,
+          "logFundingAmount": 1.791759469228055
+        },
+        {
+          "companyName": "Jito Labs",
+          "roundType": "seed",
+          "technicalDebtRatio": 2.4457861789001916,
+          "fundingAmount": 2.1,
+          "logFundingAmount": 0.7419373447293773
+        },
+        {
+          "companyName": "Jito Labs",
+          "roundType": "series_a",
+          "technicalDebtRatio": 2.2038574739123926,
+          "fundingAmount": 10,
+          "logFundingAmount": 2.302585092994046
+        },
+        {
+          "companyName": "Kong",
+          "roundType": "seed",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 1.5,
+          "logFundingAmount": 0.4054651081081644
+        },
+        {
+          "companyName": "Kong",
+          "roundType": "series_a",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 6.5,
+          "logFundingAmount": 1.8718021769015913
+        },
+        {
+          "companyName": "Kong",
+          "roundType": "series_b",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 18,
+          "logFundingAmount": 2.8903717578961645
+        },
+        {
+          "companyName": "Kong",
+          "roundType": "series_c",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 43,
+          "logFundingAmount": 3.7612001156935624
+        },
+        {
+          "companyName": "Kong",
+          "roundType": "series_d",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 100,
+          "logFundingAmount": 4.605170185988092
+        },
+        {
+          "companyName": "Kong",
+          "roundType": "series_e",
+          "technicalDebtRatio": 2.953091684434968,
+          "fundingAmount": 175,
+          "logFundingAmount": 5.1647859739235145
+        },
+        {
+          "companyName": "Liquibase",
+          "roundType": "seed",
+          "technicalDebtRatio": 2.7831349606616906,
+          "fundingAmount": 0.66,
+          "logFundingAmount": -0.4155154439616658
+        },
+        {
+          "companyName": "Liquibase",
+          "roundType": "seed_ext",
+          "technicalDebtRatio": 2.4818158502180045,
+          "fundingAmount": 1,
+          "logFundingAmount": 0
+        },
+        {
+          "companyName": "Liquibase",
+          "roundType": "series_a",
+          "technicalDebtRatio": 2.6798323036187113,
+          "fundingAmount": 3,
+          "logFundingAmount": 1.0986122886681098
+        },
+        {
+          "companyName": "Liquibase",
+          "roundType": "series_a_bridge",
+          "technicalDebtRatio": 2.506951266212684,
+          "fundingAmount": 2.3,
+          "logFundingAmount": 0.8329091229351039
+        },
+        {
+          "companyName": "Liquibase",
+          "roundType": "series_b",
+          "technicalDebtRatio": 2.9278971131481737,
+          "fundingAmount": 8,
+          "logFundingAmount": 2.0794415416798357
+        },
+        {
+          "companyName": "Liquibase",
+          "roundType": "series_c",
+          "technicalDebtRatio": 3.537180249851279,
+          "fundingAmount": 10,
+          "logFundingAmount": 2.302585092994046
+        },
+        {
+          "companyName": "Logical Clocks",
+          "roundType": "seed",
+          "technicalDebtRatio": 3.8341292886070146,
+          "fundingAmount": 1.3,
+          "logFundingAmount": 0.26236426446749106
+        },
+        {
+          "companyName": "Logical Clocks",
+          "roundType": "series_a",
+          "technicalDebtRatio": 2.8487157081143617,
+          "fundingAmount": 5,
+          "logFundingAmount": 1.6094379124341003
+        },
+        {
+          "companyName": "Logical Clocks",
+          "roundType": "series_b",
+          "technicalDebtRatio": 10,
+          "fundingAmount": 6.5,
+          "logFundingAmount": 1.8718021769015913
+        },
+        {
+          "companyName": "Mattermost",
+          "roundType": "seed",
+          "technicalDebtRatio": 3.078212290502793,
+          "fundingAmount": 3.5,
+          "logFundingAmount": 1.252762968495368
+        },
+        {
+          "companyName": "Mattermost",
+          "roundType": "series_a",
+          "technicalDebtRatio": 5.012988542985893,
+          "fundingAmount": 20,
+          "logFundingAmount": 2.995732273553991
+        },
+        {
+          "companyName": "Mattermost",
+          "roundType": "series_b",
+          "technicalDebtRatio": 5.110104970724246,
+          "fundingAmount": 50,
+          "logFundingAmount": 3.912023005428146
+        },
+        {
+          "companyName": "Mautic",
+          "roundType": "series_a",
+          "technicalDebtRatio": 12.326870585586853,
+          "fundingAmount": 5,
+          "logFundingAmount": 1.6094379124341003
+        },
+        {
+          "companyName": "MeiliSearch",
+          "roundType": "seed",
+          "technicalDebtRatio": 0.5379750507687845,
+          "fundingAmount": 5,
+          "logFundingAmount": 1.6094379124341003
+        },
+        {
+          "companyName": "MeiliSearch",
+          "roundType": "series_a",
+          "technicalDebtRatio": 0.77538686933431,
+          "fundingAmount": 15,
+          "logFundingAmount": 2.70805020110221
+        },
+        {
+          "companyName": "Metabase",
+          "roundType": "seed",
+          "technicalDebtRatio": 1.58303130783467,
+          "fundingAmount": 13,
+          "logFundingAmount": 2.5649493574615367
+        },
+        {
+          "companyName": "Metabase",
+          "roundType": "series_a",
+          "technicalDebtRatio": 1.5863823390539329,
+          "fundingAmount": 8,
+          "logFundingAmount": 2.0794415416798357
+        },
+        {
+          "companyName": "Metabase",
+          "roundType": "series_b",
+          "technicalDebtRatio": 1.4588441742591012,
+          "fundingAmount": 30,
+          "logFundingAmount": 3.4011973816621555
+        },
+        {
+          "companyName": "MinIO",
+          "roundType": "seed",
+          "technicalDebtRatio": 1.4852766691834753,
+          "fundingAmount": 3.3,
+          "logFundingAmount": 1.1939224684724346
+        },
+        {
+          "companyName": "MinIO",
+          "roundType": "series_a",
+          "technicalDebtRatio": 3.1088982006408674,
+          "fundingAmount": 20,
+          "logFundingAmount": 2.995732273553991
+        },
+        {
+          "companyName": "MinIO",
+          "roundType": "series_b",
+          "technicalDebtRatio": 8.601467699555268,
+          "fundingAmount": 103,
+          "logFundingAmount": 4.634728988229636
+        },
+        {
+          "companyName": "n8n",
+          "roundType": "seed",
+          "technicalDebtRatio": 4.965229420177722,
+          "fundingAmount": 1.5,
+          "logFundingAmount": 0.4054651081081644
+        },
+        {
+          "companyName": "n8n",
+          "roundType": "series_a",
+          "technicalDebtRatio": 5.295895457743615,
+          "fundingAmount": 12,
+          "logFundingAmount": 2.4849066497880004
+        },
+        {
+          "companyName": "n8n",
+          "roundType": "series_b",
+          "technicalDebtRatio": 4.308721066167875,
+          "fundingAmount": 59.5,
+          "logFundingAmount": 4.085976312551584
+        },
+        {
+          "companyName": "Ockam",
+          "roundType": "seed",
+          "technicalDebtRatio": 0.19723865877712032,
+          "fundingAmount": 4.9,
+          "logFundingAmount": 1.589235205116581
+        },
+        {
+          "companyName": "Ockam",
+          "roundType": "series_a",
+          "technicalDebtRatio": 0.8278007057838388,
+          "fundingAmount": 12.5,
+          "logFundingAmount": 2.5257286443082556
+        },
+        {
+          "companyName": "Oro",
+          "roundType": "series_a",
+          "technicalDebtRatio": 9.448155678187627,
+          "fundingAmount": 12,
+          "logFundingAmount": 2.4849066497880004
+        },
+        {
+          "companyName": "Oro",
+          "roundType": "series_b",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 13,
+          "logFundingAmount": 2.5649493574615367
+        },
+        {
+          "companyName": "Pachyderm",
+          "roundType": "seed",
+          "technicalDebtRatio": 5.001619695497246,
+          "fundingAmount": 2,
+          "logFundingAmount": 0.6931471805599453
+        },
+        {
+          "companyName": "Pachyderm",
+          "roundType": "series_a",
+          "technicalDebtRatio": 20.66896839373436,
+          "fundingAmount": 10,
+          "logFundingAmount": 2.302585092994046
+        },
+        {
+          "companyName": "Pachyderm",
+          "roundType": "series_b",
+          "technicalDebtRatio": 24.15242405595146,
+          "fundingAmount": 16,
+          "logFundingAmount": 2.772588722239781
+        },
+        {
+          "companyName": "Pimcore",
+          "roundType": "series_a",
+          "technicalDebtRatio": 11.940941763500064,
+          "fundingAmount": 3.5,
+          "logFundingAmount": 1.252762968495368
+        },
+        {
+          "companyName": "Pimcore",
+          "roundType": "series_b",
+          "technicalDebtRatio": 11.739951854221896,
+          "fundingAmount": 12,
+          "logFundingAmount": 2.4849066497880004
+        },
+        {
+          "companyName": "PingCAP",
+          "roundType": "seed",
+          "technicalDebtRatio": 2.958298704473234,
+          "fundingAmount": 1.6,
+          "logFundingAmount": 0.47000362924573563
+        },
+        {
+          "companyName": "PingCAP",
+          "roundType": "series_a",
+          "technicalDebtRatio": 4.82080222881023,
+          "fundingAmount": 5,
+          "logFundingAmount": 1.6094379124341003
+        },
+        {
+          "companyName": "PingCAP",
+          "roundType": "series_b",
+          "technicalDebtRatio": 6.082463227852371,
+          "fundingAmount": 15,
+          "logFundingAmount": 2.70805020110221
+        },
+        {
+          "companyName": "PingCAP",
+          "roundType": "series_c",
+          "technicalDebtRatio": 4.859656655974001,
+          "fundingAmount": 50,
+          "logFundingAmount": 3.912023005428146
+        },
+        {
+          "companyName": "PingCAP",
+          "roundType": "series_d",
+          "technicalDebtRatio": 7.486393657028076,
+          "fundingAmount": 570,
+          "logFundingAmount": 6.345636360828596
+        },
+        {
+          "companyName": "Posthog",
+          "roundType": "seed",
+          "technicalDebtRatio": 0.6055681531872008,
+          "fundingAmount": 3,
+          "logFundingAmount": 1.0986122886681098
+        },
+        {
+          "companyName": "Posthog",
+          "roundType": "series_a",
+          "technicalDebtRatio": 0.9706916764361079,
+          "fundingAmount": 9,
+          "logFundingAmount": 2.1972245773362196
+        },
+        {
+          "companyName": "Posthog",
+          "roundType": "series_b",
+          "technicalDebtRatio": 1.1548629033407953,
+          "fundingAmount": 15,
+          "logFundingAmount": 2.70805020110221
+        },
+        {
+          "companyName": "Posthog",
+          "roundType": "series_c",
+          "technicalDebtRatio": 1.974942898543606,
+          "fundingAmount": 10,
+          "logFundingAmount": 2.302585092994046
+        },
+        {
+          "companyName": "Posthog",
+          "roundType": "series_d",
+          "technicalDebtRatio": 2.5121486529524004,
+          "fundingAmount": 70,
+          "logFundingAmount": 4.248495242049359
+        },
+        {
+          "companyName": "Prefect",
+          "roundType": "seed",
+          "technicalDebtRatio": 2.328108324439701,
+          "fundingAmount": 2.5,
+          "logFundingAmount": 0.9162907318741551
+        },
+        {
+          "companyName": "Prefect",
+          "roundType": "series_a",
+          "technicalDebtRatio": 2.021933191498695,
+          "fundingAmount": 11.5,
+          "logFundingAmount": 2.4423470353692043
+        },
+        {
+          "companyName": "Prefect",
+          "roundType": "series_b",
+          "technicalDebtRatio": 2.0911584808274575,
+          "fundingAmount": 32,
+          "logFundingAmount": 3.4657359027997265
+        },
+        {
+          "companyName": "PrestaShop",
+          "roundType": "series_a",
+          "technicalDebtRatio": 10.529403669878734,
+          "fundingAmount": 3,
+          "logFundingAmount": 1.0986122886681098
+        },
+        {
+          "companyName": "PrestaShop",
+          "roundType": "series_b",
+          "technicalDebtRatio": 9.060907301428061,
+          "fundingAmount": 9.3,
+          "logFundingAmount": 2.2300144001592104
+        },
+        {
+          "companyName": "ProcessMaker",
+          "roundType": "series_a",
+          "technicalDebtRatio": 1.381549066232066,
+          "fundingAmount": 45,
+          "logFundingAmount": 3.8066624897703196
+        },
+        {
+          "companyName": "Reaction Commerce",
+          "roundType": "series_a",
+          "technicalDebtRatio": 1.0464396284829722,
+          "fundingAmount": 8.5,
+          "logFundingAmount": 2.1400661634962708
+        },
+        {
+          "companyName": "Rocket.Chat",
+          "roundType": "seed",
+          "technicalDebtRatio": 2.574669979345646,
+          "fundingAmount": 5,
+          "logFundingAmount": 1.6094379124341003
+        },
+        {
+          "companyName": "Rocket.Chat",
+          "roundType": "seed_ext",
+          "technicalDebtRatio": 1.4970969873335864,
+          "fundingAmount": 2.9,
+          "logFundingAmount": 1.0647107369924282
+        },
+        {
+          "companyName": "Rocket.Chat",
+          "roundType": "series_a",
+          "technicalDebtRatio": 1.2752735272454112,
+          "fundingAmount": 19,
+          "logFundingAmount": 2.9444389791664403
+        },
+        {
+          "companyName": "Rocket.Chat",
+          "roundType": "series_b",
+          "technicalDebtRatio": 1.074297302502634,
+          "fundingAmount": 10,
+          "logFundingAmount": 2.302585092994046
+        },
+        {
+          "companyName": "Rudderstack",
+          "roundType": "seed",
+          "technicalDebtRatio": 3.6489554950045413,
+          "fundingAmount": 5,
+          "logFundingAmount": 1.6094379124341003
+        },
+        {
+          "companyName": "Rudderstack",
+          "roundType": "series_a",
+          "technicalDebtRatio": 3.876627947905667,
+          "fundingAmount": 21,
+          "logFundingAmount": 3.044522437723423
+        },
+        {
+          "companyName": "Rudderstack",
+          "roundType": "series_b",
+          "technicalDebtRatio": 4.890116068918431,
+          "fundingAmount": 56,
+          "logFundingAmount": 4.02535169073515
+        },
+        {
+          "companyName": "Sentry",
+          "roundType": "seed",
+          "technicalDebtRatio": 3.388822495606327,
+          "fundingAmount": 1.5,
+          "logFundingAmount": 0.4054651081081644
+        },
+        {
+          "companyName": "Sentry",
+          "roundType": "series_a",
+          "technicalDebtRatio": 2.506873297476315,
+          "fundingAmount": 9,
+          "logFundingAmount": 2.1972245773362196
+        },
+        {
+          "companyName": "Sentry",
+          "roundType": "series_b",
+          "technicalDebtRatio": 3.9590290451779273,
+          "fundingAmount": 16.5,
+          "logFundingAmount": 2.803360380906535
+        },
+        {
+          "companyName": "Sentry",
+          "roundType": "series_c",
+          "technicalDebtRatio": 3.58394513053762,
+          "fundingAmount": 40,
+          "logFundingAmount": 3.6888794541139363
+        },
+        {
+          "companyName": "Sentry",
+          "roundType": "series_d",
+          "technicalDebtRatio": 1.0426840633737184,
+          "fundingAmount": 60,
+          "logFundingAmount": 4.0943445622221
+        },
+        {
+          "companyName": "Sentry",
+          "roundType": "series_e",
+          "technicalDebtRatio": 1.2650247530523584,
+          "fundingAmount": 90,
+          "logFundingAmount": 4.499809670330265
+        },
+        {
+          "companyName": "Serverless",
+          "roundType": "seed",
+          "technicalDebtRatio": 1.0803531348196918,
+          "fundingAmount": 3,
+          "logFundingAmount": 1.0986122886681098
+        },
+        {
+          "companyName": "Serverless",
+          "roundType": "series_a",
+          "technicalDebtRatio": 1.4530085197018103,
+          "fundingAmount": 10,
+          "logFundingAmount": 2.302585092994046
+        },
+        {
+          "companyName": "Smallstep",
+          "roundType": "seed",
+          "technicalDebtRatio": 0.40102389078498296,
+          "fundingAmount": 7,
+          "logFundingAmount": 1.9459101490553132
+        },
+        {
+          "companyName": "Smallstep",
+          "roundType": "series_a",
+          "technicalDebtRatio": 3.4231833555396127,
+          "fundingAmount": 19,
+          "logFundingAmount": 2.9444389791664403
+        },
+        {
+          "companyName": "Spree Commerce",
+          "roundType": "seed",
+          "technicalDebtRatio": 8.193644818423383,
+          "fundingAmount": 1.5,
+          "logFundingAmount": 0.4054651081081644
+        },
+        {
+          "companyName": "Spree Commerce",
+          "roundType": "series_a",
+          "technicalDebtRatio": 0.28133768104951845,
+          "fundingAmount": 5,
+          "logFundingAmount": 1.6094379124341003
+        },
+        {
+          "companyName": "Starburst",
+          "roundType": "series_a",
+          "technicalDebtRatio": 1.2371711167062251,
+          "fundingAmount": 22,
+          "logFundingAmount": 3.091042453358316
+        },
+        {
+          "companyName": "Starburst",
+          "roundType": "series_b",
+          "technicalDebtRatio": 1.2693781569224563,
+          "fundingAmount": 42,
+          "logFundingAmount": 3.7376696182833684
+        },
+        {
+          "companyName": "Starburst",
+          "roundType": "series_c",
+          "technicalDebtRatio": 1.3105198575404782,
+          "fundingAmount": 100,
+          "logFundingAmount": 4.605170185988092
+        },
+        {
+          "companyName": "Starburst",
+          "roundType": "series_d",
+          "technicalDebtRatio": 1.4073528150312393,
+          "fundingAmount": 250,
+          "logFundingAmount": 5.521460917862246
+        },
+        {
+          "companyName": "Strapi",
+          "roundType": "seed",
+          "technicalDebtRatio": 1.0641151038344319,
+          "fundingAmount": 4,
+          "logFundingAmount": 1.3862943611198906
+        },
+        {
+          "companyName": "Strapi",
+          "roundType": "series_a",
+          "technicalDebtRatio": 1.104770374134536,
+          "fundingAmount": 10,
+          "logFundingAmount": 2.302585092994046
+        },
+        {
+          "companyName": "Strapi",
+          "roundType": "series_b",
+          "technicalDebtRatio": 0.8762404535444877,
+          "fundingAmount": 31,
+          "logFundingAmount": 3.4339872044851463
+        },
+        {
+          "companyName": "Streamlit",
+          "roundType": "seed",
+          "technicalDebtRatio": 1.060437897285844,
+          "fundingAmount": 6,
+          "logFundingAmount": 1.791759469228055
+        },
+        {
+          "companyName": "Streamlit",
+          "roundType": "series_a",
+          "technicalDebtRatio": 3.2689681438559264,
+          "fundingAmount": 21,
+          "logFundingAmount": 3.044522437723423
+        },
+        {
+          "companyName": "Streamlit",
+          "roundType": "series_b",
+          "technicalDebtRatio": 1.4899746543200583,
+          "fundingAmount": 35,
+          "logFundingAmount": 3.5553480614894135
+        },
+        {
+          "companyName": "Supabase",
+          "roundType": "seed",
+          "technicalDebtRatio": 0.20019499512512187,
+          "fundingAmount": 6,
+          "logFundingAmount": 1.791759469228055
+        },
+        {
+          "companyName": "Supabase",
+          "roundType": "series_a",
+          "technicalDebtRatio": 0.9446313857448762,
+          "fundingAmount": 30,
+          "logFundingAmount": 3.4011973816621555
+        },
+        {
+          "companyName": "Supabase",
+          "roundType": "series_b",
+          "technicalDebtRatio": 0.8917944093778178,
+          "fundingAmount": 80,
+          "logFundingAmount": 4.382026634673881
+        },
+        {
+          "companyName": "Supabase",
+          "roundType": "series_c",
+          "technicalDebtRatio": 2.206838901647408,
+          "fundingAmount": 80,
+          "logFundingAmount": 4.382026634673881
+        },
+        {
+          "companyName": "Supabase",
+          "roundType": "series_d",
+          "technicalDebtRatio": 2.257125915781587,
+          "fundingAmount": 200,
+          "logFundingAmount": 5.298317366548036
+        },
+        {
+          "companyName": "Sysdig",
+          "roundType": "seed",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 2.3,
+          "logFundingAmount": 0.8329091229351039
+        },
+        {
+          "companyName": "Sysdig",
+          "roundType": "series_a",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 10.7,
+          "logFundingAmount": 2.3702437414678603
+        },
+        {
+          "companyName": "Sysdig",
+          "roundType": "series_b",
+          "technicalDebtRatio": 0.17543859649122806,
+          "fundingAmount": 15,
+          "logFundingAmount": 2.70805020110221
+        },
+        {
+          "companyName": "Sysdig",
+          "roundType": "series_c",
+          "technicalDebtRatio": 0.1276595744680851,
+          "fundingAmount": 25,
+          "logFundingAmount": 3.2188758248682006
+        },
+        {
+          "companyName": "Sysdig",
+          "roundType": "series_d",
+          "technicalDebtRatio": 4.466292134831461,
+          "fundingAmount": 68.5,
+          "logFundingAmount": 4.22683374526818
+        },
+        {
+          "companyName": "Sysdig",
+          "roundType": "series_e",
+          "technicalDebtRatio": 4.416666666666667,
+          "fundingAmount": 70,
+          "logFundingAmount": 4.248495242049359
+        },
+        {
+          "companyName": "Sysdig",
+          "roundType": "series_f",
+          "technicalDebtRatio": 4.061757719714964,
+          "fundingAmount": 188,
+          "logFundingAmount": 5.236441962829949
+        },
+        {
+          "companyName": "Sysdig",
+          "roundType": "series_g",
+          "technicalDebtRatio": 4.061757719714964,
+          "fundingAmount": 350,
+          "logFundingAmount": 5.857933154483459
+        },
+        {
+          "companyName": "Teleport",
+          "roundType": "seed",
+          "technicalDebtRatio": 2.8961705831157527,
+          "fundingAmount": 4.2,
+          "logFundingAmount": 1.4350845252893227
+        },
+        {
+          "companyName": "Teleport",
+          "roundType": "series_a",
+          "technicalDebtRatio": 5.431390821471884,
+          "fundingAmount": 25,
+          "logFundingAmount": 3.2188758248682006
+        },
+        {
+          "companyName": "Teleport",
+          "roundType": "series_b",
+          "technicalDebtRatio": 15.369986175073016,
+          "fundingAmount": 30,
+          "logFundingAmount": 3.4011973816621555
+        },
+        {
+          "companyName": "Teleport",
+          "roundType": "series_c",
+          "technicalDebtRatio": 15.338509451637519,
+          "fundingAmount": 110,
+          "logFundingAmount": 4.700480365792417
+        },
+        {
+          "companyName": "Temporal",
+          "roundType": "seed",
+          "technicalDebtRatio": 10.522540438466805,
+          "fundingAmount": 6.8,
+          "logFundingAmount": 1.916922612182061
+        },
+        {
+          "companyName": "Temporal",
+          "roundType": "series_a",
+          "technicalDebtRatio": 11.593694330552806,
+          "fundingAmount": 18.8,
+          "logFundingAmount": 2.9338568698359038
+        },
+        {
+          "companyName": "Temporal",
+          "roundType": "series_b",
+          "technicalDebtRatio": 10.988604067434828,
+          "fundingAmount": 103,
+          "logFundingAmount": 4.634728988229636
+        },
+        {
+          "companyName": "Temporal",
+          "roundType": "series_b_1",
+          "technicalDebtRatio": 11.05618574430191,
+          "fundingAmount": 75,
+          "logFundingAmount": 4.31748811353631
+        },
+        {
+          "companyName": "Temporal",
+          "roundType": "series_c",
+          "technicalDebtRatio": 2.760186907356482,
+          "fundingAmount": 146,
+          "logFundingAmount": 4.983606621708336
+        },
+        {
+          "companyName": "Tier IV",
+          "roundType": "series_a",
+          "technicalDebtRatio": 37.301587301587304,
+          "fundingAmount": 104,
+          "logFundingAmount": 4.6443908991413725
+        },
+        {
+          "companyName": "Tier IV",
+          "roundType": "series_b",
+          "technicalDebtRatio": 0.966121344840912,
+          "fundingAmount": 92,
+          "logFundingAmount": 4.5217885770490405
+        },
+        {
+          "companyName": "Tier IV",
+          "roundType": "series_b_1",
+          "technicalDebtRatio": 0.6035446651599857,
+          "fundingAmount": 56,
+          "logFundingAmount": 4.02535169073515
+        },
+        {
+          "companyName": "Tigera",
+          "roundType": "series_a",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 13,
+          "logFundingAmount": 2.5649493574615367
+        },
+        {
+          "companyName": "Tigera",
+          "roundType": "series_a_bridge",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 10,
+          "logFundingAmount": 2.302585092994046
+        },
+        {
+          "companyName": "Tigera",
+          "roundType": "series_b",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 30,
+          "logFundingAmount": 3.4011973816621555
+        },
+        {
+          "companyName": "Timescale",
+          "roundType": "seed",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 3.7,
+          "logFundingAmount": 1.308332819650179
+        },
+        {
+          "companyName": "Timescale",
+          "roundType": "series_a",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 12.4,
+          "logFundingAmount": 2.517696472610991
+        },
+        {
+          "companyName": "Timescale",
+          "roundType": "series_a_bridge",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 15,
+          "logFundingAmount": 2.70805020110221
+        },
+        {
+          "companyName": "Timescale",
+          "roundType": "series_b",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 40,
+          "logFundingAmount": 3.6888794541139363
+        },
+        {
+          "companyName": "Timescale",
+          "roundType": "series_c",
+          "technicalDebtRatio": 0,
+          "fundingAmount": 110,
+          "logFundingAmount": 4.700480365792417
+        },
+        {
+          "companyName": "Treeverse",
+          "roundType": "series_a",
+          "technicalDebtRatio": 4.211142246966311,
+          "fundingAmount": 23,
+          "logFundingAmount": 3.1354942159291497
+        },
+        {
+          "companyName": "Treeverse",
+          "roundType": "series_b",
+          "technicalDebtRatio": 4.6897936637628455,
+          "fundingAmount": 20,
+          "logFundingAmount": 2.995732273553991
+        },
+        {
+          "companyName": "Tyk",
+          "roundType": "series_a",
+          "technicalDebtRatio": 4.215261336732835,
+          "fundingAmount": 5,
+          "logFundingAmount": 1.6094379124341003
+        },
+        {
+          "companyName": "Tyk",
+          "roundType": "series_b",
+          "technicalDebtRatio": 5.195477753464624,
+          "fundingAmount": 35,
+          "logFundingAmount": 3.5553480614894135
+        },
+        {
+          "companyName": "Unstructured",
+          "roundType": "series_a",
+          "technicalDebtRatio": 2.302021403091558,
+          "fundingAmount": 25,
+          "logFundingAmount": 3.2188758248682006
+        },
+        {
+          "companyName": "Unstructured",
+          "roundType": "series_b",
+          "technicalDebtRatio": 2.165567371113205,
+          "fundingAmount": 40,
+          "logFundingAmount": 3.6888794541139363
+        },
+        {
+          "companyName": "Weaviate",
+          "roundType": "seed",
+          "technicalDebtRatio": 8.935423825887744,
+          "fundingAmount": 1.2,
+          "logFundingAmount": 0.1823215567939546
+        },
+        {
+          "companyName": "Weaviate",
+          "roundType": "series_a",
+          "technicalDebtRatio": 6.241438683757414,
+          "fundingAmount": 16.5,
+          "logFundingAmount": 2.803360380906535
+        },
+        {
+          "companyName": "Weaviate",
+          "roundType": "series_b",
+          "technicalDebtRatio": 6.998616974814383,
+          "fundingAmount": 50,
+          "logFundingAmount": 3.912023005428146
+        },
+        {
+          "companyName": "Yugabyte",
+          "roundType": "seed",
+          "technicalDebtRatio": 6.320930679742332,
+          "fundingAmount": 8,
+          "logFundingAmount": 2.0794415416798357
+        },
+        {
+          "companyName": "Yugabyte",
+          "roundType": "series_a",
+          "technicalDebtRatio": 53.93992932862191,
+          "fundingAmount": 16,
+          "logFundingAmount": 2.772588722239781
+        },
+        {
+          "companyName": "Yugabyte",
+          "roundType": "series_b",
+          "technicalDebtRatio": 4.060339099835126,
+          "fundingAmount": 30,
+          "logFundingAmount": 3.4011973816621555
+        },
+        {
+          "companyName": "Yugabyte",
+          "roundType": "series_b_1",
+          "technicalDebtRatio": 3.6117885430097623,
+          "fundingAmount": 48,
+          "logFundingAmount": 3.871201010907891
+        },
+        {
+          "companyName": "Yugabyte",
+          "roundType": "series_c",
+          "technicalDebtRatio": 3.2566284709116418,
+          "fundingAmount": 188,
+          "logFundingAmount": 5.236441962829949
+        }
+      ],
+      "correlation": -0.014285404790276238,
+      "correlationStrength": "weak",
+      "categories": {
+        "large": {
+          "count": 88,
+          "avgTechDebt": 4.351786247383317
+        },
+        "medium": {
+          "count": 104,
+          "avgTechDebt": 5.379583448935252
+        },
+        "small": {
+          "count": 56,
+          "avgTechDebt": 4.834449819119728
+        }
+      },
+      "insights": [
+        "Correlation with log(funding amount): -0.014 (weak)",
+        "No significant correlation between technical debt and funding amount"
+      ]
+    },
+    "technicalDebtEvolution": {
+      "evolutionSeries": [
+        {
+          "roundType": "seed",
+          "avgTechnicalDebt": 4.674746835145684,
+          "companyCount": 57,
+          "minTechDebt": 0,
+          "maxTechDebt": 54.63227916516533
+        },
+        {
+          "roundType": "series_a",
+          "avgTechnicalDebt": 6.584453198096257,
+          "companyCount": 74,
+          "minTechDebt": 0,
+          "maxTechDebt": 78.47165706973769
+        },
+        {
+          "roundType": "series_b",
+          "avgTechnicalDebt": 4.5461045818042285,
+          "companyCount": 53,
+          "minTechDebt": 0,
+          "maxTechDebt": 24.15242405595146
+        },
+        {
+          "roundType": "series_c",
+          "avgTechnicalDebt": 3.1676131151530895,
+          "companyCount": 23,
+          "minTechDebt": 0,
+          "maxTechDebt": 15.338509451637519
+        },
+        {
+          "roundType": "series_d",
+          "avgTechnicalDebt": 3.0834888324452643,
+          "companyCount": 15,
+          "minTechDebt": 0,
+          "maxTechDebt": 11.93146358288889
+        },
+        {
+          "roundType": "series_e",
+          "avgTechnicalDebt": 5.556326494178684,
+          "companyCount": 6,
+          "minTechDebt": 0.4734085319712448,
+          "maxTechDebt": 23.579694565249337
+        }
+      ],
+      "insights": [
+        "Technical debt evolution tracked across 6 distinct funding stages",
+        "Analysis covers complete funding lifecycle from early-stage to growth rounds"
+      ]
+    }
+  },
+  "summary": {
+    "totalCompanies": 74,
+    "totalSnapshots": 259,
+    "avgTechDebt": 495.7217234513756,
+    "seriesBSuccessRate": 71.62162162162163,
+    "correlationMatrix": {
+      "seriesBCorrelation": 0.12707557524260674,
+      "timeCorrelation": 0.06037545829744479,
+      "amountCorrelation": -0.014285404790276238
+    },
+    "keyInsights": [
+      "74 companies analyzed with 259 successful code snapshots",
+      "Average technical debt ratio: 495.7%",
+      "Series B success rate: 71.6%",
+      "Technical debt correlation with Series B success: 0.127 (weak)",
+      "Time-to-funding correlation: 0.060 (weak)"
+    ]
+  },
+  "exportDate": "2025-09-08T08:52:42.474Z"
 }

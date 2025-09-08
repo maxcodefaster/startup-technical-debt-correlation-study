@@ -241,44 +241,78 @@ async function runAnalysis() {
 }
 
 export async function exportAnalyticsData(): Promise<void> {
-  console.log("📤 Exporting analytics data to JSON...");
+  console.log("📤 Exporting enhanced analytics data to JSON...");
 
   try {
-    const companiesData = await db.select().from(companies);
-    const fundingRoundsData = await db.select().from(fundingRounds);
-    const codeSnapshotsData = await db.select().from(codeSnapshots);
-    const repositoryInfoData = await db.select().from(repositoryInfo);
+    // Import the analytics calculation function from server
+    const { calculateAnalytics } = await import("./server");
 
-    const analyticsData = {
-      companies: companiesData,
-      fundingRounds: fundingRoundsData,
-      codeSnapshots: codeSnapshotsData,
-      repositoryInfo: repositoryInfoData,
-      exportDate: new Date().toISOString(),
-      totalCompanies: companiesData.length,
-      totalSnapshots: codeSnapshotsData.length,
-    };
+    // Get the comprehensive analytics data
+    const analyticsData = await calculateAnalytics();
 
-    // Ensure src directory exists for the HTML file to reference
+    // Ensure directories exist
     if (!fs.existsSync("src")) {
       fs.mkdirSync("src", { recursive: true });
     }
 
+    if (!fs.existsSync("src/dashboard")) {
+      fs.mkdirSync("src/dashboard", { recursive: true });
+    }
+
+    // Write the comprehensive analytics data
     fs.writeFileSync(
       "src/dashboard/analytics.json",
       JSON.stringify(analyticsData, null, 2)
     );
 
-    console.log("✅ Analytics data exported to: src/dashboard/analytics.json");
-    console.log(`   📊 ${companiesData.length} companies`);
-    console.log(`   📈 ${codeSnapshotsData.length} code snapshots`);
+    console.log(
+      "✅ Enhanced analytics data exported to: src/dashboard/analytics.json"
+    );
+    console.log(
+      `   📊 ${analyticsData.summary.totalCompanies} companies analyzed`
+    );
+    console.log(
+      `   📈 ${analyticsData.summary.totalSnapshots} successful code snapshots`
+    );
+    console.log(
+      `   🎯 Series B success rate: ${analyticsData.summary.seriesBSuccessRate.toFixed(
+        1
+      )}%`
+    );
+    console.log(
+      `   📋 ${
+        analyticsData.coreAnalysis.seriesAVsSeriesB.insights.length +
+        analyticsData.coreAnalysis.exitSuccessAnalysis.insights.length
+      } insights generated`
+    );
     console.log(
       `   💾 File size: ${(
         fs.statSync("src/dashboard/analytics.json").size / 1024
       ).toFixed(1)} KB`
     );
+
+    // Also create a summary file for quick reference
+    const summaryData = {
+      summary: analyticsData.summary,
+      keyFindings: {
+        seriesAVsSeriesB: analyticsData.coreAnalysis.seriesAVsSeriesB.insights,
+        exitSuccess: analyticsData.coreAnalysis.exitSuccessAnalysis.insights,
+        timeGap: analyticsData.coreAnalysis.timeGapAnalysis.insights,
+        fundingAmount:
+          analyticsData.coreAnalysis.fundingAmountCorrelation.insights,
+      },
+      exportDate: analyticsData.exportDate,
+    };
+
+    fs.writeFileSync(
+      "src/dashboard/summary.json",
+      JSON.stringify(summaryData, null, 2)
+    );
+
+    console.log("✅ Summary insights exported to: src/dashboard/summary.json");
   } catch (error) {
     console.error("❌ Failed to export analytics data:", error);
+    throw error;
   }
 }
 
