@@ -8,7 +8,28 @@ import {
 import { eq } from "drizzle-orm";
 import { GitHandler } from "./git";
 import { QltyAnalyzer } from "./qlty";
+import { startDashboardServer } from "./server";
 import fs from "fs";
+
+function displayMenu() {
+  console.log("\n🚀 Startup Technical Debt Analysis System");
+  console.log("=".repeat(50));
+  console.log("Choose an option:");
+  console.log("1. 📊 Import & Analyze Technical Debt Data");
+  console.log("2. 🌐 Serve Analytics Dashboard");
+  console.log("3. 🗑️ Clean all repos and start fresh");
+  console.log("4. 📤 Export analytics data to JSON");
+  console.log("5. ❌ Exit");
+  console.log("=".repeat(50));
+}
+
+async function getUserChoice(): Promise<string> {
+  console.log("\nEnter your choice (1-5): ");
+  for await (const line of console) {
+    return line.trim();
+  }
+  return "5";
+}
 
 async function processCompany(company: any) {
   console.log(`\n📈 Processing: ${company.name}`);
@@ -72,7 +93,7 @@ async function processCompany(company: any) {
         })
         .returning();
 
-      // Run Qlty analysis with company name and round type
+      // Run Qlty analysis
       const qltyAnalyzer = new QltyAnalyzer(
         repoPath,
         "./data/analysis_results",
@@ -149,27 +170,19 @@ async function processCompany(company: any) {
   }
 }
 
-async function main() {
-  console.log("🚀 Starting Startup Technical Debt Analysis");
+async function runAnalysis() {
+  console.log("🚀 Starting Technical Debt Analysis");
   console.log("=".repeat(50));
 
   // Check for existing repos
   const existingRepos = GitHandler.listExistingRepos();
   if (existingRepos.length > 0) {
     console.log(`📁 Found ${existingRepos.length} existing repos`);
-    console.log(
-      "💡 Repos will be reused to save time. Use --clean to start fresh."
-    );
+    console.log("💡 Repos will be reused to save time.");
   }
 
   // Import CSV if provided
   const csvPath = process.argv[2] || "./data/startup_seed_data.csv";
-
-  // Check for --clean flag
-  if (process.argv.includes("--clean")) {
-    console.log("🗑️ Cleaning all existing repos...");
-    GitHandler.cleanAllRepos();
-  }
 
   if (csvPath && fs.existsSync(csvPath)) {
     console.log(`📊 Importing data from ${csvPath}...`);
@@ -185,7 +198,7 @@ async function main() {
       "❌ No companies found in database. Please import CSV data first."
     );
     console.log("Usage: bun run start <csv-file>");
-    process.exit(1);
+    return;
   }
 
   console.log(`🏢 Processing ${allCompanies.length} companies...`);
@@ -222,37 +235,93 @@ async function main() {
     ).toFixed(1)}%`
   );
 
-  // Additional metrics summary
-  if (successfulAnalyses.length > 0) {
-    const totalLOC = successfulAnalyses.reduce(
-      (sum, s) => sum + (s.linesOfCode || 0),
-      0
-    );
-    const totalCodeSmells = successfulAnalyses.reduce(
-      (sum, s) => sum + (s.totalCodeSmells || 0),
-      0
-    );
-    const avgComplexity =
-      successfulAnalyses.reduce(
-        (sum, s) => sum + (s.averageComplexity || 0),
-        0
-      ) / successfulAnalyses.length;
-
-    console.log(`\n📈 Code Quality Summary:`);
-    console.log(
-      `   Total lines of code analyzed: ${totalLOC.toLocaleString()}`
-    );
-    console.log(
-      `   Total code smells found: ${totalCodeSmells.toLocaleString()}`
-    );
-    console.log(`   Average complexity: ${avgComplexity.toFixed(2)}`);
-  }
-
   console.log(`\n💾 Data saved to: data/analysis.db`);
   console.log(`📁 Analysis results in: ./data/analysis_results/`);
   console.log(`📁 Repos kept in: ./repos/ (for debugging)`);
-  console.log(`🔍 Use 'bun run studio' to explore the data`);
-  console.log(`🗑️ Use 'bun run start --clean' to clean repos and start fresh`);
+}
+
+export async function exportAnalyticsData(): Promise<void> {
+  console.log("📤 Exporting analytics data to JSON...");
+
+  try {
+    const companiesData = await db.select().from(companies);
+    const fundingRoundsData = await db.select().from(fundingRounds);
+    const codeSnapshotsData = await db.select().from(codeSnapshots);
+    const repositoryInfoData = await db.select().from(repositoryInfo);
+
+    const analyticsData = {
+      companies: companiesData,
+      fundingRounds: fundingRoundsData,
+      codeSnapshots: codeSnapshotsData,
+      repositoryInfo: repositoryInfoData,
+      exportDate: new Date().toISOString(),
+      totalCompanies: companiesData.length,
+      totalSnapshots: codeSnapshotsData.length,
+    };
+
+    // Ensure src directory exists for the HTML file to reference
+    if (!fs.existsSync("src")) {
+      fs.mkdirSync("src", { recursive: true });
+    }
+
+    fs.writeFileSync(
+      "src/dashboard/analytics.json",
+      JSON.stringify(analyticsData, null, 2)
+    );
+
+    console.log("✅ Analytics data exported to: src/dashboard/analytics.json");
+    console.log(`   📊 ${companiesData.length} companies`);
+    console.log(`   📈 ${codeSnapshotsData.length} code snapshots`);
+    console.log(
+      `   💾 File size: ${(
+        fs.statSync("src/dashboard/analytics.json").size / 1024
+      ).toFixed(1)} KB`
+    );
+  } catch (error) {
+    console.error("❌ Failed to export analytics data:", error);
+  }
+}
+
+async function main() {
+  while (true) {
+    displayMenu();
+    const choice = await getUserChoice();
+
+    switch (choice) {
+      case "1":
+        await runAnalysis();
+        break;
+
+      case "2":
+        console.log("🌐 Starting analytics dashboard server...");
+        await exportAnalyticsData(); // Always export fresh data when serving
+        await startDashboardServer();
+        break;
+
+      case "3":
+        console.log("🗑️ Cleaning all existing repos...");
+        GitHandler.cleanAllRepos();
+        console.log("✅ All repos cleaned successfully!");
+        break;
+
+      case "4":
+        await exportAnalyticsData();
+        break;
+
+      case "5":
+        console.log("👋 Goodbye!");
+        process.exit(0);
+        break;
+
+      default:
+        console.log("❌ Invalid choice. Please enter 1-5.");
+    }
+
+    if (choice !== "2") {
+      console.log("\nPress Enter to continue...");
+      await getUserChoice();
+    }
+  }
 }
 
 // Handle graceful shutdown
