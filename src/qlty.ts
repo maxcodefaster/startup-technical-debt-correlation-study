@@ -24,9 +24,6 @@ export interface QltyMetrics {
   issuesByLevel: string; // JSON
   issuesByLanguage: string; // JSON
 
-  // Legacy fields for backward compatibility
-  duplicatedCode: number;
-  similarCode: number;
   highComplexityFunctions: number;
   highComplexityFiles: number;
   manyParameterFunctions: number;
@@ -109,8 +106,6 @@ export class QltyAnalyzer {
         issuesByCategory: smells.issuesByCategory || "{}",
         issuesByLevel: smells.issuesByLevel || "{}",
         issuesByLanguage: smells.issuesByLanguage || "{}",
-        duplicatedCode: smells.duplicatedCode || 0,
-        similarCode: smells.similarCode || 0,
         highComplexityFunctions: smells.highComplexityFunctions || 0,
         highComplexityFiles: smells.highComplexityFiles || 0,
         manyParameterFunctions: smells.manyParameterFunctions || 0,
@@ -175,10 +170,13 @@ export class QltyAnalyzer {
   private async runCodeSmellsToFile(): Promise<void> {
     const outputFile = path.join(this.outputDir, "smells.json");
 
-    const { stdout } = await execAsync("qlty smells --all --quiet --json", {
-      cwd: this.repoPath,
-      maxBuffer: 4 * 1024 * 1024 * 1024, // 4GB
-    });
+    const { stdout } = await execAsync(
+      "qlty smells --all --quiet --json --no-duplication",
+      {
+        cwd: this.repoPath,
+        maxBuffer: 4 * 1024 * 1024 * 1024, // 4GB
+      }
+    );
 
     const cleanedOutput = this.removeSnippetProperties(stdout);
     fs.writeFileSync(outputFile, cleanedOutput);
@@ -234,8 +232,6 @@ export class QltyAnalyzer {
     const levelCount: Record<string, number> = {};
     const languageCount: Record<string, number> = {};
     const legacySmells = {
-      duplicatedCode: 0,
-      similarCode: 0,
       highComplexityFunctions: 0,
       highComplexityFiles: 0,
       manyParameterFunctions: 0,
@@ -261,12 +257,6 @@ export class QltyAnalyzer {
 
       const ruleKey = issue.ruleKey || "";
       switch (ruleKey) {
-        case "identical-code":
-          legacySmells.duplicatedCode++;
-          break;
-        case "similar-code":
-          legacySmells.similarCode++;
-          break;
         case "function-complexity":
           legacySmells.highComplexityFunctions++;
           break;
@@ -364,8 +354,6 @@ export class QltyAnalyzer {
       issuesByCategory: "{}",
       issuesByLevel: "{}",
       issuesByLanguage: "{}",
-      duplicatedCode: 0,
-      similarCode: 0,
       highComplexityFunctions: 0,
       highComplexityFiles: 0,
       manyParameterFunctions: 0,
@@ -407,8 +395,6 @@ export class QltyAnalyzer {
       issuesByCategory: "{}",
       issuesByLevel: "{}",
       issuesByLanguage: "{}",
-      duplicatedCode: 0,
-      similarCode: 0,
       highComplexityFunctions: 0,
       highComplexityFiles: 0,
       manyParameterFunctions: 0,

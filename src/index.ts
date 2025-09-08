@@ -9,26 +9,28 @@ import { eq } from "drizzle-orm";
 import { GitHandler } from "./git";
 import { QltyAnalyzer } from "./qlty";
 import { startDashboardServer } from "./server";
+import { calculateComprehensiveAnalytics } from "./analytics";
 import fs from "fs";
 
 function displayMenu() {
-  console.log("\n🚀 Startup Technical Debt Analysis System");
-  console.log("=".repeat(50));
+  console.log("\n🚀 Enhanced Startup Technical Debt Analysis System");
+  console.log("=".repeat(60));
   console.log("Choose an option:");
   console.log("1. 📊 Import & Analyze Technical Debt Data");
-  console.log("2. 🌐 Serve Analytics Dashboard");
+  console.log("2. 🌐 Serve Enhanced Analytics Dashboard");
   console.log("3. 🗑️ Clean all repos and start fresh");
-  console.log("4. 📤 Export analytics data to JSON");
-  console.log("5. ❌ Exit");
-  console.log("=".repeat(50));
+  console.log("4. 📤 Export enhanced analytics data to JSON");
+  console.log("5. 🔍 Debug: Show data statistics");
+  console.log("6. ❌ Exit");
+  console.log("=".repeat(60));
 }
 
 async function getUserChoice(): Promise<string> {
-  console.log("\nEnter your choice (1-5): ");
+  console.log("\nEnter your choice (1-6): ");
   for await (const line of console) {
     return line.trim();
   }
-  return "5";
+  return "6";
 }
 
 async function processCompany(company: any) {
@@ -129,9 +131,6 @@ async function processCompany(company: any) {
         issuesByLevel: qltyMetrics.issuesByLevel,
         issuesByLanguage: qltyMetrics.issuesByLanguage,
 
-        // Legacy fields for backward compatibility
-        duplicatedCode: qltyMetrics.duplicatedCode,
-        similarCode: qltyMetrics.similarCode,
         highComplexityFunctions: qltyMetrics.highComplexityFunctions,
         highComplexityFiles: qltyMetrics.highComplexityFiles,
         manyParameterFunctions: qltyMetrics.manyParameterFunctions,
@@ -171,8 +170,8 @@ async function processCompany(company: any) {
 }
 
 async function runAnalysis() {
-  console.log("🚀 Starting Technical Debt Analysis");
-  console.log("=".repeat(50));
+  console.log("🚀 Starting Enhanced Technical Debt Analysis");
+  console.log("=".repeat(60));
 
   // Check for existing repos
   const existingRepos = GitHandler.listExistingRepos();
@@ -217,14 +216,14 @@ async function runAnalysis() {
     }
   }
 
-  console.log("\n🎉 Analysis complete!");
-  console.log("=".repeat(50));
+  console.log("\n🎉 Enhanced Analysis Complete!");
+  console.log("=".repeat(60));
 
-  // Summary statistics
+  // Enhanced summary statistics
   const totalSnapshots = await db.select().from(codeSnapshots);
   const successfulAnalyses = totalSnapshots.filter((s) => s.analysisSuccess);
 
-  console.log(`📊 Summary:`);
+  console.log(`📊 Analysis Summary:`);
   console.log(`   Companies processed: ${allCompanies.length}`);
   console.log(`   Total snapshots: ${totalSnapshots.length}`);
   console.log(`   Successful analyses: ${successfulAnalyses.length}`);
@@ -235,20 +234,35 @@ async function runAnalysis() {
     ).toFixed(1)}%`
   );
 
+  // Calculate some quick insights
+  if (successfulAnalyses.length > 0) {
+    const avgLOC =
+      successfulAnalyses.reduce((sum, s) => sum + (s.linesOfCode || 0), 0) /
+      successfulAnalyses.length;
+    const avgComplexity =
+      successfulAnalyses.reduce((sum, s) => sum + (s.complexity || 0), 0) /
+      successfulAnalyses.length;
+
+    console.log(
+      `   Average LOC per snapshot: ${Math.round(avgLOC).toLocaleString()}`
+    );
+    console.log(
+      `   Average complexity: ${Math.round(avgComplexity).toLocaleString()}`
+    );
+  }
+
   console.log(`\n💾 Data saved to: data/analysis.db`);
   console.log(`📁 Analysis results in: ./data/analysis_results/`);
   console.log(`📁 Repos kept in: ./repos/ (for debugging)`);
+  console.log(`\n🎯 Run option 2 to view enhanced analytics dashboard!`);
 }
 
-export async function exportAnalyticsData(): Promise<void> {
+export async function exportEnhancedAnalyticsData(): Promise<void> {
   console.log("📤 Exporting enhanced analytics data to JSON...");
 
   try {
-    // Import the analytics calculation function from server
-    const { calculateAnalytics } = await import("./server");
-
     // Get the comprehensive analytics data
-    const analyticsData = await calculateAnalytics();
+    const analyticsData = await calculateComprehensiveAnalytics();
 
     // Ensure directories exist
     if (!fs.existsSync("src")) {
@@ -261,12 +275,12 @@ export async function exportAnalyticsData(): Promise<void> {
 
     // Write the comprehensive analytics data
     fs.writeFileSync(
-      "src/dashboard/analytics.json",
+      "src/dashboard/enhanced_analytics.json",
       JSON.stringify(analyticsData, null, 2)
     );
 
     console.log(
-      "✅ Enhanced analytics data exported to: src/dashboard/analytics.json"
+      "✅ Enhanced analytics data exported to: src/dashboard/enhanced_analytics.json"
     );
     console.log(
       `   📊 ${analyticsData.summary.totalCompanies} companies analyzed`
@@ -280,39 +294,115 @@ export async function exportAnalyticsData(): Promise<void> {
       )}%`
     );
     console.log(
-      `   📋 ${
-        analyticsData.coreAnalysis.seriesAVsSeriesB.insights.length +
-        analyticsData.coreAnalysis.exitSuccessAnalysis.insights.length
-      } insights generated`
+      `   🔍 ${analyticsData.strongestCorrelations.length} significant correlations found`
+    );
+    console.log(
+      `   🎨 Top language: ${
+        analyticsData.summary.topLanguages[0]?.language || "Unknown"
+      }`
     );
     console.log(
       `   💾 File size: ${(
-        fs.statSync("src/dashboard/analytics.json").size / 1024
+        fs.statSync("src/dashboard/enhanced_analytics.json").size / 1024
       ).toFixed(1)} KB`
     );
 
     // Also create a summary file for quick reference
     const summaryData = {
       summary: analyticsData.summary,
-      keyFindings: {
-        seriesAVsSeriesB: analyticsData.coreAnalysis.seriesAVsSeriesB.insights,
-        exitSuccess: analyticsData.coreAnalysis.exitSuccessAnalysis.insights,
-        timeGap: analyticsData.coreAnalysis.timeGapAnalysis.insights,
-        fundingAmount:
-          analyticsData.coreAnalysis.fundingAmountCorrelation.insights,
-      },
+      keyInsights: analyticsData.keyInsights,
+      strongestCorrelations: analyticsData.strongestCorrelations.slice(0, 5),
       exportDate: analyticsData.exportDate,
     };
 
     fs.writeFileSync(
-      "src/dashboard/summary.json",
+      "src/dashboard/enhanced_summary.json",
       JSON.stringify(summaryData, null, 2)
     );
 
-    console.log("✅ Summary insights exported to: src/dashboard/summary.json");
+    console.log(
+      "✅ Enhanced summary exported to: src/dashboard/enhanced_summary.json"
+    );
   } catch (error) {
-    console.error("❌ Failed to export analytics data:", error);
+    console.error("❌ Failed to export enhanced analytics data:", error);
     throw error;
+  }
+}
+
+async function showDataStatistics() {
+  console.log("🔍 Database Statistics");
+  console.log("=".repeat(40));
+
+  try {
+    const companiesData = await db.select().from(companies);
+    const roundsData = await db.select().from(fundingRounds);
+    const snapshotsData = await db.select().from(codeSnapshots);
+    const repoInfoData = await db.select().from(repositoryInfo);
+
+    console.log(`📊 Data Overview:`);
+    console.log(`   Companies: ${companiesData.length}`);
+    console.log(`   Funding rounds: ${roundsData.length}`);
+    console.log(`   Code snapshots: ${snapshotsData.length}`);
+    console.log(`   Repository info: ${repoInfoData.length}`);
+    console.log(
+      `   Successful analyses: ${
+        snapshotsData.filter((s) => s.analysisSuccess).length
+      }`
+    );
+
+    if (snapshotsData.length > 0) {
+      const avgTechDebt =
+        snapshotsData.reduce((sum, s) => sum + (s.technicalDebtRatio || 0), 0) /
+        snapshotsData.length;
+      const avgLOC =
+        snapshotsData.reduce((sum, s) => sum + (s.linesOfCode || 0), 0) /
+        snapshotsData.length;
+
+      console.log(`\n📈 Quality Metrics:`);
+      console.log(
+        `   Average tech debt ratio: ${(avgTechDebt * 100).toFixed(1)}%`
+      );
+      console.log(
+        `   Average lines of code: ${Math.round(avgLOC).toLocaleString()}`
+      );
+    }
+
+    // Exit states breakdown
+    const exitStates = companiesData.reduce((acc, c) => {
+      acc[c.exitState || "none"] = (acc[c.exitState || "none"] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    console.log(`\n🎯 Exit States:`);
+    Object.entries(exitStates).forEach(([state, count]) => {
+      console.log(`   ${state}: ${count} companies`);
+    });
+
+    // Round types breakdown
+    const roundTypes = roundsData.reduce((acc, r) => {
+      acc[r.roundType] = (acc[r.roundType] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    console.log(`\n💰 Funding Rounds:`);
+    Object.entries(roundTypes).forEach(([type, count]) => {
+      console.log(`   ${type}: ${count} rounds`);
+    });
+
+    console.log(`\n🔍 Sample snapshot data:`);
+    const sampleSnapshot = snapshotsData.find((s) => s.analysisSuccess);
+    if (sampleSnapshot) {
+      console.log(`   LOC: ${sampleSnapshot.linesOfCode || 0}`);
+      console.log(`   Complexity: ${sampleSnapshot.complexity || 0}`);
+      console.log(`   Total issues: ${sampleSnapshot.totalIssues || 0}`);
+      console.log(
+        `   Tech debt ratio: ${(
+          (sampleSnapshot.technicalDebtRatio || 0) * 100
+        ).toFixed(2)}%`
+      );
+    }
+  } catch (error) {
+    console.error("❌ Error fetching statistics:", error);
   }
 }
 
@@ -327,8 +417,8 @@ async function main() {
         break;
 
       case "2":
-        console.log("🌐 Starting analytics dashboard server...");
-        await exportAnalyticsData(); // Always export fresh data when serving
+        console.log("🌐 Starting enhanced analytics dashboard server...");
+        await exportEnhancedAnalyticsData(); // Always export fresh data when serving
         await startDashboardServer();
         break;
 
@@ -339,16 +429,20 @@ async function main() {
         break;
 
       case "4":
-        await exportAnalyticsData();
+        await exportEnhancedAnalyticsData();
         break;
 
       case "5":
+        await showDataStatistics();
+        break;
+
+      case "6":
         console.log("👋 Goodbye!");
         process.exit(0);
         break;
 
       default:
-        console.log("❌ Invalid choice. Please enter 1-5.");
+        console.log("❌ Invalid choice. Please enter 1-6.");
     }
 
     if (choice !== "2") {

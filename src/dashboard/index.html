@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Technical Debt & Startup Success Analysis</title>
+    <title>Enhanced Technical Debt & Startup Success Analysis</title>
     <style>
       * {
         margin: 0;
@@ -64,7 +64,7 @@
       }
 
       .container {
-        max-width: 1400px;
+        max-width: 1600px;
         margin: 0 auto;
         padding: 0 2rem;
       }
@@ -97,7 +97,7 @@
 
       .dashboard-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
         gap: 2rem;
         margin-bottom: 2rem;
       }
@@ -109,6 +109,10 @@
         padding: 2rem;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .card.wide {
+        grid-column: 1 / -1;
       }
 
       .card h2 {
@@ -127,6 +131,10 @@
 
       .chart-container.large {
         height: 500px;
+      }
+
+      .chart-container.small {
+        height: 300px;
       }
 
       .insights {
@@ -178,43 +186,37 @@
         }
       }
 
-      .correlation-value {
-        font-size: 1.2rem;
-        font-weight: bold;
-        padding: 0.5rem;
-        border-radius: 6px;
-        display: inline-block;
-        margin: 0.5rem;
+      .correlation-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1rem;
+        margin: 1rem 0;
       }
 
-      .correlation-strong {
-        background: #ff6b6b;
-        color: white;
-      }
-      .correlation-moderate {
-        background: #ffa726;
-        color: white;
-      }
-      .correlation-weak {
-        background: #66bb6a;
-        color: white;
-      }
-
-      .summary-section {
-        grid-column: 1 / -1;
+      .correlation-card {
         background: linear-gradient(135deg, #667eea, #764ba2);
         color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
       }
 
-      .summary-section h2 {
-        color: white;
-        border-bottom-color: rgba(255, 255, 255, 0.3);
+      .correlation-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+
+      .correlation-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
       }
 
       .tabs {
         display: flex;
         margin-bottom: 1rem;
         border-bottom: 1px solid #ddd;
+        flex-wrap: wrap;
       }
 
       .tab {
@@ -222,9 +224,10 @@
         background: none;
         border: none;
         cursor: pointer;
-        font-size: 1rem;
+        font-size: 0.9rem;
         border-bottom: 2px solid transparent;
         transition: all 0.3s ease;
+        white-space: nowrap;
       }
 
       .tab.active {
@@ -258,20 +261,110 @@
         color: #666;
         font-style: italic;
       }
+
+      .language-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.5rem;
+        margin: 1rem 0;
+      }
+
+      .language-card {
+        background: #f8f9ff;
+        padding: 0.8rem;
+        border-radius: 6px;
+        text-align: center;
+        border: 1px solid #e0e0e0;
+      }
+
+      .language-name {
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 0.2rem;
+      }
+
+      .language-stats {
+        font-size: 0.8rem;
+        color: #666;
+      }
+
+      .debug-panel {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        font-family: monospace;
+        font-size: 0.8rem;
+        max-width: 300px;
+        z-index: 1000;
+        display: none;
+      }
+
+      .debug-toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 0.5rem;
+        border-radius: 4px;
+        cursor: pointer;
+        z-index: 1001;
+      }
+
+      .trend-chart {
+        background: linear-gradient(135deg, #f8f9ff, #e8f5e8);
+        border-radius: 8px;
+        padding: 1rem;
+      }
+
+      .highlight {
+        background: linear-gradient(45deg, #ffd700, #ffed4e);
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-weight: bold;
+        color: #333;
+      }
+
+      @media (max-width: 768px) {
+        .dashboard-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .metrics-grid {
+          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+
+        .correlation-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .container {
+          padding: 0 1rem;
+        }
+      }
     </style>
   </head>
   <body>
+    <button class="debug-toggle" onclick="toggleDebug()">🔍 Debug</button>
+    <div id="debugPanel" class="debug-panel"></div>
+
     <div class="header">
-      <h1>Technical Debt & Startup Success Analysis</h1>
+      <h1>Enhanced Technical Debt & Startup Success Analysis</h1>
       <p>
-        Comprehensive analysis of code quality metrics and their correlation
-        with funding success, exit outcomes, and growth trajectories
+        Deep dive into code quality metrics, growth patterns, and their
+        correlation with funding success, exit outcomes, and business
+        trajectories
       </p>
       <div id="statusIndicator" class="status-indicator">Loading...</div>
     </div>
 
     <div class="container">
-      <!-- Metrics Summary -->
+      <!-- Enhanced Metrics Summary -->
       <div class="metrics-grid">
         <div class="metric-card">
           <div class="metric-value" id="totalCompanies">-</div>
@@ -282,8 +375,16 @@
           <div class="metric-label">Code Snapshots</div>
         </div>
         <div class="metric-card">
-          <div class="metric-value" id="avgTechDebt">-</div>
-          <div class="metric-label">Avg Tech Debt Ratio</div>
+          <div class="metric-value" id="avgLinesOfCode">-</div>
+          <div class="metric-label">Avg Lines of Code</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="avgCodebaseAge">-</div>
+          <div class="metric-label">Avg Codebase Age (days)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="topLanguage">-</div>
+          <div class="metric-label">Top Programming Language</div>
         </div>
         <div class="metric-card">
           <div class="metric-value" id="successRate">-</div>
@@ -291,117 +392,183 @@
         </div>
       </div>
 
+      <!-- Strongest Correlations Overview -->
+      <div class="card wide">
+        <h2>🔥 Strongest Correlations Discovered</h2>
+        <div id="correlationsGrid" class="correlation-grid">
+          <div class="loading">
+            <div class="spinner"></div>
+            Identifying strongest correlations across all metrics...
+          </div>
+        </div>
+      </div>
+
       <!-- Main Dashboard -->
       <div class="dashboard-grid">
-        <!-- Primary Hypothesis: Series A vs Series B -->
+        <!-- Code Growth Analysis -->
         <div class="card">
-          <h2>
-            Primary Hypothesis: Series A Technical Debt vs Series B Success
-          </h2>
-          <div class="chart-container">
-            <canvas id="seriesAvsB"></canvas>
-          </div>
-          <div class="insights" id="seriesInsights">
-            <div class="loading">
-              <div class="spinner"></div>
-              Analyzing Series A technical debt patterns...
-            </div>
-          </div>
-        </div>
-
-        <!-- Exit Success Analysis -->
-        <div class="card">
-          <h2>Exit Success Analysis</h2>
+          <h2>📈 Code Growth vs Funding Success</h2>
           <div class="tabs">
-            <button class="tab active" onclick="showTab('exit-overview')">
-              Overview
+            <button class="tab active" onclick="showTab('growth-overview')">
+              Growth Rates
             </button>
-            <button class="tab" onclick="showTab('exit-metrics')">
-              Tech Debt by Exit
+            <button class="tab" onclick="showTab('growth-scatter')">
+              Scatter Plot
             </button>
           </div>
-          <div id="exit-overview" class="tab-content active">
+          <div id="growth-overview" class="tab-content active">
             <div class="chart-container">
-              <canvas id="exitAnalysis"></canvas>
+              <canvas id="codeGrowthChart"></canvas>
             </div>
           </div>
-          <div id="exit-metrics" class="tab-content">
+          <div id="growth-scatter" class="tab-content">
             <div class="chart-container">
-              <canvas id="exitTechDebt"></canvas>
+              <canvas id="codeGrowthScatter"></canvas>
             </div>
           </div>
-          <div class="insights" id="exitInsights">
+          <div class="insights" id="codeGrowthInsights">
             <div class="loading">
               <div class="spinner"></div>
-              Analyzing exit outcomes vs technical debt...
+              Analyzing code growth patterns vs funding success...
             </div>
           </div>
         </div>
 
-        <!-- Funding Trajectory Analysis -->
+        <!-- Complexity Evolution -->
         <div class="card">
-          <h2>Funding Trajectory Analysis</h2>
+          <h2>🧠 Complexity Evolution</h2>
           <div class="chart-container">
-            <canvas id="trajectoryAnalysis"></canvas>
+            <canvas id="complexityEvolutionChart"></canvas>
           </div>
-          <div class="insights" id="trajectoryInsights">
+          <div class="insights" id="complexityInsights">
             <div class="loading">
               <div class="spinner"></div>
-              Analyzing funding progression patterns...
+              Tracking complexity evolution across funding rounds...
             </div>
           </div>
         </div>
 
-        <!-- Time-to-Funding Correlation -->
+        <!-- Quality Metrics vs Exit -->
         <div class="card">
-          <h2>Time-to-Funding Correlation</h2>
-          <div class="chart-container">
-            <canvas id="timeCorrelation"></canvas>
+          <h2>🎯 Code Quality vs Exit Outcomes</h2>
+          <div class="tabs">
+            <button class="tab active" onclick="showTab('quality-duplication')">
+              Duplication
+            </button>
+            <button class="tab" onclick="showTab('quality-complexity')">
+              Complexity Density
+            </button>
+            <button class="tab" onclick="showTab('quality-issues')">
+              Issues Density
+            </button>
           </div>
-          <div class="insights" id="timeInsights">
+          <div id="quality-duplication" class="tab-content active">
+            <div class="chart-container small">
+              <canvas id="qualityDuplicationChart"></canvas>
+            </div>
+          </div>
+          <div id="quality-complexity" class="tab-content">
+            <div class="chart-container small">
+              <canvas id="qualityComplexityChart"></canvas>
+            </div>
+          </div>
+          <div id="quality-issues" class="tab-content">
+            <div class="chart-container small">
+              <canvas id="qualityIssuesChart"></canvas>
+            </div>
+          </div>
+          <div class="insights" id="qualityInsights">
             <div class="loading">
               <div class="spinner"></div>
-              Calculating time-gap correlations...
+              Analyzing quality metrics vs exit outcomes...
             </div>
           </div>
         </div>
 
-        <!-- Technical Debt Evolution -->
+        <!-- Repository Characteristics -->
         <div class="card">
-          <h2>Technical Debt Evolution</h2>
-          <div class="chart-container large">
-            <canvas id="evolutionChart"></canvas>
+          <h2>📁 Repository Characteristics</h2>
+          <div class="tabs">
+            <button class="tab active" onclick="showTab('repo-size')">
+              Size vs Funding
+            </button>
+            <button class="tab" onclick="showTab('repo-age')">
+              Age vs Success
+            </button>
+            <button class="tab" onclick="showTab('repo-files')">
+              Files vs LOC
+            </button>
           </div>
-          <div class="insights" id="evolutionInsights">
+          <div id="repo-size" class="tab-content active">
+            <div class="chart-container small">
+              <canvas id="repoSizeChart"></canvas>
+            </div>
+          </div>
+          <div id="repo-age" class="tab-content">
+            <div class="chart-container small">
+              <canvas id="repoAgeChart"></canvas>
+            </div>
+          </div>
+          <div id="repo-files" class="tab-content">
+            <div class="chart-container small">
+              <canvas id="repoFilesChart"></canvas>
+            </div>
+          </div>
+          <div class="insights" id="repoInsights">
             <div class="loading">
               <div class="spinner"></div>
-              Tracking technical debt evolution over time...
+              Analyzing repository characteristics vs success...
             </div>
           </div>
         </div>
 
-        <!-- Funding Amount vs Technical Debt -->
-        <div class="card">
-          <h2>Funding Amount vs Technical Debt</h2>
-          <div class="chart-container">
-            <canvas id="amountCorrelation"></canvas>
+        <!-- Language Technology Analysis -->
+        <div class="card wide">
+          <h2>💻 Programming Language & Technology Analysis</h2>
+          <div class="tabs">
+            <button class="tab active" onclick="showTab('lang-overview')">
+              Language Overview
+            </button>
+            <button class="tab" onclick="showTab('lang-funding')">
+              Languages vs Funding
+            </button>
+            <button class="tab" onclick="showTab('lang-quality')">
+              Languages vs Quality
+            </button>
           </div>
-          <div class="insights" id="amountInsights">
+          <div id="lang-overview" class="tab-content active">
+            <div id="languageGrid" class="language-grid">
+              <div class="loading">
+                <div class="spinner"></div>
+                Analyzing programming language usage...
+              </div>
+            </div>
+          </div>
+          <div id="lang-funding" class="tab-content">
+            <div class="chart-container">
+              <canvas id="languageFundingChart"></canvas>
+            </div>
+          </div>
+          <div id="lang-quality" class="tab-content">
+            <div class="chart-container">
+              <canvas id="languageQualityChart"></canvas>
+            </div>
+          </div>
+          <div class="insights" id="languageInsights">
             <div class="loading">
               <div class="spinner"></div>
-              Analyzing funding amount correlations...
+              Analyzing programming language patterns vs success...
             </div>
           </div>
         </div>
 
-        <!-- Key Findings Summary -->
-        <div class="card summary-section">
-          <h2>Key Findings & Statistical Summary</h2>
-          <div id="correlationMatrix"></div>
-          <div class="insights" id="summaryInsights">
+        <!-- Key Insights Summary -->
+        <div class="card wide">
+          <h2>🎯 Key Insights & Actionable Findings</h2>
+          <div class="insights" id="keyInsightsSummary">
             <div class="loading">
               <div class="spinner"></div>
-              Generating comprehensive analysis summary...
+              Generating comprehensive insights summary...
             </div>
           </div>
         </div>
@@ -414,32 +581,34 @@
     <script>
       // Global data storage
       let analyticsData = null;
+      let debugMode = false;
 
       // Utility functions
       function showTab(tabId) {
-        document
+        const parentCard = event.target.closest(".card");
+        parentCard
           .querySelectorAll(".tab-content")
           .forEach((el) => el.classList.remove("active"));
-        document
+        parentCard
           .querySelectorAll(".tab")
           .forEach((el) => el.classList.remove("active"));
-        document.getElementById(tabId).classList.add("active");
+        parentCard.querySelector(`#${tabId}`).classList.add("active");
         event.target.classList.add("active");
       }
 
       function formatNumber(num) {
         if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
         if (num >= 1000) return (num / 1000).toFixed(1) + "K";
-        return num.toFixed(2);
+        return Math.round(num).toLocaleString();
       }
 
       function updateStatusIndicator() {
         const indicator = document.getElementById("statusIndicator");
         if (isLocalhost()) {
-          indicator.textContent = "🟢 Live Data (API)";
+          indicator.textContent = "🟢 Live Enhanced Analytics";
           indicator.className = "status-indicator status-localhost";
         } else {
-          indicator.textContent = "📄 Static Data";
+          indicator.textContent = "📄 Demo Mode";
           indicator.className = "status-indicator status-production";
         }
       }
@@ -459,12 +628,390 @@
         }
       }
 
-      function showChartPlaceholder(canvasId, message) {
-        const canvas = document.getElementById(canvasId);
-        if (canvas) {
-          const container = canvas.parentElement;
-          container.innerHTML = `<div class="chart-loading">${message}</div>`;
+      function toggleDebug() {
+        debugMode = !debugMode;
+        const panel = document.getElementById("debugPanel");
+        panel.style.display = debugMode ? "block" : "none";
+
+        if (debugMode) {
+          updateDebugPanel();
         }
+      }
+
+      async function updateDebugPanel() {
+        try {
+          const response = await fetch("/api/debug-info");
+          const debug = await response.json();
+
+          document.getElementById("debugPanel").innerHTML = `
+            <h4>Debug Info</h4>
+            <div>Companies: ${debug.companies}</div>
+            <div>Funding Rounds: ${debug.fundingRounds}</div>
+            <div>Code Snapshots: ${debug.codeSnapshots}</div>
+            <div>Successful: ${debug.successfulSnapshots}</div>
+            <div>Avg Tech Debt: ${debug.avgTechDebtRatio?.toFixed(2)}</div>
+            <div>API Status: ${isLocalhost() ? "Live" : "Demo"}</div>
+          `;
+        } catch (error) {
+          document.getElementById("debugPanel").innerHTML = `
+            <h4>Debug Info</h4>
+            <div>Error: ${error.message}</div>
+          `;
+        }
+      }
+
+      // Main data loading function
+      async function loadData() {
+        updateStatusIndicator();
+
+        try {
+          let data;
+
+          if (isLocalhost()) {
+            console.log("Loading enhanced analytics from API...");
+            const response = await fetch("/api/analysis-data");
+            if (!response.ok) throw new Error(`API error: ${response.status}`);
+            data = await response.json();
+          } else {
+            console.log("Loading demo data for enhanced analytics");
+            data = createEnhancedDemoData();
+          }
+
+          analyticsData = data;
+          updateMetrics();
+          updateCorrelationsOverview();
+
+          // Wait for Chart.js then create visualizations
+          waitForChart(() => {
+            createEnhancedVisualizations();
+          });
+        } catch (error) {
+          console.error("Error loading enhanced analytics:", error);
+          showError(
+            "keyInsightsSummary",
+            "Failed to load enhanced analytics data. Using demo data for visualization."
+          );
+
+          // Fallback to enhanced demo data
+          analyticsData = createEnhancedDemoData();
+          updateMetrics();
+          updateCorrelationsOverview();
+          waitForChart(() => {
+            createEnhancedVisualizations();
+          });
+        }
+      }
+
+      // Enhanced demo data creation
+      function createEnhancedDemoData() {
+        return {
+          summary: {
+            totalCompanies: 74,
+            totalSnapshots: 259,
+            avgLinesOfCode: 42350,
+            avgComplexity: 892,
+            seriesBSuccessRate: 71.6,
+            avgCodebaseAge: 623,
+            topLanguages: [
+              { language: "JavaScript", usage: 145 },
+              { language: "Python", usage: 98 },
+              { language: "TypeScript", usage: 76 },
+              { language: "Java", usage: 54 },
+              { language: "Go", usage: 32 },
+            ],
+          },
+          coreAnalysis: {
+            codeGrowthAnalysis: {
+              growthData: generateGrowthData(40),
+              locGrowthCorrelation: 0.342,
+              complexityGrowthCorrelation: -0.187,
+              insights: [
+                "LOC growth rate correlation with funding success: 0.342 (Moderate)",
+                "Complexity growth rate correlation: -0.187 (Weak)",
+                "Average LOC growth: 12.3% per month",
+              ],
+            },
+            complexityEvolutionAnalysis: {
+              evolutionData: [
+                {
+                  roundType: "seed",
+                  avgTotalComplexity: 234,
+                  avgFunctionComplexity: 3.2,
+                  companyCount: 45,
+                },
+                {
+                  roundType: "series_a",
+                  avgTotalComplexity: 567,
+                  avgFunctionComplexity: 4.1,
+                  companyCount: 62,
+                },
+                {
+                  roundType: "series_b",
+                  avgTotalComplexity: 892,
+                  avgFunctionComplexity: 4.8,
+                  companyCount: 38,
+                },
+                {
+                  roundType: "series_c",
+                  avgTotalComplexity: 1205,
+                  avgFunctionComplexity: 5.2,
+                  companyCount: 18,
+                },
+              ],
+              insights: [
+                "Complexity tracked across 4 funding stages",
+                "Highest average complexity in series_c",
+              ],
+            },
+            qualityMetricsVsExitAnalysis: {
+              exitMetrics: [
+                {
+                  exitState: "none",
+                  avgDuplication: 8.2,
+                  avgComplexityDensity: 21.3,
+                  avgIssuesDensity: 34.7,
+                  companyCount: 65,
+                },
+                {
+                  exitState: "acquired",
+                  avgDuplication: 5.8,
+                  avgComplexityDensity: 18.9,
+                  avgIssuesDensity: 28.4,
+                  companyCount: 7,
+                },
+                {
+                  exitState: "ipo",
+                  avgDuplication: 4.1,
+                  avgComplexityDensity: 15.2,
+                  avgIssuesDensity: 22.1,
+                  companyCount: 2,
+                },
+              ],
+              insights: [
+                "none: 8.2% duplication, 21.3 complexity density (65 companies)",
+                "acquired: 5.8% duplication, 18.9 complexity density (7 companies)",
+                "ipo: 4.1% duplication, 15.2 complexity density (2 companies)",
+              ],
+            },
+            repositoryCharacteristicsAnalysis: {
+              characteristics: generateRepoCharacteristics(50),
+              correlations: {
+                sizeVsFunding: 0.423,
+                filesVsLOC: 0.789,
+                ageVsFunding: 0.156,
+              },
+              insights: [
+                "Repo size vs funding correlation: 0.423 (Moderate)",
+                "Files vs LOC correlation: 0.789 (Very Strong)",
+                "Codebase age vs funding correlation: 0.156 (Weak)",
+              ],
+            },
+            languageTechnologyAnalysis: {
+              languageAnalysis: [
+                {
+                  language: "JavaScript",
+                  companyCount: 45,
+                  avgComplexity: 4.2,
+                  avgIssuesDensity: 28.3,
+                  avgFunding: 8.5,
+                },
+                {
+                  language: "Python",
+                  companyCount: 38,
+                  avgComplexity: 3.8,
+                  avgIssuesDensity: 24.7,
+                  avgFunding: 12.2,
+                },
+                {
+                  language: "TypeScript",
+                  companyCount: 29,
+                  avgComplexity: 4.5,
+                  avgIssuesDensity: 26.1,
+                  avgFunding: 15.8,
+                },
+                {
+                  language: "Java",
+                  companyCount: 22,
+                  avgComplexity: 5.1,
+                  avgIssuesDensity: 31.4,
+                  avgFunding: 18.3,
+                },
+                {
+                  language: "Go",
+                  companyCount: 18,
+                  avgComplexity: 3.2,
+                  avgIssuesDensity: 19.8,
+                  avgFunding: 22.1,
+                },
+              ],
+              insights: [
+                "Top languages: JavaScript (45 companies), Python (38 companies), TypeScript (29 companies)",
+                "Language with highest funding: Go",
+              ],
+            },
+          },
+          strongestCorrelations: [
+            {
+              metric1: "Repository Size",
+              metric2: "Funding Amount",
+              correlation: 0.456,
+              strength: "Moderate",
+              insight:
+                "Moderate positive correlation between repository size and funding amount",
+            },
+            {
+              metric1: "Quality Score",
+              metric2: "Funding Success",
+              correlation: -0.387,
+              strength: "Moderate",
+              insight:
+                "Moderate negative correlation between composite quality score and funding success",
+            },
+            {
+              metric1: "Lines per File",
+              metric2: "Technical Debt Ratio",
+              correlation: 0.345,
+              strength: "Moderate",
+              insight:
+                "Moderate positive correlation between lines per file and technical debt ratio",
+            },
+            {
+              metric1: "Code Growth Rate",
+              metric2: "Funding Success",
+              correlation: 0.342,
+              strength: "Moderate",
+              insight:
+                "Moderate positive correlation between code growth rate and funding success",
+            },
+            {
+              metric1: "Scale-Quality Ratio",
+              metric2: "Funding Success",
+              correlation: 0.298,
+              strength: "Weak",
+              insight:
+                "Weak positive correlation between scale-quality ratio and funding success",
+            },
+            {
+              metric1: "Lines of Code",
+              metric2: "Technical Debt Ratio",
+              correlation: 0.287,
+              strength: "Weak",
+              insight:
+                "Weak positive correlation between codebase size and technical debt ratio",
+            },
+            {
+              metric1: "Duplication %",
+              metric2: "Exit Success",
+              correlation: -0.234,
+              strength: "Weak",
+              insight:
+                "Weak negative correlation between code duplication and successful exits",
+            },
+            {
+              metric1: "Maturity Score",
+              metric2: "Funding Success",
+              correlation: 0.234,
+              strength: "Weak",
+              insight:
+                "Weak positive correlation between codebase maturity and funding success",
+            },
+          ],
+          keyInsights: [
+            "Repository size emerges as the strongest technical predictor of funding success (r=0.456)",
+            "Composite quality scores show stronger correlation (-0.387) than individual metrics",
+            "Quality quintile analysis reveals 42.3 percentage point difference in success rates",
+            "Technical debt threshold of 25.3% creates 26.1% difference in success rates",
+            "Code organization (lines per file) strongly correlates with technical debt accumulation",
+            "Temporal trends show improving funding success rates over time despite rising complexity",
+          ],
+          exportDate: new Date().toISOString(),
+        };
+      }
+
+      function generateGrowthData(count) {
+        const data = [];
+        for (let i = 0; i < count; i++) {
+          data.push({
+            companyId: i,
+            companyName: `Company ${i}`,
+            locGrowthRate: (Math.random() - 0.3) * 50, // -15 to +35
+            complexityGrowthRate: (Math.random() - 0.5) * 30, // -15 to +15
+            timeMonths: Math.random() * 18 + 3, // 3-21 months
+            fundingSuccess: Math.random() > 0.4,
+          });
+        }
+        return data;
+      }
+
+      function generateRepoCharacteristics(count) {
+        const data = [];
+        for (let i = 0; i < count; i++) {
+          const loc = Math.random() * 100000 + 5000;
+          data.push({
+            companyName: `Company ${i}`,
+            repoSizeMB: Math.random() * 200 + 10,
+            totalFiles: Math.round(loc / 100 + Math.random() * 500),
+            linesOfCode: Math.round(loc),
+            codebaseAge: Math.random() * 1000 + 100,
+            fundingAmount: Math.random() * 50000000 + 1000000,
+          });
+        }
+        return data;
+      }
+
+      // Update enhanced metrics
+      function updateMetrics() {
+        if (!analyticsData || !analyticsData.summary) return;
+
+        const summary = analyticsData.summary;
+
+        document.getElementById("totalCompanies").textContent =
+          summary.totalCompanies;
+        document.getElementById("totalSnapshots").textContent =
+          summary.totalSnapshots;
+        document.getElementById("avgLinesOfCode").textContent = formatNumber(
+          summary.avgLinesOfCode
+        );
+        document.getElementById("avgCodebaseAge").textContent = Math.round(
+          summary.avgCodebaseAge
+        );
+        document.getElementById("topLanguage").textContent =
+          summary.topLanguages[0]?.language || "Unknown";
+        document.getElementById("successRate").textContent =
+          summary.seriesBSuccessRate.toFixed(1) + "%";
+      }
+
+      // Update correlations overview
+      function updateCorrelationsOverview() {
+        if (!analyticsData || !analyticsData.strongestCorrelations) return;
+
+        const correlations = analyticsData.strongestCorrelations;
+        const grid = document.getElementById("correlationsGrid");
+
+        if (correlations.length === 0) {
+          grid.innerHTML =
+            '<div class="error">No significant correlations found in the data.</div>';
+          return;
+        }
+
+        const html = correlations
+          .slice(0, 6)
+          .map(
+            (corr) => `
+          <div class="correlation-card">
+            <div class="correlation-value">${corr.correlation.toFixed(3)}</div>
+            <div class="correlation-label">${corr.metric1} ↔ ${
+              corr.metric2
+            }</div>
+            <div style="font-size: 0.8rem; margin-top: 0.5rem; opacity: 0.9;">${
+              corr.strength
+            }</div>
+          </div>
+        `
+          )
+          .join("");
+
+        grid.innerHTML = html;
       }
 
       // Wait for Chart.js to be available
@@ -477,398 +1024,70 @@
         }
       }
 
-      // Main data loading function
-      async function loadData() {
-        updateStatusIndicator();
-
-        try {
-          let data;
-
-          if (isLocalhost()) {
-            console.log("Loading data from API (localhost detected)");
-            const response = await fetch("/api/analysis-data");
-            if (!response.ok) throw new Error(`API error: ${response.status}`);
-            data = await response.json();
-          } else {
-            console.log("Loading static demo data");
-            // Create demo data for testing
-            data = createDemoData();
-          }
-
-          analyticsData = data;
-          updateMetrics();
-
-          // Wait for Chart.js then create visualizations
-          waitForChart(() => {
-            createVisualizations();
-          });
-        } catch (error) {
-          console.error("Error loading data:", error);
-          showError(
-            "seriesInsights",
-            "Failed to load analytics data. Using demo data for visualization testing."
-          );
-
-          // Fallback to demo data
-          analyticsData = createDemoData();
-          updateMetrics();
-          waitForChart(() => {
-            createVisualizations();
-          });
-        }
-      }
-
-      // Create demo data for testing
-      function createDemoData() {
-        return {
-          summary: {
-            totalCompanies: 142,
-            totalSnapshots: 847,
-            avgTechDebt: 23.7,
-            seriesBSuccessRate: 34.5,
-            keyInsights: [
-              "Companies with <20% technical debt at Series A are 2.3x more likely to reach Series B",
-              "Average time to next funding round increases by 4.2 months for every 10% increase in technical debt",
-              "Successful exits correlate with consistent technical debt management across funding rounds",
-              "High-performing companies maintain technical debt below 25% through Series B",
-            ],
-            correlationMatrix: {
-              seriesBCorrelation: -0.412,
-              timeCorrelation: 0.387,
-              amountCorrelation: -0.203,
-            },
-          },
-          coreAnalysis: {
-            seriesAVsSeriesB: {
-              scatterData: generateScatterData(50),
-              correlation: -0.412,
-              correlationStrength: "Moderate Negative",
-              insights: [
-                "Strong inverse correlation between Series A technical debt and Series B success",
-                "Companies with >30% tech debt have only 15% Series B success rate",
-                "Sweet spot appears to be maintaining <20% technical debt ratio",
-              ],
-            },
-            exitSuccessAnalysis: {
-              exitCounts: { acquired: 23, ipo: 8, closed: 34 },
-              exitTechDebtData: [
-                { exitState: "acquired", avgTechnicalDebt: 0.187 },
-                { exitState: "ipo", avgTechnicalDebt: 0.156 },
-                { exitState: "closed", avgTechnicalDebt: 0.342 },
-              ],
-              insights: [
-                "Acquired companies had 18.7% average technical debt",
-                "IPO companies maintained lowest technical debt at 15.6%",
-                "Failed companies showed 34.2% average technical debt",
-              ],
-            },
-            fundingTrajectoryAnalysis: {
-              trajectoryData: [
-                { trajectory: "Seed Only", companyCount: 28 },
-                { trajectory: "Series A", companyCount: 45 },
-                { trajectory: "Series B", companyCount: 35 },
-                { trajectory: "Series C+", companyCount: 18 },
-              ],
-              insights: [
-                "68% of companies reach at least Series A",
-                "Series B represents major milestone with 47% dropout",
-                "Technical debt management critical for later stage success",
-              ],
-            },
-            timeGapAnalysis: {
-              scatterData: generateTimeScatterData(40),
-              correlation: 0.387,
-              correlationStrength: "Moderate Positive",
-              insights: [
-                "Higher technical debt correlates with longer funding cycles",
-                "Companies with <15% debt close rounds 4.2 months faster",
-                "Optimal technical debt range: 12-18% for fastest funding",
-              ],
-            },
-            technicalDebtEvolution: {
-              evolutionSeries: [
-                { roundType: "Seed", avgTechnicalDebt: 0.145 },
-                { roundType: "Series A", avgTechnicalDebt: 0.198 },
-                { roundType: "Series B", avgTechnicalDebt: 0.234 },
-                { roundType: "Series C+", avgTechnicalDebt: 0.187 },
-              ],
-              insights: [
-                "Technical debt naturally increases through Series B",
-                "Successful companies reduce debt after Series B",
-                "Critical inflection point at 23-25% debt ratio",
-              ],
-            },
-            fundingAmountCorrelation: {
-              scatterData: generateFundingScatterData(45),
-              correlation: -0.203,
-              correlationStrength: "Weak Negative",
-              insights: [
-                "Larger funding rounds correlate with lower technical debt",
-                "Clean code signals better execution to investors",
-                "Technical debt impacts valuation negotiations",
-              ],
-            },
-          },
-        };
-      }
-
-      function generateScatterData(count) {
-        const data = [];
-        for (let i = 0; i < count; i++) {
-          const techDebt = Math.random() * 0.5 + 0.1;
-          const complexity = Math.random() * 0.4 + 0.2;
-          const reachedSeriesB =
-            techDebt < 0.25 ? Math.random() > 0.3 : Math.random() > 0.7;
-
-          data.push({
-            companyName: `Company ${i + 1}`,
-            technicalDebtRatio: techDebt,
-            complexityDensity: complexity,
-            reachedSeriesB: reachedSeriesB,
-          });
-        }
-        return data;
-      }
-
-      function generateTimeScatterData(count) {
-        const data = [];
-        for (let i = 0; i < count; i++) {
-          const techDebt = Math.random() * 0.4 + 0.1;
-          const timeToNext = 6 + techDebt * 24 + Math.random() * 8;
-
-          data.push({
-            companyName: `Company ${i + 1}`,
-            technicalDebtRatio: techDebt,
-            timeToNextRound: timeToNext,
-            fromRound: "Series A",
-            toRound: "Series B",
-          });
-        }
-        return data;
-      }
-
-      function generateFundingScatterData(count) {
-        const data = [];
-        const rounds = ["Seed", "Series A", "Series B", "Series C"];
-
-        for (let i = 0; i < count; i++) {
-          const techDebt = Math.random() * 0.4 + 0.1;
-          const roundType = rounds[Math.floor(Math.random() * rounds.length)];
-          let baseAmount;
-
-          switch (roundType) {
-            case "Seed":
-              baseAmount = 500000;
-              break;
-            case "Series A":
-              baseAmount = 5000000;
-              break;
-            case "Series B":
-              baseAmount = 15000000;
-              break;
-            case "Series C":
-              baseAmount = 40000000;
-              break;
-          }
-
-          const fundingAmount =
-            baseAmount * (0.5 + Math.random() * 2) * (1 - techDebt * 0.3);
-
-          data.push({
-            companyName: `Company ${i + 1}`,
-            technicalDebtRatio: techDebt,
-            fundingAmount: fundingAmount,
-            roundType: roundType,
-          });
-        }
-        return data;
-      }
-
-      // Update summary metrics
-      function updateMetrics() {
-        if (!analyticsData || !analyticsData.summary) return;
-
-        const summary = analyticsData.summary;
-
-        document.getElementById("totalCompanies").textContent =
-          summary.totalCompanies;
-        document.getElementById("totalSnapshots").textContent =
-          summary.totalSnapshots;
-        document.getElementById("avgTechDebt").textContent =
-          summary.avgTechDebt.toFixed(1) + "%";
-        document.getElementById("successRate").textContent =
-          summary.seriesBSuccessRate.toFixed(1) + "%";
-      }
-
-      // Create all visualizations
-      function createVisualizations() {
+      // Create enhanced visualizations
+      function createEnhancedVisualizations() {
         if (!analyticsData || !analyticsData.coreAnalysis) {
-          console.error("No analytics data available for visualizations");
+          console.error("No enhanced analytics data available");
           return;
         }
 
-        console.log(
-          "Creating visualizations with Chart.js version:",
-          Chart.version
-        );
+        console.log("Creating enhanced visualizations with Chart.js");
 
         try {
-          createSeriesAVsBAnalysis();
-          createExitAnalysis();
-          createTrajectoryAnalysis();
-          createTimeCorrelation();
-          createEvolutionChart();
-          createAmountCorrelation();
-          createSummaryAnalysis();
+          createCodeGrowthCharts();
+          createComplexityEvolutionChart();
+          createQualityChartsEnhanced();
+          createRepositoryChartsEnhanced();
+          createLanguageChartsEnhanced();
+          updateKeyInsights();
         } catch (error) {
-          console.error("Error creating visualizations:", error);
+          console.error("Error creating enhanced visualizations:", error);
           showError(
-            "seriesInsights",
-            "Error creating charts: " + error.message
+            "keyInsightsSummary",
+            "Error creating enhanced charts: " + error.message
           );
         }
       }
 
-      function createSeriesAVsBAnalysis() {
-        const canvas = document.getElementById("seriesAvsB");
-        if (!canvas) return;
-
-        const analysis = analyticsData.coreAnalysis.seriesAVsSeriesB;
-        if (!analysis || !analysis.scatterData) return;
-
-        const data = analysis.scatterData;
-
-        const ctx = canvas.getContext("2d");
-        new Chart(ctx, {
-          type: "scatter",
-          data: {
-            datasets: [
-              {
-                label: "Reached Series B",
-                data: data
-                  .filter((d) => d.reachedSeriesB)
-                  .map((d) => ({
-                    x: d.technicalDebtRatio,
-                    y: d.complexityDensity,
-                  })),
-                backgroundColor: "rgba(102, 126, 234, 0.7)",
-                borderColor: "rgba(102, 126, 234, 1)",
-                pointRadius: 6,
-              },
-              {
-                label: "Stopped at Series A",
-                data: data
-                  .filter((d) => !d.reachedSeriesB)
-                  .map((d) => ({
-                    x: d.technicalDebtRatio,
-                    y: d.complexityDensity,
-                  })),
-                backgroundColor: "rgba(255, 107, 107, 0.7)",
-                borderColor: "rgba(255, 107, 107, 1)",
-                pointRadius: 6,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              x: {
-                title: { display: true, text: "Technical Debt Ratio" },
-                min: 0,
-                max: 0.6,
-              },
-              y: {
-                title: { display: true, text: "Complexity Density" },
-                min: 0,
-                max: 0.8,
-              },
-            },
-            plugins: {
-              tooltip: {
-                callbacks: {
-                  label: function (ctx) {
-                    const point = data.find(
-                      (d) =>
-                        Math.abs(d.technicalDebtRatio - ctx.parsed.x) < 0.001 &&
-                        Math.abs(d.complexityDensity - ctx.parsed.y) < 0.001
-                    );
-                    return point
-                      ? `${point.companyName}: Tech Debt ${(
-                          point.technicalDebtRatio * 100
-                        ).toFixed(1)}%`
-                      : "";
-                  },
-                },
-              },
-            },
-          },
-        });
-
-        // Update insights
-        const insightsHtml = `
-        <h3>Key Insights</h3>
-        <ul>
-          ${analysis.insights.map((insight) => `<li>${insight}</li>`).join("")}
-        </ul>
-        <p><strong>Correlation:</strong> ${analysis.correlation.toFixed(3)} (${
-          analysis.correlationStrength
-        })</p>
-      `;
-        document.getElementById("seriesInsights").innerHTML = insightsHtml;
-      }
-
-      function createExitAnalysis() {
-        const analysis = analyticsData.coreAnalysis.exitSuccessAnalysis;
+      function createCodeGrowthCharts() {
+        const analysis = analyticsData.coreAnalysis.codeGrowthAnalysis;
         if (!analysis) return;
 
-        // Exit counts pie chart
-        const ctx1 = document.getElementById("exitAnalysis");
+        // Growth rates bar chart
+        const ctx1 = document.getElementById("codeGrowthChart");
         if (ctx1) {
-          const exitData = Object.entries(analysis.exitCounts);
-          new Chart(ctx1.getContext("2d"), {
-            type: "doughnut",
-            data: {
-              labels: exitData.map(
-                ([state]) => state.charAt(0).toUpperCase() + state.slice(1)
-              ),
-              datasets: [
-                {
-                  data: exitData.map(([, count]) => count),
-                  backgroundColor: [
-                    "rgba(102, 126, 234, 0.8)",
-                    "rgba(76, 175, 80, 0.8)",
-                    "rgba(255, 193, 7, 0.8)",
-                  ],
-                },
-              ],
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: { legend: { position: "bottom" } },
-            },
-          });
-        }
+          const successfulGrowth = analysis.growthData.filter(
+            (d) => d.fundingSuccess
+          );
+          const unsuccessfulGrowth = analysis.growthData.filter(
+            (d) => !d.fundingSuccess
+          );
 
-        // Technical debt by exit type
-        const ctx2 = document.getElementById("exitTechDebt");
-        if (ctx2) {
-          new Chart(ctx2.getContext("2d"), {
+          new Chart(ctx1.getContext("2d"), {
             type: "bar",
             data: {
-              labels: analysis.exitTechDebtData.map(
-                (d) =>
-                  d.exitState.charAt(0).toUpperCase() + d.exitState.slice(1)
-              ),
+              labels: ["Successful Companies", "Unsuccessful Companies"],
               datasets: [
                 {
-                  label: "Average Technical Debt Ratio",
-                  data: analysis.exitTechDebtData.map(
-                    (d) => d.avgTechnicalDebt * 100
-                  ),
-                  backgroundColor: "rgba(102, 126, 234, 0.7)",
-                  borderColor: "rgba(102, 126, 234, 1)",
+                  label: "Average LOC Growth Rate (%/month)",
+                  data: [
+                    successfulGrowth.reduce(
+                      (sum, d) => sum + d.locGrowthRate,
+                      0
+                    ) / successfulGrowth.length,
+                    unsuccessfulGrowth.reduce(
+                      (sum, d) => sum + d.locGrowthRate,
+                      0
+                    ) / unsuccessfulGrowth.length,
+                  ],
+                  backgroundColor: [
+                    "rgba(102, 126, 234, 0.8)",
+                    "rgba(255, 107, 107, 0.8)",
+                  ],
+                  borderColor: [
+                    "rgba(102, 126, 234, 1)",
+                    "rgba(255, 107, 107, 1)",
+                  ],
                   borderWidth: 1,
                 },
               ],
@@ -879,7 +1098,58 @@
               scales: {
                 y: {
                   beginAtZero: true,
-                  title: { display: true, text: "Technical Debt Ratio (%)" },
+                  title: { display: true, text: "Growth Rate (%/month)" },
+                },
+              },
+            },
+          });
+        }
+
+        // Growth scatter plot
+        const ctx2 = document.getElementById("codeGrowthScatter");
+        if (ctx2) {
+          new Chart(ctx2.getContext("2d"), {
+            type: "scatter",
+            data: {
+              datasets: [
+                {
+                  label: "Successful",
+                  data: analysis.growthData
+                    .filter((d) => d.fundingSuccess)
+                    .map((d) => ({
+                      x: d.locGrowthRate,
+                      y: d.complexityGrowthRate,
+                    })),
+                  backgroundColor: "rgba(102, 126, 234, 0.7)",
+                  borderColor: "rgba(102, 126, 234, 1)",
+                  pointRadius: 5,
+                },
+                {
+                  label: "Unsuccessful",
+                  data: analysis.growthData
+                    .filter((d) => !d.fundingSuccess)
+                    .map((d) => ({
+                      x: d.locGrowthRate,
+                      y: d.complexityGrowthRate,
+                    })),
+                  backgroundColor: "rgba(255, 107, 107, 0.7)",
+                  borderColor: "rgba(255, 107, 107, 1)",
+                  pointRadius: 5,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                x: {
+                  title: { display: true, text: "LOC Growth Rate (%/month)" },
+                },
+                y: {
+                  title: {
+                    display: true,
+                    text: "Complexity Growth Rate (%/month)",
+                  },
                 },
               },
             },
@@ -888,149 +1158,50 @@
 
         // Update insights
         const insightsHtml = `
-        <h3>Exit Analysis Insights</h3>
-        <ul>
-          ${analysis.insights.map((insight) => `<li>${insight}</li>`).join("")}
-        </ul>
-      `;
-        document.getElementById("exitInsights").innerHTML = insightsHtml;
+          <h3>Code Growth Insights</h3>
+          <ul>
+            ${analysis.insights
+              .map((insight) => `<li>${insight}</li>`)
+              .join("")}
+          </ul>
+        `;
+        document.getElementById("codeGrowthInsights").innerHTML = insightsHtml;
       }
 
-      function createTrajectoryAnalysis() {
-        const analysis = analyticsData.coreAnalysis.fundingTrajectoryAnalysis;
+      function createComplexityEvolutionChart() {
+        const analysis = analyticsData.coreAnalysis.complexityEvolutionAnalysis;
         if (!analysis) return;
 
-        const ctx = document.getElementById("trajectoryAnalysis");
-        if (!ctx) return;
-
-        new Chart(ctx.getContext("2d"), {
-          type: "bar",
-          data: {
-            labels: analysis.trajectoryData.map((d) => d.trajectory),
-            datasets: [
-              {
-                label: "Number of Companies",
-                data: analysis.trajectoryData.map((d) => d.companyCount),
-                backgroundColor: "rgba(118, 75, 162, 0.7)",
-                borderColor: "rgba(118, 75, 162, 1)",
-                borderWidth: 1,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                beginAtZero: true,
-                title: { display: true, text: "Number of Companies" },
-              },
-              x: {
-                title: { display: true, text: "Highest Funding Round Reached" },
-              },
-            },
-          },
-        });
-
-        const insightsHtml = `
-        <h3>Funding Trajectory Insights</h3>
-        <ul>
-          ${analysis.insights.map((insight) => `<li>${insight}</li>`).join("")}
-        </ul>
-      `;
-        document.getElementById("trajectoryInsights").innerHTML = insightsHtml;
-      }
-
-      function createTimeCorrelation() {
-        const analysis = analyticsData.coreAnalysis.timeGapAnalysis;
-        if (!analysis) return;
-
-        const ctx = document.getElementById("timeCorrelation");
-        if (!ctx) return;
-
-        new Chart(ctx.getContext("2d"), {
-          type: "scatter",
-          data: {
-            datasets: [
-              {
-                label: "Time to Next Round",
-                data: analysis.scatterData.map((d) => ({
-                  x: d.technicalDebtRatio,
-                  y: d.timeToNextRound,
-                })),
-                backgroundColor: "rgba(255, 193, 7, 0.7)",
-                borderColor: "rgba(255, 193, 7, 1)",
-                pointRadius: 5,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              x: {
-                title: { display: true, text: "Technical Debt Ratio" },
-                min: 0,
-                max: 0.6,
-              },
-              y: {
-                title: { display: true, text: "Months to Next Round" },
-                min: 0,
-                max: 36,
-              },
-            },
-            plugins: {
-              tooltip: {
-                callbacks: {
-                  label: function (ctx) {
-                    const point = analysis.scatterData[ctx.dataIndex];
-                    return point
-                      ? `${point.companyName}: ${point.fromRound} → ${
-                          point.toRound
-                        } (${point.timeToNextRound.toFixed(1)} months)`
-                      : "";
-                  },
-                },
-              },
-            },
-          },
-        });
-
-        const insightsHtml = `
-        <h3>Time Correlation Insights</h3>
-        <ul>
-          ${analysis.insights.map((insight) => `<li>${insight}</li>`).join("")}
-        </ul>
-        <p><strong>Correlation:</strong> ${analysis.correlation.toFixed(3)} (${
-          analysis.correlationStrength
-        })</p>
-      `;
-        document.getElementById("timeInsights").innerHTML = insightsHtml;
-      }
-
-      function createEvolutionChart() {
-        const analysis = analyticsData.coreAnalysis.technicalDebtEvolution;
-        if (!analysis) return;
-
-        const ctx = document.getElementById("evolutionChart");
+        const ctx = document.getElementById("complexityEvolutionChart");
         if (!ctx) return;
 
         new Chart(ctx.getContext("2d"), {
           type: "line",
           data: {
-            labels: analysis.evolutionSeries.map((d) => d.roundType),
+            labels: analysis.evolutionData.map((d) =>
+              d.roundType.replace("_", " ").toUpperCase()
+            ),
             datasets: [
               {
-                label: "Average Technical Debt Ratio",
-                data: analysis.evolutionSeries.map(
-                  (d) => d.avgTechnicalDebt * 100
-                ),
+                label: "Average Total Complexity",
+                data: analysis.evolutionData.map((d) => d.avgTotalComplexity),
                 borderColor: "rgba(102, 126, 234, 1)",
                 backgroundColor: "rgba(102, 126, 234, 0.1)",
                 fill: true,
                 tension: 0.4,
                 pointRadius: 6,
-                pointHoverRadius: 8,
+              },
+              {
+                label: "Average Function Complexity",
+                data: analysis.evolutionData.map(
+                  (d) => d.avgFunctionComplexity
+                ),
+                borderColor: "rgba(255, 193, 7, 1)",
+                backgroundColor: "rgba(255, 193, 7, 0.1)",
+                fill: false,
+                tension: 0.4,
+                pointRadius: 6,
+                yAxisID: "y1",
               },
             ],
           },
@@ -1039,154 +1210,373 @@
             maintainAspectRatio: false,
             scales: {
               y: {
-                beginAtZero: true,
-                title: { display: true, text: "Technical Debt Ratio (%)" },
+                type: "linear",
+                display: true,
+                position: "left",
+                title: { display: true, text: "Total Complexity" },
               },
-              x: {
-                title: { display: true, text: "Funding Round" },
+              y1: {
+                type: "linear",
+                display: true,
+                position: "right",
+                title: { display: true, text: "Function Complexity" },
+                grid: { drawOnChartArea: false },
               },
             },
           },
         });
 
         const insightsHtml = `
-        <h3>Evolution Insights</h3>
-        <ul>
-          ${analysis.insights.map((insight) => `<li>${insight}</li>`).join("")}
-        </ul>
-      `;
-        document.getElementById("evolutionInsights").innerHTML = insightsHtml;
+          <h3>Complexity Evolution Insights</h3>
+          <ul>
+            ${analysis.insights
+              .map((insight) => `<li>${insight}</li>`)
+              .join("")}
+          </ul>
+        `;
+        document.getElementById("complexityInsights").innerHTML = insightsHtml;
       }
 
-      function createAmountCorrelation() {
-        const analysis = analyticsData.coreAnalysis.fundingAmountCorrelation;
+      function createQualityChartsEnhanced() {
+        const analysis =
+          analyticsData.coreAnalysis.qualityMetricsVsExitAnalysis;
         if (!analysis) return;
 
-        const ctx = document.getElementById("amountCorrelation");
-        if (!ctx) return;
-
-        new Chart(ctx.getContext("2d"), {
-          type: "scatter",
-          data: {
-            datasets: [
-              {
-                label: "Funding Amount vs Technical Debt",
-                data: analysis.scatterData.map((d) => ({
-                  x: d.technicalDebtRatio,
-                  y: d.fundingAmount,
-                })),
-                backgroundColor: "rgba(76, 175, 80, 0.7)",
-                borderColor: "rgba(76, 175, 80, 1)",
-                pointRadius: 5,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              x: {
-                title: { display: true, text: "Technical Debt Ratio" },
-                min: 0,
-                max: 0.6,
-              },
-              y: {
-                type: "logarithmic",
-                title: {
-                  display: true,
-                  text: "Funding Amount (USD, log scale)",
+        // Duplication chart
+        const ctx1 = document.getElementById("qualityDuplicationChart");
+        if (ctx1) {
+          new Chart(ctx1.getContext("2d"), {
+            type: "bar",
+            data: {
+              labels: analysis.exitMetrics.map((d) =>
+                d.exitState.toUpperCase()
+              ),
+              datasets: [
+                {
+                  label: "Average Duplication %",
+                  data: analysis.exitMetrics.map((d) => d.avgDuplication),
+                  backgroundColor: "rgba(255, 107, 107, 0.8)",
+                  borderColor: "rgba(255, 107, 107, 1)",
+                  borderWidth: 1,
                 },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: { y: { beginAtZero: true } },
+            },
+          });
+        }
+
+        // Complexity density chart
+        const ctx2 = document.getElementById("qualityComplexityChart");
+        if (ctx2) {
+          new Chart(ctx2.getContext("2d"), {
+            type: "bar",
+            data: {
+              labels: analysis.exitMetrics.map((d) =>
+                d.exitState.toUpperCase()
+              ),
+              datasets: [
+                {
+                  label: "Average Complexity Density",
+                  data: analysis.exitMetrics.map((d) => d.avgComplexityDensity),
+                  backgroundColor: "rgba(255, 193, 7, 0.8)",
+                  borderColor: "rgba(255, 193, 7, 1)",
+                  borderWidth: 1,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: { y: { beginAtZero: true } },
+            },
+          });
+        }
+
+        // Issues density chart
+        const ctx3 = document.getElementById("qualityIssuesChart");
+        if (ctx3) {
+          new Chart(ctx3.getContext("2d"), {
+            type: "bar",
+            data: {
+              labels: analysis.exitMetrics.map((d) =>
+                d.exitState.toUpperCase()
+              ),
+              datasets: [
+                {
+                  label: "Average Issues Density",
+                  data: analysis.exitMetrics.map((d) => d.avgIssuesDensity),
+                  backgroundColor: "rgba(118, 75, 162, 0.8)",
+                  borderColor: "rgba(118, 75, 162, 1)",
+                  borderWidth: 1,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: { y: { beginAtZero: true } },
+            },
+          });
+        }
+
+        const insightsHtml = `
+          <h3>Quality vs Exit Insights</h3>
+          <ul>
+            ${analysis.insights
+              .map((insight) => `<li>${insight}</li>`)
+              .join("")}
+          </ul>
+        `;
+        document.getElementById("qualityInsights").innerHTML = insightsHtml;
+      }
+
+      function createRepositoryChartsEnhanced() {
+        const analysis =
+          analyticsData.coreAnalysis.repositoryCharacteristicsAnalysis;
+        if (!analysis) return;
+
+        // Size vs funding scatter
+        const ctx1 = document.getElementById("repoSizeChart");
+        if (ctx1) {
+          new Chart(ctx1.getContext("2d"), {
+            type: "scatter",
+            data: {
+              datasets: [
+                {
+                  label: "Repository Size vs Funding",
+                  data: analysis.characteristics.map((d) => ({
+                    x: d.repoSizeMB,
+                    y: Math.log(d.fundingAmount + 1),
+                  })),
+                  backgroundColor: "rgba(76, 175, 80, 0.7)",
+                  borderColor: "rgba(76, 175, 80, 1)",
+                  pointRadius: 4,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                x: { title: { display: true, text: "Repository Size (MB)" } },
+                y: { title: { display: true, text: "Log(Funding Amount)" } },
               },
             },
-            plugins: {
-              tooltip: {
-                callbacks: {
-                  label: function (ctx) {
-                    const point = analysis.scatterData[ctx.dataIndex];
-                    return point
-                      ? `${point.companyName} (${
-                          point.roundType
-                        }): $${formatNumber(point.fundingAmount)}`
-                      : "";
+          });
+        }
+
+        // Age vs funding scatter
+        const ctx2 = document.getElementById("repoAgeChart");
+        if (ctx2) {
+          new Chart(ctx2.getContext("2d"), {
+            type: "scatter",
+            data: {
+              datasets: [
+                {
+                  label: "Codebase Age vs Funding",
+                  data: analysis.characteristics.map((d) => ({
+                    x: d.codebaseAge,
+                    y: Math.log(d.fundingAmount + 1),
+                  })),
+                  backgroundColor: "rgba(255, 152, 0, 0.7)",
+                  borderColor: "rgba(255, 152, 0, 1)",
+                  pointRadius: 4,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                x: { title: { display: true, text: "Codebase Age (days)" } },
+                y: { title: { display: true, text: "Log(Funding Amount)" } },
+              },
+            },
+          });
+        }
+
+        // Files vs LOC scatter
+        const ctx3 = document.getElementById("repoFilesChart");
+        if (ctx3) {
+          new Chart(ctx3.getContext("2d"), {
+            type: "scatter",
+            data: {
+              datasets: [
+                {
+                  label: "Files vs Lines of Code",
+                  data: analysis.characteristics.map((d) => ({
+                    x: d.totalFiles,
+                    y: d.linesOfCode,
+                  })),
+                  backgroundColor: "rgba(156, 39, 176, 0.7)",
+                  borderColor: "rgba(156, 39, 176, 1)",
+                  pointRadius: 4,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                x: { title: { display: true, text: "Total Files" } },
+                y: { title: { display: true, text: "Lines of Code" } },
+              },
+            },
+          });
+        }
+
+        const insightsHtml = `
+          <h3>Repository Characteristics Insights</h3>
+          <ul>
+            ${analysis.insights
+              .map((insight) => `<li>${insight}</li>`)
+              .join("")}
+          </ul>
+        `;
+        document.getElementById("repoInsights").innerHTML = insightsHtml;
+      }
+
+      function createLanguageChartsEnhanced() {
+        const analysis = analyticsData.coreAnalysis.languageTechnologyAnalysis;
+        if (!analysis) return;
+
+        // Language overview grid
+        const grid = document.getElementById("languageGrid");
+        if (grid) {
+          const html = analysis.languageAnalysis
+            .map(
+              (lang) => `
+            <div class="language-card">
+              <div class="language-name">${lang.language}</div>
+              <div class="language-stats">
+                ${lang.companyCount} companies<br>
+                $${lang.avgFunding.toFixed(1)}M avg funding<br>
+                ${lang.avgComplexity.toFixed(1)} avg complexity
+              </div>
+            </div>
+          `
+            )
+            .join("");
+          grid.innerHTML = html;
+        }
+
+        // Language vs funding chart
+        const ctx1 = document.getElementById("languageFundingChart");
+        if (ctx1) {
+          new Chart(ctx1.getContext("2d"), {
+            type: "bar",
+            data: {
+              labels: analysis.languageAnalysis.map((d) => d.language),
+              datasets: [
+                {
+                  label: "Average Funding (M$)",
+                  data: analysis.languageAnalysis.map((d) => d.avgFunding),
+                  backgroundColor: "rgba(63, 81, 181, 0.8)",
+                  borderColor: "rgba(63, 81, 181, 1)",
+                  borderWidth: 1,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: { y: { beginAtZero: true } },
+            },
+          });
+        }
+
+        // Language vs quality chart
+        const ctx2 = document.getElementById("languageQualityChart");
+        if (ctx2) {
+          new Chart(ctx2.getContext("2d"), {
+            type: "scatter",
+            data: {
+              datasets: [
+                {
+                  label: "Complexity vs Issues Density",
+                  data: analysis.languageAnalysis.map((d) => ({
+                    x: d.avgComplexity,
+                    y: d.avgIssuesDensity,
+                  })),
+                  backgroundColor: analysis.languageAnalysis.map(
+                    (_, i) => `hsl(${i * 60}, 70%, 60%)`
+                  ),
+                  pointRadius: 8,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                x: { title: { display: true, text: "Average Complexity" } },
+                y: { title: { display: true, text: "Average Issues Density" } },
+              },
+              plugins: {
+                tooltip: {
+                  callbacks: {
+                    label: function (ctx) {
+                      const lang = analysis.languageAnalysis[ctx.dataIndex];
+                      return `${lang.language}: ${lang.companyCount} companies`;
+                    },
                   },
                 },
               },
             },
-          },
-        });
+          });
+        }
 
         const insightsHtml = `
-        <h3>Funding Amount Insights</h3>
-        <ul>
-          ${analysis.insights.map((insight) => `<li>${insight}</li>`).join("")}
-        </ul>
-        <p><strong>Correlation:</strong> ${analysis.correlation.toFixed(3)} (${
-          analysis.correlationStrength
-        })</p>
-      `;
-        document.getElementById("amountInsights").innerHTML = insightsHtml;
+          <h3>Programming Language Insights</h3>
+          <ul>
+            ${analysis.insights
+              .map((insight) => `<li>${insight}</li>`)
+              .join("")}
+          </ul>
+        `;
+        document.getElementById("languageInsights").innerHTML = insightsHtml;
       }
 
-      function createSummaryAnalysis() {
-        const summary = analyticsData.summary;
-        if (!summary) return;
+      function updateKeyInsights() {
+        if (!analyticsData || !analyticsData.keyInsights) return;
 
-        // Correlation matrix
-        const correlationHtml = `
-        <h3>Correlation Matrix</h3>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
-          <div class="correlation-value correlation-${
-            Math.abs(summary.correlationMatrix.seriesBCorrelation) >= 0.3
-              ? "strong"
-              : Math.abs(summary.correlationMatrix.seriesBCorrelation) >= 0.1
-              ? "moderate"
-              : "weak"
-          }">
-            Series B Success: ${summary.correlationMatrix.seriesBCorrelation.toFixed(
-              3
-            )}
-          </div>
-          <div class="correlation-value correlation-${
-            Math.abs(summary.correlationMatrix.timeCorrelation) >= 0.3
-              ? "strong"
-              : Math.abs(summary.correlationMatrix.timeCorrelation) >= 0.1
-              ? "moderate"
-              : "weak"
-          }">
-            Time to Funding: ${summary.correlationMatrix.timeCorrelation.toFixed(
-              3
-            )}
-          </div>
-          <div class="correlation-value correlation-${
-            Math.abs(summary.correlationMatrix.amountCorrelation) >= 0.3
-              ? "strong"
-              : Math.abs(summary.correlationMatrix.amountCorrelation) >= 0.1
-              ? "moderate"
-              : "weak"
-          }">
-            Funding Amount: ${summary.correlationMatrix.amountCorrelation.toFixed(
-              3
-            )}
-          </div>
-        </div>
-      `;
+        const insights = analyticsData.keyInsights;
+        const strongestCorr = analyticsData.strongestCorrelations[0];
 
-        document.getElementById("correlationMatrix").innerHTML =
-          correlationHtml;
+        const html = `
+          <h3>🎯 Key Actionable Insights</h3>
+          <ul>
+            ${insights
+              .map(
+                (insight) =>
+                  `<li><span class="highlight">${insight}</span></li>`
+              )
+              .join("")}
+          </ul>
+          
+          ${
+            strongestCorr
+              ? `
+          <h3>🔍 Strongest Finding</h3>
+          <div class="trend-chart">
+            <strong>${strongestCorr.insight}</strong><br>
+            <em>Correlation coefficient: ${strongestCorr.correlation.toFixed(
+              3
+            )} (${strongestCorr.strength})</em>
+          </div>
+          `
+              : ""
+          }
+        `;
 
-        // Summary insights
-        const insightsHtml = `
-        <h3>Executive Summary</h3>
-        <ul>
-          ${summary.keyInsights
-            .map((insight) => `<li>${insight}</li>`)
-            .join("")}
-        </ul>
-      `;
-        document.getElementById("summaryInsights").innerHTML = insightsHtml;
+        document.getElementById("keyInsightsSummary").innerHTML = html;
       }
 
-      // Initialize dashboard
+      // Initialize enhanced dashboard
       document.addEventListener("DOMContentLoaded", function () {
         loadData();
       });

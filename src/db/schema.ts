@@ -77,9 +77,6 @@ export const codeSnapshots = sqliteTable("code_snapshots", {
   // Issues by language (JSON: {LANGUAGE_PYTHON: count, LANGUAGE_JAVA: count, ...})
   issuesByLanguage: text("issues_by_language"),
 
-  // Legacy fields for backward compatibility
-  duplicatedCode: integer("duplicated_code"),
-  similarCode: integer("similar_code"),
   highComplexityFunctions: integer("high_complexity_functions"),
   highComplexityFiles: integer("high_complexity_files"),
   manyParameterFunctions: integer("many_parameter_functions"),
