@@ -137,7 +137,7 @@ async function processCompany(company: any) {
       });
     }
 
-    // Calculate TDV between consecutive rounds
+    // Enhanced TDV calculation between consecutive rounds
     for (let i = 1; i < snapshots.length; i++) {
       const fromSnapshot = snapshots[i - 1];
       const toSnapshot = snapshots[i];
@@ -145,7 +145,8 @@ async function processCompany(company: any) {
       const fromRound = fromSnapshot.roundInfo;
       const toRound = toSnapshot.roundInfo;
 
-      const devMetrics = await gitHandler.calculateDevelopmentSpeed(
+      // Use enhanced velocity calculation instead of simple one
+      const velocityMetrics = await gitHandler.calculateDevelopmentVelocity(
         fromRound.roundDate,
         toRound.roundDate
       );
@@ -154,9 +155,15 @@ async function processCompany(company: any) {
       const endTDR = toSnapshot.technicalDebtRatio || 0;
       const tdrChange = startTDR > 0 ? (endTDR - startTDR) / startTDR : 0;
 
-      const tdv =
-        devMetrics.developmentSpeed > 0
-          ? tdrChange / devMetrics.developmentSpeed
+      // Calculate both TDV measures for comparison
+      const tdvSimple =
+        velocityMetrics.linesAdded > 0
+          ? tdrChange /
+            (velocityMetrics.linesAdded / velocityMetrics.periodDays)
+          : 0;
+      const tdvComposite =
+        velocityMetrics.compositeVelocity > 0
+          ? tdrChange / velocityMetrics.compositeVelocity
           : 0;
 
       // Check if company got next round
@@ -165,17 +172,40 @@ async function processCompany(company: any) {
       );
       const gotNextRound = futureRounds.length > 0;
 
+      // Store enhanced velocity data
       await db.insert(developmentVelocity).values({
         companyId: company.id,
         fromRoundId: fromRound.id > 0 ? fromRound.id : null,
         toRoundId: toRound.id > 0 ? toRound.id : null,
-        periodDays: devMetrics.periodDays,
-        linesAdded: devMetrics.linesAdded,
-        developmentSpeed: devMetrics.developmentSpeed,
+
+        // Period and raw metrics
+        periodDays: velocityMetrics.periodDays,
+        commitCount: velocityMetrics.commitCount,
+        authorCount: velocityMetrics.authorCount,
+        linesAdded: velocityMetrics.linesAdded,
+        linesDeleted: velocityMetrics.linesDeleted,
+        linesChanged: velocityMetrics.linesChanged,
+
+        // Velocity metrics
+        commitVelocity: velocityMetrics.commitVelocity,
+        authorActivity: velocityMetrics.authorActivity,
+        codeChurn: velocityMetrics.codeChurn,
+        compositeVelocity: velocityMetrics.compositeVelocity,
+
+        // Legacy simple metric (for comparison)
+        developmentSpeed:
+          velocityMetrics.linesAdded / velocityMetrics.periodDays,
+
+        // Technical debt metrics
         startTDR,
         endTDR,
         tdrChange,
-        tdv,
+
+        // Enhanced TDV calculations
+        tdvSimple,
+        tdvComposite,
+
+        // Funding outcome
         gotNextRound,
       });
     }

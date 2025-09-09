@@ -92,7 +92,7 @@ export const codeSnapshots = sqliteTable("code_snapshots", {
   analysisDate: text("analysis_date").default(sql`CURRENT_TIMESTAMP`),
 });
 
-// NEW: Simple table for TDV calculation between rounds
+// Enhanced TDV calculation table with comprehensive velocity metrics
 export const developmentVelocity = sqliteTable("development_velocity", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   companyId: integer("company_id")
@@ -101,15 +101,37 @@ export const developmentVelocity = sqliteTable("development_velocity", {
   fromRoundId: integer("from_round_id").references(() => fundingRounds.id),
   toRoundId: integer("to_round_id").references(() => fundingRounds.id),
 
+  // Period metrics
   periodDays: integer("period_days").notNull(),
+
+  // Raw development activity metrics (CNCF-inspired)
+  commitCount: integer("commit_count"),
+  authorCount: integer("author_count"),
   linesAdded: integer("lines_added"),
+  linesDeleted: integer("lines_deleted"),
+  linesChanged: integer("lines_changed"), // additions + deletions
+
+  // Velocity metrics (per day)
+  commitVelocity: real("commit_velocity"), // commits/day
+  authorActivity: real("author_activity"), // authors/day (team activity)
+  codeChurn: real("code_churn"), // lines_changed/day
+
+  // Composite development speed (weighted combination)
+  compositeVelocity: real("composite_velocity"),
+
+  // Legacy simple metric (for comparison)
   developmentSpeed: real("development_speed"), // lines_added / period_days
 
+  // Technical debt metrics
   startTDR: real("start_tdr"),
   endTDR: real("end_tdr"),
   tdrChange: real("tdr_change"), // (end - start) / start
 
-  tdv: real("tdv"), // tdrChange / developmentSpeed
+  // TDV calculations (using different velocity measures)
+  tdvSimple: real("tdv_simple"), // tdrChange / developmentSpeed (original)
+  tdvComposite: real("tdv_composite"), // tdrChange / compositeVelocity (enhanced)
+
+  // Funding outcome
   gotNextRound: integer("got_next_round", { mode: "boolean" }),
 
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),

@@ -15,6 +15,25 @@ export interface RepoInfo {
   lastCommitDate: string | null;
 }
 
+export interface DevelopmentVelocityMetrics {
+  periodDays: number;
+
+  // Basic metrics
+  commitCount: number;
+  authorCount: number;
+  linesAdded: number;
+  linesDeleted: number;
+  linesChanged: number; // additions + deletions
+
+  // Velocity metrics
+  commitVelocity: number; // commits per day
+  authorActivity: number; // authors per day (team activity indicator)
+  codeChurn: number; // lines changed per day
+
+  // Composite development speed (weighted combination)
+  compositeVelocity: number;
+}
+
 export class GitHandler {
   private repoPath: string;
 
@@ -149,15 +168,11 @@ export class GitHandler {
     };
   }
 
-  // Calculate development speed between two dates for TDV
-  async calculateDevelopmentSpeed(
+  // Enhanced development velocity calculation inspired by CNCF approach
+  async calculateDevelopmentVelocity(
     startDate: string,
     endDate: string
-  ): Promise<{
-    periodDays: number;
-    linesAdded: number;
-    developmentSpeed: number;
-  }> {
+  ): Promise<DevelopmentVelocityMetrics> {
     try {
       // Calculate period length in days
       const start = new Date(startDate);
@@ -167,8 +182,23 @@ export class GitHandler {
         Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
       );
 
-      // Calculate line additions using git log --stat
+      // Get commit count in period
+      const { stdout: commitOutput } = await execAsync(
+        `git rev-list --count --since="${startDate}T00:00:00" --until="${endDate}T23:59:59" --all`,
+        { cwd: this.repoPath }
+      );
+      const commitCount = parseInt(commitOutput.trim()) || 0;
+
+      // Get unique author count in period
+      const { stdout: authorOutput } = await execAsync(
+        `git log --format="%ae" --since="${startDate}T00:00:00" --until="${endDate}T23:59:59" --all | sort | uniq | wc -l`,
+        { cwd: this.repoPath }
+      );
+      const authorCount = parseInt(authorOutput.trim()) || 0;
+
+      // Get line changes (additions and deletions) using git log --stat
       let linesAdded = 0;
+      let linesDeleted = 0;
 
       try {
         const { stdout: statsOutput } = await execAsync(
@@ -176,25 +206,51 @@ export class GitHandler {
           { cwd: this.repoPath }
         );
 
-        // Parse git stat output to count insertions
+        // Parse git stat output to count insertions and deletions
         const statLines = statsOutput.split("\n");
         for (const line of statLines) {
           const insertionsMatch = line.match(/(\d+) insertions?\(\+\)/);
-          if (insertionsMatch) {
+          const deletionsMatch = line.match(/(\d+) deletions?\(-\)/);
+
+          if (insertionsMatch?.[1]) {
             linesAdded += parseInt(insertionsMatch[1]);
+          }
+          if (deletionsMatch?.[1]) {
+            linesDeleted += parseInt(deletionsMatch[1]);
           }
         }
       } catch (error) {
-        // Fallback: estimate based on period
-        linesAdded = Math.max(0, periodDays * 10); // rough estimate
+        // Fallback: estimate based on commits (rough heuristic)
+        linesAdded = Math.max(0, commitCount * 20); // ~20 lines per commit average
+        linesDeleted = Math.max(0, commitCount * 5); // ~5 deletions per commit average
       }
 
-      const developmentSpeed = linesAdded / periodDays;
+      const linesChanged = linesAdded + linesDeleted;
+
+      // Calculate velocity metrics
+      const commitVelocity = commitCount / periodDays;
+      const authorActivity = authorCount / periodDays;
+      const codeChurn = linesChanged / periodDays;
+
+      // Composite velocity metric (weighted combination)
+      // Weight: 40% code churn, 35% commit velocity, 25% author activity
+      // This balances code output with team activity and commit frequency
+      const compositeVelocity =
+        codeChurn * 0.4 +
+        commitVelocity * 50 * 0.35 + // scale commits by 50 to match line scale
+        authorActivity * 100 * 0.25; // scale authors by 100 to match line scale
 
       return {
         periodDays,
+        commitCount,
+        authorCount,
         linesAdded,
-        developmentSpeed,
+        linesDeleted,
+        linesChanged,
+        commitVelocity,
+        authorActivity,
+        codeChurn,
+        compositeVelocity,
       };
     } catch (error) {
       // Return fallback metrics
@@ -207,8 +263,15 @@ export class GitHandler {
       );
       return {
         periodDays,
+        commitCount: 0,
+        authorCount: 0,
         linesAdded: 0,
-        developmentSpeed: 0,
+        linesDeleted: 0,
+        linesChanged: 0,
+        commitVelocity: 0,
+        authorActivity: 0,
+        codeChurn: 0,
+        compositeVelocity: 0,
       };
     }
   }

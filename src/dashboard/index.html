@@ -43,7 +43,7 @@
         font-size: 1.1rem;
         color: #2563eb;
         margin: 1rem auto;
-        max-width: 400px;
+        max-width: 500px;
       }
 
       .container {
@@ -236,7 +236,7 @@
       <div>
         How Development Speed Moderates Technical Debt Impact on Funding Success
       </div>
-      <div class="formula">TDV = TDR_Change / Development_Speed</div>
+      <div class="formula">TDV = TDR_Change / Composite_Velocity</div>
     </div>
 
     <div class="container">
@@ -252,7 +252,7 @@
         </div>
         <div class="metric-card">
           <div class="metric-value" id="avgSpeed">-</div>
-          <div class="metric-label">Avg Speed</div>
+          <div class="metric-label">Composite Velocity</div>
         </div>
         <div class="metric-card">
           <div class="metric-value" id="avgTDR">-</div>
@@ -300,8 +300,8 @@
           <h2>🧪 Hypothesis Test</h2>
           <div class="hypothesis-test">
             <div>
-              <strong>H₁:</strong> Development speed moderates technical debt
-              impact (β₃ > 0)
+              <strong>H₁:</strong> Composite velocity moderates technical debt
+              impact (β₃ > 0.1)
             </div>
             <div class="coefficient-display" id="coefficientDisplay">
               Loading...
@@ -347,7 +347,7 @@
         document.getElementById("totalPeriods").textContent =
           data.summary.totalPeriods;
         document.getElementById("avgSpeed").textContent =
-          data.summary.avgDevelopmentSpeed.toFixed(1);
+          data.summary.avgCompositeVelocity.toFixed(1);
         document.getElementById("avgTDR").textContent =
           (data.summary.avgTDRChange * 100).toFixed(1) + "%";
         document.getElementById("successRate").textContent =
@@ -375,7 +375,7 @@
       }
 
       function updateHypothesis(data) {
-        const coefficient = data.interactionEffect;
+        const coefficient = data.interactionEffectComposite;
         const isSupported = coefficient > 0.1;
 
         document.getElementById("coefficientDisplay").textContent =
@@ -399,7 +399,7 @@
           summary: {
             totalCompanies: 42,
             totalPeriods: 89,
-            avgDevelopmentSpeed: 23.4,
+            avgCompositeVelocity: 47.3,
             avgTDRChange: 0.15,
             fundingSuccessRate: 68.3,
           },
@@ -415,7 +415,7 @@
             engineeringExcellence: 90.3,
             overEngineering: 42.9,
           },
-          interactionEffect: 0.342,
+          interactionEffectComposite: 0.342,
           keyInsight:
             "HYPOTHESIS SUPPORTED: Fast teams can afford 58.3% higher technical debt (β₃=0.342)",
         };
