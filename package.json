@@ -1,11 +1,16 @@
 {
-  "name": "startup-technical-debt-analysis",
+  "name": "entrepreneurship-technical-debt-analysis",
+  "version": "1.0.0",
+  "description": "Master's thesis: Technical debt associations with entrepreneurial execution in technology ventures",
   "main": "src/index.ts",
   "scripts": {
     "start": "bun run src/index.ts",
     "generate": "bunx drizzle-kit generate --dialect sqlite --schema ./src/db/schema.ts",
     "studio": "bunx drizzle-kit studio"
   },
+  "keywords": ["entrepreneurship", "technical-debt", "startups", "venture-analysis", "masters-thesis"],
+  "author": "Your Name",
+  "license": "MIT",
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
     "@types/bun": "latest",
@@ -16,6 +21,7 @@
   },
   "dependencies": {
     "better-sqlite3": "^12.2.0",
-    "drizzle-orm": "^0.44.5"
+    "drizzle-orm": "^0.44.5",
+    "regression": "^2.0.1"
   }
 }

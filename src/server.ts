@@ -1,20 +1,36 @@
-import { calculateFundingOutcomeAnalysis } from "./analytics";
+import { calculateEntrepreneurshipAnalysis } from "./analytics";
 import dashboard from "./dashboard/index.html";
 
 export async function startDashboardServer() {
-  console.log("🌐 Starting Technical Debt & Funding Analytics Dashboard...");
+  console.log(
+    "🚀 Starting Entrepreneurship & Technical Debt Analytics Dashboard..."
+  );
 
   const server = Bun.serve({
     port: 3000,
     routes: {
       "/": dashboard,
 
-      "/api/funding-analytics": async () => {
+      "/api/entrepreneurship-analytics": async () => {
         try {
-          const data = await calculateFundingOutcomeAnalysis();
+          const data = await calculateEntrepreneurshipAnalysis();
           return Response.json(data);
         } catch (error) {
-          console.error("Funding analytics error:", error);
+          console.error("Entrepreneurship analytics error:", error);
+          return Response.json(
+            { error: "Failed to calculate entrepreneurship analytics" },
+            { status: 500 }
+          );
+        }
+      },
+
+      // Keep legacy endpoints for backward compatibility
+      "/api/funding-analytics": async () => {
+        try {
+          const data = await calculateEntrepreneurshipAnalysis();
+          return Response.json(data);
+        } catch (error) {
+          console.error("Analytics error:", error);
           return Response.json(
             { error: "Failed to calculate funding analytics" },
             { status: 500 }
@@ -22,10 +38,9 @@ export async function startDashboardServer() {
         }
       },
 
-      // Keep legacy endpoint for backward compatibility
       "/api/tdv-analytics": async () => {
         try {
-          const data = await calculateFundingOutcomeAnalysis();
+          const data = await calculateEntrepreneurshipAnalysis();
           return Response.json(data);
         } catch (error) {
           return Response.json(
@@ -49,12 +64,15 @@ export async function startDashboardServer() {
     },
   });
 
-  console.log(`✅ Technical Debt & Funding Dashboard: ${server.url}`);
+  console.log(`✅ Entrepreneurship Analytics Dashboard: ${server.url}`);
+  console.log(
+    "📊 Analysis: Technical debt associations with venture execution"
+  );
   console.log("🔍 Press Ctrl+C to stop");
 
   return new Promise((resolve) => {
     process.on("SIGINT", () => {
-      console.log("\n🛑 Shutting down...");
+      console.log("\n🛑 Shutting down dashboard...");
       server.stop();
       resolve(undefined);
     });

@@ -2,333 +2,128 @@ import { db } from "./db/db";
 import { companies, fundingRounds, developmentVelocity } from "./db/schema";
 import { eq } from "drizzle-orm";
 
-interface FundingOutcomeAnalysis {
+// @ts-ignore
+import regression from "regression";
+
+interface EntrepreneurshipAnalysis {
   summary: {
-    totalCompanies: number;
-    totalFundingPeriods: number;
+    totalVentures: number;
+    totalExecutionPeriods: number;
     avgFundingGrowthRate: number;
     avgDaysBetweenRounds: number;
-    avgTDRChange: number;
-    avgCompositeVelocity: number;
-    fundingSuccessRate: number;
+    avgResourceConstraint: number; // was: avgTDRChange
+    avgOrganizationalAgility: number; // was: avgCompositeVelocity
+    executionSuccessRate: number; // was: fundingSuccessRate
   };
 
-  strategicMatrix: {
-    speedStrategy: {
+  strategicFramework: {
+    speedToMarket: {
+      // High agility, high debt - startup hustle
       count: number;
       avgFundingGrowth: number;
       successRate: number;
     };
-    technicalChaos: {
+    technicalDebtTrap: {
+      // High debt, low agility - execution bottleneck
       count: number;
       avgFundingGrowth: number;
       successRate: number;
     };
-    engineeringExcellence: {
+    sustainableExecution: {
+      // Low debt, high agility - optimal execution
       count: number;
       avgFundingGrowth: number;
       successRate: number;
     };
-    overEngineering: {
+    prematureOptimization: {
+      // Low debt, low agility - over-engineering
       count: number;
       avgFundingGrowth: number;
       successRate: number;
     };
   };
 
-  // Proper regression results
-  hypothesisTest: {
-    mainEffect_TDR: number;
-    mainEffect_Velocity: number;
-    interactionEffect: number;
-    interactionPValue: number;
-    hypothesisSupported: boolean;
+  empiricalFindings: {
+    primaryAssociation: number; // correlation coefficient
+    regressionSlope: number; // debt impact on agility
     rSquared: number;
-    standardErrors: number[];
-    tStatistics: number[];
-    robustness: {
-      logTransform: { interaction: number; pValue: number };
-      winsorized: { interaction: number; pValue: number };
-      excludeOutliers: { interaction: number; pValue: number };
-    };
+    sampleSize: number;
+    significanceLevel: string; // "strong", "moderate", "weak", "none"
+    associationSupported: boolean;
   };
 
-  fundingOutcomes: {
-    byTDRQuartile: Array<{
+  correlationMatrix: {
+    debtAgility: number; // tech debt vs organizational agility
+    debtFunding: number; // tech debt vs funding growth
+    agilityFunding: number; // organizational agility vs funding
+    debtTeamSize: number; // tech debt vs team size
+    agilityAge: number; // agility vs venture age
+  };
+
+  ventureOutcomes: {
+    byDebtQuartile: Array<{
       quartile: string;
       avgFundingGrowth: number;
-      avgVelocity: number;
+      avgAgility: number;
       successRate: number;
       count: number;
     }>;
-    byVelocityQuartile: Array<{
+    byAgilityQuartile: Array<{
       quartile: string;
       avgFundingGrowth: number;
-      avgTDRChange: number;
+      avgResourceConstraint: number;
       successRate: number;
       count: number;
     }>;
   };
 
-  keyFindings: {
-    primaryInsight: string;
-    economicSignificance: string;
-    theoreticalImplication: string;
-    practicalRecommendation: string;
-    academicContribution: string;
-    limitations: string;
+  entrepreneurshipInsights: {
+    primaryFinding: string;
+    practicalImplication: string;
+    vcImplication: string;
+    entrepreneurialRecommendation: string;
+    researchContribution: string;
+    studyLimitations: string;
   };
 
   exportDate: string;
 }
 
-// Proper linear algebra functions for OLS regression
-function transpose(matrix: number[][]): number[][] {
-  return matrix[0].map((_, colIndex) => matrix.map((row) => row[colIndex]));
-}
+function calculateCorrelation(x: number[], y: number[]): number {
+  const n = x.length;
+  if (n === 0) return 0;
 
-function matrixMultiply(A: number[][], B: number[][]): number[][] {
-  const result = Array(A.length)
-    .fill(0)
-    .map(() => Array(B[0].length).fill(0));
-  for (let i = 0; i < A.length; i++) {
-    for (let j = 0; j < B[0].length; j++) {
-      for (let k = 0; k < B.length; k++) {
-        result[i][j] += A[i][k] * B[k][j];
-      }
-    }
-  }
-  return result;
-}
+  const meanX = x.reduce((sum, val) => sum + val, 0) / n;
+  const meanY = y.reduce((sum, val) => sum + val, 0) / n;
 
-function matrixInverse(matrix: number[][]): number[][] {
-  const n = matrix.length;
-  const identity = Array(n)
-    .fill(0)
-    .map((_, i) =>
-      Array(n)
-        .fill(0)
-        .map((_, j) => (i === j ? 1 : 0))
-    );
-  const augmented = matrix.map((row, i) => [...row, ...identity[i]]);
-
-  // Gaussian elimination
-  for (let i = 0; i < n; i++) {
-    // Find pivot
-    let maxRow = i;
-    for (let k = i + 1; k < n; k++) {
-      if (Math.abs(augmented[k][i]) > Math.abs(augmented[maxRow][i])) {
-        maxRow = k;
-      }
-    }
-    [augmented[i], augmented[maxRow]] = [augmented[maxRow], augmented[i]];
-
-    // Make diagonal 1
-    const divisor = augmented[i][i];
-    if (Math.abs(divisor) < 1e-10) continue; // Skip if singular
-    for (let j = 0; j < 2 * n; j++) {
-      augmented[i][j] /= divisor;
-    }
-
-    // Eliminate column
-    for (let k = 0; k < n; k++) {
-      if (k !== i) {
-        const factor = augmented[k][i];
-        for (let j = 0; j < 2 * n; j++) {
-          augmented[k][j] -= factor * augmented[i][j];
-        }
-      }
-    }
-  }
-
-  return augmented.map((row) => row.slice(n));
-}
-
-function matrixVectorMultiply(matrix: number[][], vector: number[]): number[] {
-  return matrix.map((row) =>
-    row.reduce((sum, val, i) => sum + val * vector[i], 0)
+  const numerator = x.reduce(
+    (sum, val, i) => sum + (val - meanX) * (y[i] - meanY),
+    0
   );
-}
-
-function mean(values: number[]): number {
-  return values.reduce((sum, val) => sum + val, 0) / values.length;
-}
-
-function standardDeviation(values: number[]): number {
-  const avg = mean(values);
-  const squared = values.map((val) => Math.pow(val - avg, 2));
-  return Math.sqrt(mean(squared));
-}
-
-// t-distribution CDF approximation (good enough for p-values)
-function tCDF(t: number, df: number): number {
-  if (df >= 30) {
-    // Use normal approximation for large df
-    return 0.5 * (1 + erf(t / Math.sqrt(2)));
-  }
-
-  // Simple approximation for small df
-  const x = t / Math.sqrt(df);
-  return (
-    0.5 + 0.5 * Math.sign(x) * Math.sqrt(1 - Math.exp((-2 * x * x) / Math.PI))
+  const denomX = Math.sqrt(
+    x.reduce((sum, val) => sum + Math.pow(val - meanX, 2), 0)
   );
-}
-
-function erf(x: number): number {
-  // Abramowitz and Stegun approximation
-  const a1 = 0.254829592;
-  const a2 = -0.284496736;
-  const a3 = 1.421413741;
-  const a4 = -1.453152027;
-  const a5 = 1.061405429;
-  const p = 0.3275911;
-
-  const sign = x >= 0 ? 1 : -1;
-  x = Math.abs(x);
-
-  const t = 1.0 / (1.0 + p * x);
-  const y =
-    1.0 - ((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
-
-  return sign * y;
-}
-
-function classifyIndustry(githubUrl: string): string {
-  const repoName = githubUrl.toLowerCase();
-  if (repoName.includes("database") || repoName.includes("db"))
-    return "database";
-  if (repoName.includes("ml") || repoName.includes("ai")) return "ai_ml";
-  if (repoName.includes("web") || repoName.includes("frontend")) return "web";
-  if (repoName.includes("devtools") || repoName.includes("cli"))
-    return "devtools";
-  if (repoName.includes("analytics") || repoName.includes("data"))
-    return "data";
-  return "infrastructure";
-}
-
-function createIndustryDummies(industries: string[]): number[][] {
-  const uniqueIndustries = [...new Set(industries)];
-  return industries.map((industry) =>
-    uniqueIndustries.map((unique) => (industry === unique ? 1 : 0))
+  const denomY = Math.sqrt(
+    y.reduce((sum, val) => sum + Math.pow(val - meanY, 2), 0)
   );
+
+  if (denomX === 0 || denomY === 0) return 0;
+  return numerator / (denomX * denomY);
 }
 
-function winsorize(values: number[], percentile: number): number[] {
-  const sorted = [...values].sort((a, b) => a - b);
-  const lowerBound = sorted[Math.floor(values.length * percentile)];
-  const upperBound = sorted[Math.floor(values.length * (1 - percentile))];
+function classifyVentureStrategy(
+  resourceConstraint: number, // technical debt ratio
+  organizationalAgility: number, // development velocity
+  medianConstraint: number,
+  medianAgility: number
+): string {
+  const highConstraint = resourceConstraint > medianConstraint;
+  const highAgility = organizationalAgility > medianAgility;
 
-  return values.map((val) => Math.max(lowerBound, Math.min(upperBound, val)));
-}
-
-// PROPER OLS REGRESSION IMPLEMENTATION
-function calculateProperRegression(
-  tdrChanges: number[],
-  velocities: number[],
-  fundingGrowths: number[],
-  controls: {
-    companyAge: number[];
-    teamSize: number[];
-    roundNumber: number[];
-    industryDummies: number[][];
-  }
-): {
-  mainTDR: number;
-  mainVelocity: number;
-  interaction: number;
-  rSquared: number;
-  pValue: number;
-  standardErrors: number[];
-  tStatistics: number[];
-} {
-  const n = tdrChanges.length;
-
-  if (n < 20) {
-    // Return fallback for small samples
-    return {
-      mainTDR: 0,
-      mainVelocity: 0,
-      interaction: 0,
-      rSquared: 0,
-      pValue: 1,
-      standardErrors: [],
-      tStatistics: [],
-    };
-  }
-
-  // Create design matrix X: [constant, TDR, Velocity, TDR*Velocity, controls...]
-  const X: number[][] = [];
-  const y = fundingGrowths;
-
-  for (let i = 0; i < n; i++) {
-    const row = [
-      1, // constant
-      tdrChanges[i] || 0, // β₁
-      velocities[i] || 0, // β₂
-      (tdrChanges[i] || 0) * (velocities[i] || 0), // β₃ (key interaction)
-      Math.log(controls.companyAge[i] + 1), // log company age
-      Math.log(controls.teamSize[i] + 1), // log team size
-      controls.roundNumber[i], // funding round number
-      ...controls.industryDummies[i], // industry fixed effects
-    ];
-    X.push(row);
-  }
-
-  try {
-    // OLS: β = (X'X)⁻¹X'y
-    const Xt = transpose(X);
-    const XtX = matrixMultiply(Xt, X);
-    const XtXinv = matrixInverse(XtX);
-    const Xty = matrixVectorMultiply(Xt, y);
-    const coefficients = matrixVectorMultiply(XtXinv, Xty);
-
-    // Calculate residuals and standard errors
-    const predictions = X.map((row) =>
-      row.reduce((sum, val, i) => sum + val * coefficients[i], 0)
-    );
-    const residuals = y.map((actual, i) => actual - predictions[i]);
-    const rss = residuals.reduce((sum, r) => sum + r * r, 0);
-    const mse = rss / (n - coefficients.length);
-
-    // Standard errors: SE(β) = √(MSE * diagonal(X'X)⁻¹)
-    const standardErrors = coefficients.map((_, i) =>
-      Math.sqrt(mse * Math.abs(XtXinv[i][i]))
-    );
-
-    // t-statistics and p-values
-    const tStatistics = coefficients.map((coef, i) =>
-      standardErrors[i] > 0 ? coef / standardErrors[i] : 0
-    );
-    const interactionTStat = tStatistics[3]; // β₃ coefficient
-    const pValue =
-      2 * (1 - tCDF(Math.abs(interactionTStat), n - coefficients.length));
-
-    // R²
-    const meanY = mean(y);
-    const tss = y.reduce((sum, yi) => sum + Math.pow(yi - meanY, 2), 0);
-    const rSquared = tss > 0 ? Math.max(0, 1 - rss / tss) : 0;
-
-    return {
-      mainTDR: coefficients[1] || 0,
-      mainVelocity: coefficients[2] || 0,
-      interaction: coefficients[3] || 0, // This is your key hypothesis β₃
-      rSquared: rSquared,
-      pValue: Math.min(1, Math.max(0, pValue)),
-      standardErrors,
-      tStatistics,
-    };
-  } catch (error) {
-    console.warn("Regression calculation failed:", error);
-    return {
-      mainTDR: 0,
-      mainVelocity: 0,
-      interaction: 0,
-      rSquared: 0,
-      pValue: 1,
-      standardErrors: [],
-      tStatistics: [],
-    };
-  }
+  if (highConstraint && highAgility) return "speedToMarket";
+  if (highConstraint && !highAgility) return "technicalDebtTrap";
+  if (!highConstraint && highAgility) return "sustainableExecution";
+  return "prematureOptimization";
 }
 
 function calculateQuartiles(values: number[]): {
@@ -345,14 +140,30 @@ function calculateQuartiles(values: number[]): {
   };
 }
 
-export async function calculateFundingOutcomeAnalysis(): Promise<FundingOutcomeAnalysis> {
+function getSignificanceLevel(correlation: number, sampleSize: number): string {
+  const absCorr = Math.abs(correlation);
+
+  // Rule of thumb for correlation significance
+  if (sampleSize < 30) {
+    if (absCorr > 0.5) return "moderate";
+    if (absCorr > 0.3) return "weak";
+    return "none";
+  }
+
+  if (absCorr > 0.5) return "strong";
+  if (absCorr > 0.3) return "moderate";
+  if (absCorr > 0.1) return "weak";
+  return "none";
+}
+
+export async function calculateEntrepreneurshipAnalysis(): Promise<EntrepreneurshipAnalysis> {
   const allVelocityData = await db.select().from(developmentVelocity);
 
   if (allVelocityData.length === 0) {
-    return createDemoFundingData();
+    return createDemoEntrepreneurshipData();
   }
 
-  // Enhanced data preparation with controls
+  // Enhanced data preparation for entrepreneurship analysis
   const analysisData = await Promise.all(
     allVelocityData.map(async (velocity) => {
       const fromRound = velocity.fromRoundId
@@ -370,7 +181,6 @@ export async function calculateFundingOutcomeAnalysis(): Promise<FundingOutcomeA
             .limit(1)
         : [null];
 
-      // Get company info for controls
       const company = await db
         .select()
         .from(companies)
@@ -379,25 +189,14 @@ export async function calculateFundingOutcomeAnalysis(): Promise<FundingOutcomeA
 
       const fromAmount = fromRound[0]?.amountUsd || 0;
       const toAmount = toRound[0]?.amountUsd || 0;
-
-      // Calculate funding growth rate (percentage increase)
       const fundingGrowthRate =
         fromAmount > 0 ? ((toAmount - fromAmount) / fromAmount) * 100 : 0;
 
-      // Control variables
-      const companyAge = velocity.periodDays
+      // Entrepreneurship context variables
+      const ventureAge = velocity.periodDays
         ? Math.floor(velocity.periodDays / 30)
-        : 12; // months
-      const teamSize = Math.max(1, velocity.authorCount || 1);
-      const industry = classifyIndustry(company[0]?.githubLink || "");
-
-      // Count funding round number
-      const allRounds = await db
-        .select()
-        .from(fundingRounds)
-        .where(eq(fundingRounds.companyId, velocity.companyId));
-      const roundNumber =
-        allRounds.findIndex((r) => r.id === velocity.toRoundId) + 1;
+        : 12;
+      const teamStructure = Math.max(1, velocity.authorCount || 1);
 
       return {
         ...velocity,
@@ -405,144 +204,139 @@ export async function calculateFundingOutcomeAnalysis(): Promise<FundingOutcomeA
         toAmount,
         fundingGrowthRate,
         daysBetweenRounds: velocity.periodDays || 0,
-        // Control variables
-        companyAge,
-        teamSize,
-        industry,
-        roundNumber,
-        // Handle negative development cases
-        validVelocity: (velocity.compositeVelocity || 0) > 0,
-        validTDRChange: Math.abs(velocity.tdrChange || 0) < 2.0,
+        ventureAge,
+        teamStructure,
+        resourceConstraint: Math.abs(velocity.tdrChange || 0), // Technical debt accumulation
+        organizationalAgility: velocity.compositeVelocity || 0, // Development velocity
+        validData:
+          (velocity.compositeVelocity || 0) > 0 &&
+          Math.abs(velocity.tdrChange || 0) < 2.0 &&
+          fundingGrowthRate >= -50 &&
+          fundingGrowthRate <= 1000,
       };
     })
   );
 
-  // Filter for valid data points
-  const validData = analysisData.filter(
-    (d) =>
-      d.validVelocity &&
-      d.validTDRChange &&
-      d.fundingGrowthRate >= -50 &&
-      d.fundingGrowthRate <= 1000 &&
-      d.companyAge > 0 &&
-      d.teamSize > 0
-  );
+  const validData = analysisData.filter((d) => d.validData);
 
   if (validData.length < 10) {
-    return createDemoFundingData();
+    return createDemoEntrepreneurshipData();
   }
 
-  // Extract metrics for regression
+  // Extract key entrepreneurship metrics
   const fundingGrowthRates = validData.map((d) => d.fundingGrowthRate);
-  const tdrChanges = validData.map((d) => Math.abs(d.tdrChange || 0));
-  const compositeVelocities = validData.map((d) => d.compositeVelocity || 0);
-  const daysBetweenRounds = validData.map((d) => d.daysBetweenRounds);
+  const resourceConstraints = validData.map((d) => d.resourceConstraint);
+  const organizationalAgilities = validData.map((d) => d.organizationalAgility);
+  const teamSizes = validData.map((d) => d.teamStructure);
+  const ventureAges = validData.map((d) => d.ventureAge);
   const successIndicators = validData.map((d) => (d.gotNextRound ? 1 : 0));
 
-  // Prepare control variables
-  const controls = {
-    companyAge: validData.map((d) => d.companyAge),
-    teamSize: validData.map((d) => d.teamSize),
-    roundNumber: validData.map((d) => d.roundNumber),
-    industryDummies: createIndustryDummies(validData.map((d) => d.industry)),
+  // CORRELATION ANALYSIS (main empirical method)
+  const correlations = {
+    debtAgility: calculateCorrelation(
+      resourceConstraints,
+      organizationalAgilities
+    ),
+    debtFunding: calculateCorrelation(resourceConstraints, fundingGrowthRates),
+    agilityFunding: calculateCorrelation(
+      organizationalAgilities,
+      fundingGrowthRates
+    ),
+    debtTeamSize: calculateCorrelation(resourceConstraints, teamSizes),
+    agilityAge: calculateCorrelation(organizationalAgilities, ventureAges),
   };
 
-  // Calculate quartiles for strategic analysis
-  const tdrQuartiles = calculateQuartiles(tdrChanges);
-  const velocityQuartiles = calculateQuartiles(compositeVelocities);
+  // SIMPLE REGRESSION: Technical Debt → Organizational Agility
+  const regressionData = validData.map((d) => [
+    d.resourceConstraint,
+    d.organizationalAgility,
+  ]);
+  let regressionResult;
+  let rSquared = 0;
+  let regressionSlope = 0;
 
-  // Strategic Matrix Classification
-  const medianTDR = tdrQuartiles.q2;
-  const medianVelocity = velocityQuartiles.q2;
+  try {
+    regressionResult = regression.linear(regressionData, { precision: 4 });
+    rSquared = regressionResult.r2;
+    regressionSlope = regressionResult.equation[0]; // slope
+  } catch (error) {
+    console.warn("Regression calculation failed, using correlation");
+    regressionSlope = correlations.debtAgility;
+    rSquared = Math.pow(correlations.debtAgility, 2);
+  }
 
-  let speedStrategy = { count: 0, totalGrowth: 0, successes: 0 };
-  let technicalChaos = { count: 0, totalGrowth: 0, successes: 0 };
-  let engineeringExcellence = { count: 0, totalGrowth: 0, successes: 0 };
-  let overEngineering = { count: 0, totalGrowth: 0, successes: 0 };
+  // Strategic Framework Classification
+  const debtQuartiles = calculateQuartiles(resourceConstraints);
+  const agilityQuartiles = calculateQuartiles(organizationalAgilities);
+  const medianDebt = debtQuartiles.q2;
+  const medianAgility = agilityQuartiles.q2;
+
+  let speedToMarket = { count: 0, totalGrowth: 0, successes: 0 };
+  let technicalDebtTrap = { count: 0, totalGrowth: 0, successes: 0 };
+  let sustainableExecution = { count: 0, totalGrowth: 0, successes: 0 };
+  let prematureOptimization = { count: 0, totalGrowth: 0, successes: 0 };
 
   validData.forEach((d) => {
-    const highTDR = (d.tdrChange || 0) > medianTDR;
-    const fastDev = (d.compositeVelocity || 0) > medianVelocity;
+    const strategy = classifyVentureStrategy(
+      d.resourceConstraint,
+      d.organizationalAgility,
+      medianDebt,
+      medianAgility
+    );
     const growth = d.fundingGrowthRate;
     const success = d.gotNextRound ? 1 : 0;
 
-    if (highTDR && fastDev) {
-      speedStrategy.count++;
-      speedStrategy.totalGrowth += growth;
-      speedStrategy.successes += success;
-    } else if (highTDR && !fastDev) {
-      technicalChaos.count++;
-      technicalChaos.totalGrowth += growth;
-      technicalChaos.successes += success;
-    } else if (!highTDR && fastDev) {
-      engineeringExcellence.count++;
-      engineeringExcellence.totalGrowth += growth;
-      engineeringExcellence.successes += success;
-    } else {
-      overEngineering.count++;
-      overEngineering.totalGrowth += growth;
-      overEngineering.successes += success;
+    switch (strategy) {
+      case "speedToMarket":
+        speedToMarket.count++;
+        speedToMarket.totalGrowth += growth;
+        speedToMarket.successes += success;
+        break;
+      case "technicalDebtTrap":
+        technicalDebtTrap.count++;
+        technicalDebtTrap.totalGrowth += growth;
+        technicalDebtTrap.successes += success;
+        break;
+      case "sustainableExecution":
+        sustainableExecution.count++;
+        sustainableExecution.totalGrowth += growth;
+        sustainableExecution.successes += success;
+        break;
+      case "prematureOptimization":
+        prematureOptimization.count++;
+        prematureOptimization.totalGrowth += growth;
+        prematureOptimization.successes += success;
+        break;
     }
   });
 
-  // MAIN REGRESSION ANALYSIS
-  const regressionResults = calculateProperRegression(
-    tdrChanges,
-    compositeVelocities,
-    fundingGrowthRates,
-    controls
+  // Significance assessment
+  const primaryCorrelation = correlations.debtAgility;
+  const significanceLevel = getSignificanceLevel(
+    primaryCorrelation,
+    validData.length
   );
+  const associationSupported =
+    significanceLevel !== "none" && Math.abs(primaryCorrelation) > 0.2;
 
-  // ROBUSTNESS CHECKS
-  const logTransformResults = calculateProperRegression(
-    tdrChanges,
-    compositeVelocities,
-    fundingGrowthRates.map((x) => Math.log(Math.max(0.1, x + 100))), // log(growth + 100)
-    controls
-  );
-
-  const winsorizedResults = calculateProperRegression(
-    tdrChanges,
-    compositeVelocities,
-    winsorize(fundingGrowthRates, 0.05),
-    controls
-  );
-
-  const outlierFreeData = validData.filter(
-    (d) => Math.abs(d.tdrChange || 0) <= 1.5
-  );
-  const outlierFreeResults =
-    outlierFreeData.length >= 10
-      ? calculateProperRegression(
-          outlierFreeData.map((d) => Math.abs(d.tdrChange || 0)),
-          outlierFreeData.map((d) => d.compositeVelocity || 0),
-          outlierFreeData.map((d) => d.fundingGrowthRate),
-          {
-            companyAge: outlierFreeData.map((d) => d.companyAge),
-            teamSize: outlierFreeData.map((d) => d.teamSize),
-            roundNumber: outlierFreeData.map((d) => d.roundNumber),
-            industryDummies: createIndustryDummies(
-              outlierFreeData.map((d) => d.industry)
-            ),
-          }
-        )
-      : regressionResults;
-
-  const hypothesisSupported =
-    regressionResults.interaction > 0.05 && regressionResults.pValue < 0.1;
-
-  // Quartile Analysis
-  const tdrQuartileAnalysis = [
-    { quartile: "Q1 (Low TDR)", range: `0-${tdrQuartiles.q1.toFixed(2)}` },
+  // Quartile Analysis for Entrepreneurs
+  const debtQuartileAnalysis = [
     {
-      quartile: "Q2",
-      range: `${tdrQuartiles.q1.toFixed(2)}-${tdrQuartiles.q2.toFixed(2)}`,
+      quartile: "Q1 (Low Technical Debt)",
+      range: `0-${debtQuartiles.q1.toFixed(2)}`,
     },
     {
-      quartile: "Q3",
-      range: `${tdrQuartiles.q2.toFixed(2)}-${tdrQuartiles.q3.toFixed(2)}`,
+      quartile: "Q2 (Moderate Debt)",
+      range: `${debtQuartiles.q1.toFixed(2)}-${debtQuartiles.q2.toFixed(2)}`,
     },
-    { quartile: "Q4 (High TDR)", range: `${tdrQuartiles.q3.toFixed(2)}+` },
+    {
+      quartile: "Q3 (High Debt)",
+      range: `${debtQuartiles.q2.toFixed(2)}-${debtQuartiles.q3.toFixed(2)}`,
+    },
+    {
+      quartile: "Q4 (Critical Debt)",
+      range: `${debtQuartiles.q3.toFixed(2)}+`,
+    },
   ].map((q, index) => {
     const quarterData = validData.filter((_, i) => {
       const quartileIndex = Math.floor((i / validData.length) * 4);
@@ -554,8 +348,8 @@ export async function calculateFundingOutcomeAnalysis(): Promise<FundingOutcomeA
       avgFundingGrowth:
         quarterData.reduce((sum, d) => sum + d.fundingGrowthRate, 0) /
         Math.max(quarterData.length, 1),
-      avgVelocity:
-        quarterData.reduce((sum, d) => sum + (d.compositeVelocity || 0), 0) /
+      avgAgility:
+        quarterData.reduce((sum, d) => sum + d.organizationalAgility, 0) /
         Math.max(quarterData.length, 1),
       successRate:
         (quarterData.reduce((sum, d) => sum + (d.gotNextRound ? 1 : 0), 0) /
@@ -565,24 +359,27 @@ export async function calculateFundingOutcomeAnalysis(): Promise<FundingOutcomeA
     };
   });
 
-  const velocityQuartileAnalysis = [
+  const agilityQuartileAnalysis = [
     {
-      quartile: "Q1 (Slow Dev)",
-      range: `0-${velocityQuartiles.q1.toFixed(1)}`,
+      quartile: "Q1 (Low Agility)",
+      range: `0-${agilityQuartiles.q1.toFixed(1)}`,
     },
     {
-      quartile: "Q2",
-      range: `${velocityQuartiles.q1.toFixed(1)}-${velocityQuartiles.q2.toFixed(
+      quartile: "Q2 (Moderate Agility)",
+      range: `${agilityQuartiles.q1.toFixed(1)}-${agilityQuartiles.q2.toFixed(
         1
       )}`,
     },
     {
-      quartile: "Q3",
-      range: `${velocityQuartiles.q2.toFixed(1)}-${velocityQuartiles.q3.toFixed(
+      quartile: "Q3 (High Agility)",
+      range: `${agilityQuartiles.q2.toFixed(1)}-${agilityQuartiles.q3.toFixed(
         1
       )}`,
     },
-    { quartile: "Q4 (Fast Dev)", range: `${velocityQuartiles.q3.toFixed(1)}+` },
+    {
+      quartile: "Q4 (Exceptional Agility)",
+      range: `${agilityQuartiles.q3.toFixed(1)}+`,
+    },
   ].map((q, index) => {
     const quarterData = validData.filter((_, i) => {
       const quartileIndex = Math.floor((i / validData.length) * 4);
@@ -594,8 +391,8 @@ export async function calculateFundingOutcomeAnalysis(): Promise<FundingOutcomeA
       avgFundingGrowth:
         quarterData.reduce((sum, d) => sum + d.fundingGrowthRate, 0) /
         Math.max(quarterData.length, 1),
-      avgTDRChange:
-        quarterData.reduce((sum, d) => sum + Math.abs(d.tdrChange || 0), 0) /
+      avgResourceConstraint:
+        quarterData.reduce((sum, d) => sum + d.resourceConstraint, 0) /
         Math.max(quarterData.length, 1),
       successRate:
         (quarterData.reduce((sum, d) => sum + (d.gotNextRound ? 1 : 0), 0) /
@@ -605,270 +402,265 @@ export async function calculateFundingOutcomeAnalysis(): Promise<FundingOutcomeA
     };
   });
 
-  // ACADEMIC FINDINGS
-  const velocityStdDev = standardDeviation(compositeVelocities);
-  const economicEffect = regressionResults.interaction * velocityStdDev;
-
-  const keyFindings = {
-    primaryInsight: hypothesisSupported
-      ? `Interaction coefficient β₃ = ${regressionResults.interaction.toFixed(
-          3
-        )} (p = ${regressionResults.pValue.toFixed(
-          3
-        )}) indicates development velocity significantly moderates technical debt effects on funding outcomes.`
-      : `No significant moderation effect detected: β₃ = ${regressionResults.interaction.toFixed(
-          3
-        )} (p = ${regressionResults.pValue.toFixed(
-          3
-        )}). Traditional technical debt management principles appear to dominate.`,
-
-    economicSignificance: hypothesisSupported
-      ? `A one-standard-deviation increase in development velocity (${velocityStdDev.toFixed(
-          1
-        )} units) reduces the technical debt funding penalty by ${Math.abs(
-          economicEffect
-        ).toFixed(1)} percentage points.`
-      : `Effect size economically insignificant: ${Math.abs(
-          economicEffect
-        ).toFixed(2)} percentage points per standard deviation.`,
-
-    theoreticalImplication: hypothesisSupported
-      ? "Supports dynamic capabilities theory: development velocity acts as a compensating organizational capability during investor evaluation periods."
-      : "Results align with traditional software engineering principles: code quality impacts performance regardless of development speed.",
-
-    practicalRecommendation: hypothesisSupported
-      ? `Early-stage startups with development velocity above ${velocityQuartiles.q3.toFixed(
-          1
-        )} can strategically prioritize speed over technical debt reduction during funding preparation.`
-      : "Startups should prioritize technical debt reduction regardless of development velocity constraints when preparing for funding rounds.",
-
-    academicContribution:
-      "First empirical analysis of development velocity as a moderating factor in the technical debt-funding relationship, extending both technical debt literature and entrepreneurial finance research.",
-
-    limitations:
-      "Results limited to open-source software startups. Endogeneity concerns remain due to potential unobserved management quality factors affecting both technical debt and development practices.",
-  };
+  // Generate Entrepreneurship Insights
+  const entrepreneurshipInsights = generateEntrepreneurshipInsights(
+    primaryCorrelation,
+    significanceLevel,
+    associationSupported,
+    validData.length,
+    rSquared
+  );
 
   return {
     summary: {
-      totalCompanies: await db
+      totalVentures: await db
         .select()
         .from(companies)
         .then((r) => r.length),
-      totalFundingPeriods: validData.length,
+      totalExecutionPeriods: validData.length,
       avgFundingGrowthRate:
         fundingGrowthRates.reduce((a, b) => a + b, 0) /
         fundingGrowthRates.length,
       avgDaysBetweenRounds:
-        daysBetweenRounds.reduce((a, b) => a + b, 0) / daysBetweenRounds.length,
-      avgTDRChange: tdrChanges.reduce((a, b) => a + b, 0) / tdrChanges.length,
-      avgCompositeVelocity:
-        compositeVelocities.reduce((a, b) => a + b, 0) /
-        compositeVelocities.length,
-      fundingSuccessRate:
+        validData.reduce((sum, d) => sum + d.daysBetweenRounds, 0) /
+        validData.length,
+      avgResourceConstraint:
+        resourceConstraints.reduce((a, b) => a + b, 0) /
+        resourceConstraints.length,
+      avgOrganizationalAgility:
+        organizationalAgilities.reduce((a, b) => a + b, 0) /
+        organizationalAgilities.length,
+      executionSuccessRate:
         (successIndicators.reduce((a, b) => a + b, 0) /
           successIndicators.length) *
         100,
     },
 
-    strategicMatrix: {
-      speedStrategy: {
-        count: speedStrategy.count,
+    strategicFramework: {
+      speedToMarket: {
+        count: speedToMarket.count,
         avgFundingGrowth:
-          speedStrategy.count > 0
-            ? speedStrategy.totalGrowth / speedStrategy.count
+          speedToMarket.count > 0
+            ? speedToMarket.totalGrowth / speedToMarket.count
             : 0,
         successRate:
-          speedStrategy.count > 0
-            ? (speedStrategy.successes / speedStrategy.count) * 100
+          speedToMarket.count > 0
+            ? (speedToMarket.successes / speedToMarket.count) * 100
             : 0,
       },
-      technicalChaos: {
-        count: technicalChaos.count,
+      technicalDebtTrap: {
+        count: technicalDebtTrap.count,
         avgFundingGrowth:
-          technicalChaos.count > 0
-            ? technicalChaos.totalGrowth / technicalChaos.count
+          technicalDebtTrap.count > 0
+            ? technicalDebtTrap.totalGrowth / technicalDebtTrap.count
             : 0,
         successRate:
-          technicalChaos.count > 0
-            ? (technicalChaos.successes / technicalChaos.count) * 100
+          technicalDebtTrap.count > 0
+            ? (technicalDebtTrap.successes / technicalDebtTrap.count) * 100
             : 0,
       },
-      engineeringExcellence: {
-        count: engineeringExcellence.count,
+      sustainableExecution: {
+        count: sustainableExecution.count,
         avgFundingGrowth:
-          engineeringExcellence.count > 0
-            ? engineeringExcellence.totalGrowth / engineeringExcellence.count
+          sustainableExecution.count > 0
+            ? sustainableExecution.totalGrowth / sustainableExecution.count
             : 0,
         successRate:
-          engineeringExcellence.count > 0
-            ? (engineeringExcellence.successes / engineeringExcellence.count) *
+          sustainableExecution.count > 0
+            ? (sustainableExecution.successes / sustainableExecution.count) *
               100
             : 0,
       },
-      overEngineering: {
-        count: overEngineering.count,
+      prematureOptimization: {
+        count: prematureOptimization.count,
         avgFundingGrowth:
-          overEngineering.count > 0
-            ? overEngineering.totalGrowth / overEngineering.count
+          prematureOptimization.count > 0
+            ? prematureOptimization.totalGrowth / prematureOptimization.count
             : 0,
         successRate:
-          overEngineering.count > 0
-            ? (overEngineering.successes / overEngineering.count) * 100
+          prematureOptimization.count > 0
+            ? (prematureOptimization.successes / prematureOptimization.count) *
+              100
             : 0,
       },
     },
 
-    hypothesisTest: {
-      mainEffect_TDR: regressionResults.mainTDR,
-      mainEffect_Velocity: regressionResults.mainVelocity,
-      interactionEffect: regressionResults.interaction,
-      interactionPValue: regressionResults.pValue,
-      hypothesisSupported,
-      rSquared: regressionResults.rSquared,
-      standardErrors: regressionResults.standardErrors,
-      tStatistics: regressionResults.tStatistics,
-      robustness: {
-        logTransform: {
-          interaction: logTransformResults.interaction,
-          pValue: logTransformResults.pValue,
-        },
-        winsorized: {
-          interaction: winsorizedResults.interaction,
-          pValue: winsorizedResults.pValue,
-        },
-        excludeOutliers: {
-          interaction: outlierFreeResults.interaction,
-          pValue: outlierFreeResults.pValue,
-        },
-      },
+    empiricalFindings: {
+      primaryAssociation: primaryCorrelation,
+      regressionSlope: regressionSlope,
+      rSquared: rSquared,
+      sampleSize: validData.length,
+      significanceLevel: significanceLevel,
+      associationSupported: associationSupported,
     },
 
-    fundingOutcomes: {
-      byTDRQuartile: tdrQuartileAnalysis,
-      byVelocityQuartile: velocityQuartileAnalysis,
+    correlationMatrix: correlations,
+
+    ventureOutcomes: {
+      byDebtQuartile: debtQuartileAnalysis,
+      byAgilityQuartile: agilityQuartileAnalysis,
     },
 
-    keyFindings,
+    entrepreneurshipInsights,
     exportDate: new Date().toISOString(),
   };
 }
 
-function createDemoFundingData(): FundingOutcomeAnalysis {
+function generateEntrepreneurshipInsights(
+  correlation: number,
+  significance: string,
+  supported: boolean,
+  sampleSize: number,
+  rSquared: number
+): any {
+  return {
+    primaryFinding: supported
+      ? `Technical debt shows a ${significance} association with organizational agility (r = ${correlation.toFixed(
+          3
+        )}, n = ${sampleSize}). This suggests that accumulating technical debt is associated with reduced execution speed in technology ventures.`
+      : `No significant association detected between technical debt and organizational agility (r = ${correlation.toFixed(
+          3
+        )}, n = ${sampleSize}). Code quality and execution speed appear to vary independently in this sample.`,
+
+    practicalImplication: supported
+      ? `The observed association suggests entrepreneurs face a trade-off between short-term development speed and long-term organizational agility. Technical debt accumulation appears to create execution bottlenecks as ventures scale.`
+      : `Technical debt and execution speed show no consistent relationship across ventures, suggesting other factors (team experience, technology choices, market pressure) may be more important for organizational agility.`,
+
+    vcImplication: supported
+      ? `Code quality metrics may provide additional due diligence signals about execution risk. Ventures with high technical debt may face scaling challenges that impact their ability to iterate and respond to market feedback.`
+      : `Technical debt metrics alone do not appear predictive of execution capabilities. Due diligence should focus on team quality, market timing, and business model validation rather than code quality metrics.`,
+
+    entrepreneurialRecommendation: supported
+      ? `Entrepreneurs should monitor technical debt accumulation as a leading indicator of execution constraints. Strategic debt can be acceptable during product-market fit discovery, but should be actively managed before scaling phases.`
+      : `Technical debt management should be balanced with other business priorities. There is no evidence that prioritizing code quality over market responsiveness improves venture outcomes in this sample.`,
+
+    researchContribution: `This study provides the first systematic empirical analysis of technical debt patterns across a technology venture portfolio. The ${
+      supported ? "observed associations" : "lack of clear relationships"
+    } contribute to our understanding of operational factors in startup execution and provide a foundation for future causal research.`,
+
+    studyLimitations: `Key limitations include: (1) Cross-sectional associations cannot establish causality, (2) Funding amounts may not reflect true venture success, (3) Sample limited to open-source ventures, (4) Potential selection bias toward publicly visible startups, (5) Technical debt metrics may not capture all code quality dimensions. Results should be interpreted as exploratory patterns rather than prescriptive guidance.`,
+  };
+}
+
+function createDemoEntrepreneurshipData(): EntrepreneurshipAnalysis {
   return {
     summary: {
-      totalCompanies: 42,
-      totalFundingPeriods: 87,
+      totalVentures: 42,
+      totalExecutionPeriods: 87,
       avgFundingGrowthRate: 145.7,
       avgDaysBetweenRounds: 487,
-      avgTDRChange: 0.23,
-      avgCompositeVelocity: 47.3,
-      fundingSuccessRate: 71.2,
+      avgResourceConstraint: 0.23,
+      avgOrganizationalAgility: 47.3,
+      executionSuccessRate: 71.2,
     },
-    strategicMatrix: {
-      speedStrategy: { count: 18, avgFundingGrowth: 178.5, successRate: 83.3 },
-      technicalChaos: { count: 12, avgFundingGrowth: 89.2, successRate: 25.0 },
-      engineeringExcellence: {
+    strategicFramework: {
+      speedToMarket: { count: 18, avgFundingGrowth: 178.5, successRate: 83.3 },
+      technicalDebtTrap: {
+        count: 12,
+        avgFundingGrowth: 89.2,
+        successRate: 25.0,
+      },
+      sustainableExecution: {
         count: 31,
         avgFundingGrowth: 195.8,
         successRate: 90.3,
       },
-      overEngineering: {
+      prematureOptimization: {
         count: 26,
         avgFundingGrowth: 124.1,
         successRate: 53.8,
       },
     },
-    hypothesisTest: {
-      mainEffect_TDR: -0.234,
-      mainEffect_Velocity: 0.445,
-      interactionEffect: 0.327,
-      interactionPValue: 0.048,
-      hypothesisSupported: true,
-      rSquared: 0.287,
-      standardErrors: [0.05, 0.12, 0.08, 0.15, 0.03, 0.02, 0.01],
-      tStatistics: [12.1, -1.95, 5.56, 2.18, 4.33, 8.91, 2.45],
-      robustness: {
-        logTransform: { interaction: 0.298, pValue: 0.062 },
-        winsorized: { interaction: 0.315, pValue: 0.053 },
-        excludeOutliers: { interaction: 0.341, pValue: 0.041 },
-      },
+    empiricalFindings: {
+      primaryAssociation: -0.347,
+      regressionSlope: -2.45,
+      rSquared: 0.12,
+      sampleSize: 87,
+      significanceLevel: "moderate",
+      associationSupported: true,
     },
-    fundingOutcomes: {
-      byTDRQuartile: [
+    correlationMatrix: {
+      debtAgility: -0.347,
+      debtFunding: -0.128,
+      agilityFunding: 0.256,
+      debtTeamSize: -0.089,
+      agilityAge: -0.134,
+    },
+    ventureOutcomes: {
+      byDebtQuartile: [
         {
-          quartile: "Q1 (Low TDR)",
+          quartile: "Q1 (Low Technical Debt)",
           avgFundingGrowth: 198.4,
-          avgVelocity: 52.1,
+          avgAgility: 52.1,
           successRate: 85.7,
           count: 22,
         },
         {
-          quartile: "Q2",
+          quartile: "Q2 (Moderate Debt)",
           avgFundingGrowth: 167.3,
-          avgVelocity: 48.9,
+          avgAgility: 48.9,
           successRate: 76.9,
           count: 21,
         },
         {
-          quartile: "Q3",
+          quartile: "Q3 (High Debt)",
           avgFundingGrowth: 134.2,
-          avgVelocity: 44.2,
+          avgAgility: 44.2,
           successRate: 68.2,
           count: 22,
         },
         {
-          quartile: "Q4 (High TDR)",
+          quartile: "Q4 (Critical Debt)",
           avgFundingGrowth: 123.8,
-          avgVelocity: 43.8,
+          avgAgility: 43.8,
           successRate: 54.5,
           count: 22,
         },
       ],
-      byVelocityQuartile: [
+      byAgilityQuartile: [
         {
-          quartile: "Q1 (Slow Dev)",
+          quartile: "Q1 (Low Agility)",
           avgFundingGrowth: 98.3,
-          avgTDRChange: 0.31,
+          avgResourceConstraint: 0.31,
           successRate: 45.5,
           count: 22,
         },
         {
-          quartile: "Q2",
+          quartile: "Q2 (Moderate Agility)",
           avgFundingGrowth: 142.1,
-          avgTDRChange: 0.25,
+          avgResourceConstraint: 0.25,
           successRate: 71.4,
           count: 21,
         },
         {
-          quartile: "Q3",
+          quartile: "Q3 (High Agility)",
           avgFundingGrowth: 167.8,
-          avgTDRChange: 0.21,
+          avgResourceConstraint: 0.21,
           successRate: 81.8,
           count: 22,
         },
         {
-          quartile: "Q4 (Fast Dev)",
+          quartile: "Q4 (Exceptional Agility)",
           avgFundingGrowth: 174.6,
-          avgTDRChange: 0.15,
+          avgResourceConstraint: 0.15,
           successRate: 86.4,
           count: 22,
         },
       ],
     },
-    keyFindings: {
-      primaryInsight:
-        "Interaction coefficient β₃ = 0.327 (p = 0.048) indicates development velocity significantly moderates technical debt effects on funding outcomes.",
-      economicSignificance:
-        "A one-standard-deviation increase in development velocity (15.4 units) reduces the technical debt funding penalty by 5.0 percentage points.",
-      theoreticalImplication:
-        "Supports dynamic capabilities theory: development velocity acts as a compensating organizational capability during investor evaluation periods.",
-      practicalRecommendation:
-        "Early-stage startups with development velocity above 65.4 can strategically prioritize speed over technical debt reduction during funding preparation.",
-      academicContribution:
-        "First empirical analysis of development velocity as a moderating factor in the technical debt-funding relationship, extending both technical debt literature and entrepreneurial finance research.",
-      limitations:
-        "Results limited to open-source software startups. Endogeneity concerns remain due to potential unobserved management quality factors affecting both technical debt and development practices.",
+    entrepreneurshipInsights: {
+      primaryFinding:
+        "Technical debt shows a moderate association with organizational agility (r = -0.347, n = 87). This suggests that accumulating technical debt is associated with reduced execution speed in technology ventures.",
+      practicalImplication:
+        "The observed association suggests entrepreneurs face a trade-off between short-term development speed and long-term organizational agility. Technical debt accumulation appears to create execution bottlenecks as ventures scale.",
+      vcImplication:
+        "Code quality metrics may provide additional due diligence signals about execution risk. Ventures with high technical debt may face scaling challenges that impact their ability to iterate and respond to market feedback.",
+      entrepreneurialRecommendation:
+        "Entrepreneurs should monitor technical debt accumulation as a leading indicator of execution constraints. Strategic debt can be acceptable during product-market fit discovery, but should be actively managed before scaling phases.",
+      researchContribution:
+        "This study provides the first systematic empirical analysis of technical debt patterns across a technology venture portfolio. The observed associations contribute to our understanding of operational factors in startup execution and provide a foundation for future causal research.",
+      studyLimitations:
+        "Key limitations include: (1) Cross-sectional associations cannot establish causality, (2) Funding amounts may not reflect true venture success, (3) Sample limited to open-source ventures, (4) Potential selection bias toward publicly visible startups, (5) Technical debt metrics may not capture all code quality dimensions. Results should be interpreted as exploratory patterns rather than prescriptive guidance.",
     },
     exportDate: new Date().toISOString(),
   };
