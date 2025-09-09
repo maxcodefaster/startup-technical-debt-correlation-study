@@ -34,10 +34,18 @@ async function getUserChoice(): Promise<string> {
   return "5";
 }
 
+// FIXED: Add proper temporal lag for due diligence timing
+function getAnalysisDate(fundingDate: string): string {
+  const date = new Date(fundingDate);
+  date.setMonth(date.getMonth() - 3); // 3 months before funding announcement
+  return date.toISOString().split("T")[0];
+}
+
 async function processCompany(company: any) {
   const gitHandler = new GitHandler(company.name, false);
 
   try {
+    console.log(`  → Cloning ${company.githubLink}...`);
     const repoPath = await gitHandler.cloneRepo(company.githubLink);
 
     const rounds = await db
@@ -63,19 +71,30 @@ async function processCompany(company: any) {
         new Date(a.roundDate).getTime() - new Date(b.roundDate).getTime()
     );
 
-    console.log(`  → ${analysisPoints.length} events`);
+    console.log(`  → ${analysisPoints.length} events to analyze`);
     const snapshots: any[] = [];
 
     for (const [index, round] of analysisPoints.entries()) {
-      const commitHash = await gitHandler.checkoutDate(round.roundDate);
-      if (!commitHash) continue;
+      // FIXED: Use proper temporal lag (3 months before funding)
+      const analysisDate = getAnalysisDate(round.roundDate);
+      console.log(
+        `  → Analyzing ${round.roundType} at ${analysisDate} (3mo before ${round.roundDate})`
+      );
+
+      const commitHash = await gitHandler.checkoutDate(analysisDate);
+      if (!commitHash) {
+        console.log(
+          `  ⚠️ No commits found before ${analysisDate}, skipping ${round.roundType}`
+        );
+        continue;
+      }
 
       const repoInfo = await gitHandler.analyzeRepository();
       const [repositoryInfoRecord] = await db
         .insert(repositoryInfo)
         .values({
           companyId: company.id,
-          analysisDate: round.roundDate,
+          analysisDate: analysisDate, // Use analysis date, not funding date
           totalFiles: repoInfo.totalFiles,
           repoSizeMB: repoInfo.repoSizeMB,
           commitCount: repoInfo.commitCount,
@@ -88,9 +107,11 @@ async function processCompany(company: any) {
         repoPath,
         "./data/analysis_results",
         company.name,
-        round.roundDate,
+        analysisDate, // Use analysis date for file naming
         round.roundType
       );
+
+      console.log(`  → Running Qlty analysis for ${round.roundType}...`);
       const qltyMetrics = await qltyAnalyzer.runAnalysis();
 
       const [snapshotRecord] = await db
@@ -99,7 +120,7 @@ async function processCompany(company: any) {
           companyId: company.id,
           fundingRoundId: round.id > 0 ? round.id : null,
           repositoryInfoId: repositoryInfoRecord!.id,
-          snapshotDate: round.roundDate,
+          snapshotDate: analysisDate, // Store analysis date
           commitHash,
           linesOfCode: qltyMetrics.linesOfCode,
           totalLines: qltyMetrics.totalLines,
@@ -140,16 +161,21 @@ async function processCompany(company: any) {
       });
     }
 
-    // Development velocity between consecutive rounds
+    // Calculate development velocity between consecutive analysis points
     for (let i = 1; i < snapshots.length; i++) {
       const fromSnapshot = snapshots[i - 1];
       const toSnapshot = snapshots[i];
       const fromRound = fromSnapshot.roundInfo;
       const toRound = toSnapshot.roundInfo;
 
+      console.log(
+        `  → Calculating velocity from ${fromRound.roundType} to ${toRound.roundType}...`
+      );
+
+      // Calculate velocity between the analysis dates (not funding dates)
       const velocityMetrics = await gitHandler.calculateDevelopmentVelocity(
-        fromRound.roundDate,
-        toRound.roundDate
+        fromSnapshot.snapshotDate, // Use analysis dates
+        toSnapshot.snapshotDate
       );
 
       const startTDR = fromSnapshot.technicalDebtRatio || 0;
@@ -162,12 +188,13 @@ async function processCompany(company: any) {
       );
       const safeDevelopmentSpeed = Math.max(
         0.1,
-        velocityMetrics.linesAdded / velocityMetrics.periodDays
+        velocityMetrics.linesChanged / velocityMetrics.periodDays
       );
 
       const tdvSimple = Math.abs(tdrChange) / safeDevelopmentSpeed;
       const tdvComposite = Math.abs(tdrChange) / safeCompositeVelocity;
 
+      // Check if company got next funding round after the "to" round
       const futureRounds = analysisPoints.filter(
         (r) => new Date(r.roundDate) > new Date(toRound.roundDate) && r.id > 0
       );
@@ -197,7 +224,11 @@ async function processCompany(company: any) {
       });
     }
 
-    console.log(`  ✅ ${company.name}`);
+    console.log(
+      `  ✅ ${company.name} - ${snapshots.length} snapshots, ${
+        snapshots.length - 1
+      } velocity periods`
+    );
   } catch (error) {
     console.error(`  ❌ ${company.name}: ${(error as Error).message}`);
   } finally {
@@ -206,12 +237,12 @@ async function processCompany(company: any) {
 }
 
 async function runCompleteAnalysis() {
-  console.log("🚀 Starting Analysis");
+  console.log("🚀 Starting Academic Analysis with Proper Temporal Controls");
 
   // Import CSV
   const csvPath = "./data/startup_seed_data.csv";
   if (fs.existsSync(csvPath)) {
-    console.log("📊 Importing CSV...");
+    console.log("📊 Importing CSV data...");
     await importCSV(csvPath);
   } else {
     console.log("❌ CSV not found: ./data/startup_seed_data.csv");
@@ -220,99 +251,182 @@ async function runCompleteAnalysis() {
 
   const allCompanies = await db.select().from(companies);
   if (allCompanies.length === 0) {
-    console.log("❌ No companies found");
+    console.log("❌ No companies found in database");
     return;
   }
 
-  console.log(`🏢 Processing ${allCompanies.length} startups...`);
+  console.log(
+    `🏢 Processing ${allCompanies.length} startups with 3-month temporal lag...`
+  );
+  console.log(
+    "📝 Note: Analyzing code state 3 months before each funding date"
+  );
 
   for (let i = 0; i < allCompanies.length; i++) {
     const company = allCompanies[i];
-    console.log(`[${i + 1}/${allCompanies.length}] ${company!.name}`);
+    console.log(`\n[${i + 1}/${allCompanies.length}] ${company!.name}`);
     await processCompany(company);
   }
 
-  // Final analytics
-  console.log("📈 Generating results...");
+  // Generate final analytics with proper regression
+  console.log("\n📈 Running Statistical Analysis...");
   const analytics = await calculateFundingOutcomeAnalysis();
 
-  console.log("\n🎯 RESULTS");
-  console.log("=".repeat(40));
-  console.log(`Companies: ${analytics.summary.totalCompanies}`);
-  console.log(`Periods: ${analytics.summary.totalFundingPeriods}`);
+  console.log("\n🎯 ACADEMIC RESULTS");
+  console.log("=".repeat(60));
   console.log(
-    `Avg funding growth: ${analytics.summary.avgFundingGrowthRate.toFixed(1)}%`
+    `📊 Sample: ${analytics.summary.totalCompanies} companies, ${analytics.summary.totalFundingPeriods} funding periods`
   );
   console.log(
-    `Success rate: ${analytics.summary.fundingSuccessRate.toFixed(1)}%`
+    `💰 Average funding growth: ${analytics.summary.avgFundingGrowthRate.toFixed(
+      1
+    )}%`
   );
+  console.log(
+    `📈 Success rate: ${analytics.summary.fundingSuccessRate.toFixed(1)}%`
+  );
+  console.log(`📉 R-squared: ${analytics.hypothesisTest.rSquared.toFixed(3)}`);
 
   if (analytics.hypothesisTest.hypothesisSupported) {
+    console.log(`\n✅ HYPOTHESIS SUPPORTED`);
     console.log(
-      `\n🎉 HYPOTHESIS SUPPORTED (β₃=${analytics.hypothesisTest.interactionEffect.toFixed(
+      `🔬 Interaction coefficient: β₃ = ${analytics.hypothesisTest.interactionEffect.toFixed(
         3
-      )})`
+      )}`
     );
+    console.log(
+      `📊 Statistical significance: p = ${analytics.hypothesisTest.interactionPValue.toFixed(
+        3
+      )}`
+    );
+    console.log(`💡 ${analytics.keyFindings.theoreticalImplication}`);
   } else {
+    console.log(`\n❌ HYPOTHESIS NOT SUPPORTED`);
     console.log(
-      `\n📋 HYPOTHESIS NOT SUPPORTED (β₃=${analytics.hypothesisTest.interactionEffect.toFixed(
+      `🔬 Interaction coefficient: β₃ = ${analytics.hypothesisTest.interactionEffect.toFixed(
         3
-      )})`
+      )}`
     );
+    console.log(
+      `📊 Statistical significance: p = ${analytics.hypothesisTest.interactionPValue.toFixed(
+        3
+      )}`
+    );
+    console.log(`💡 ${analytics.keyFindings.theoreticalImplication}`);
   }
 
-  console.log(`\n💡 ${analytics.keyFindings.primaryInsight}`);
-  console.log("\n🌐 View full dashboard (option 2)");
+  console.log(`\n🎓 Academic Contribution:`);
+  console.log(`${analytics.keyFindings.academicContribution}`);
+
+  console.log(`\n⚠️  Limitations:`);
+  console.log(`${analytics.keyFindings.limitations}`);
+
+  console.log(`\n🔄 Robustness Checks:`);
+  console.log(
+    `   Log transform: β₃ = ${analytics.hypothesisTest.robustness.logTransform.interaction.toFixed(
+      3
+    )} (p = ${analytics.hypothesisTest.robustness.logTransform.pValue.toFixed(
+      3
+    )})`
+  );
+  console.log(
+    `   Winsorized: β₃ = ${analytics.hypothesisTest.robustness.winsorized.interaction.toFixed(
+      3
+    )} (p = ${analytics.hypothesisTest.robustness.winsorized.pValue.toFixed(
+      3
+    )})`
+  );
+  console.log(
+    `   Outliers excluded: β₃ = ${analytics.hypothesisTest.robustness.excludeOutliers.interaction.toFixed(
+      3
+    )} (p = ${analytics.hypothesisTest.robustness.excludeOutliers.pValue.toFixed(
+      3
+    )})`
+  );
+
+  console.log("\n🌐 Launch dashboard (option 2) to see detailed results");
 }
 
 async function showQuickAnalytics() {
-  console.log("📊 Quick Preview");
+  console.log("📊 Quick Preview of Current Results");
 
   try {
     const analytics = await calculateFundingOutcomeAnalysis();
 
-    console.log(`Companies: ${analytics.summary.totalCompanies}`);
-    console.log(`Periods: ${analytics.summary.totalFundingPeriods}`);
+    console.log(`\n📈 Dataset Summary:`);
+    console.log(`   Companies analyzed: ${analytics.summary.totalCompanies}`);
+    console.log(`   Funding periods: ${analytics.summary.totalFundingPeriods}`);
     console.log(
-      `Funding growth: ${analytics.summary.avgFundingGrowthRate.toFixed(1)}%`
+      `   Average funding growth: ${analytics.summary.avgFundingGrowthRate.toFixed(
+        1
+      )}%`
     );
     console.log(
-      `Success rate: ${analytics.summary.fundingSuccessRate.toFixed(1)}%`
+      `   Overall success rate: ${analytics.summary.fundingSuccessRate.toFixed(
+        1
+      )}%`
     );
 
+    console.log(`\n🔬 Statistical Results:`);
     console.log(
-      `\nHypothesis: β₃=${analytics.hypothesisTest.interactionEffect.toFixed(
+      `   R-squared: ${analytics.hypothesisTest.rSquared.toFixed(3)}`
+    );
+    console.log(
+      `   Main TDR effect (β₁): ${analytics.hypothesisTest.mainEffect_TDR.toFixed(
         3
-      )} (${
-        analytics.hypothesisTest.hypothesisSupported
-          ? "SUPPORTED"
-          : "NOT SUPPORTED"
-      })`
+      )}`
+    );
+    console.log(
+      `   Main velocity effect (β₂): ${analytics.hypothesisTest.mainEffect_Velocity.toFixed(
+        3
+      )}`
+    );
+    console.log(
+      `   Interaction effect (β₃): ${analytics.hypothesisTest.interactionEffect.toFixed(
+        3
+      )}`
+    );
+    console.log(
+      `   P-value: ${analytics.hypothesisTest.interactionPValue.toFixed(3)}`
     );
 
-    console.log(`\nStrategy Performance:`);
+    const result = analytics.hypothesisTest.hypothesisSupported
+      ? "✅ SUPPORTED"
+      : "❌ NOT SUPPORTED";
+    console.log(`   Hypothesis: ${result}`);
+
+    console.log(`\n📊 Strategic Matrix Performance:`);
     console.log(
-      `  Speed Strategy: ${analytics.strategicMatrix.speedStrategy.avgFundingGrowth.toFixed(
+      `   Speed Strategy: ${analytics.strategicMatrix.speedStrategy.avgFundingGrowth.toFixed(
         1
-      )}% growth`
+      )}% growth (${analytics.strategicMatrix.speedStrategy.count} companies)`
     );
     console.log(
-      `  Tech Chaos: ${analytics.strategicMatrix.technicalChaos.avgFundingGrowth.toFixed(
+      `   Technical Chaos: ${analytics.strategicMatrix.technicalChaos.avgFundingGrowth.toFixed(
         1
-      )}% growth`
+      )}% growth (${analytics.strategicMatrix.technicalChaos.count} companies)`
     );
     console.log(
-      `  Excellence: ${analytics.strategicMatrix.engineeringExcellence.avgFundingGrowth.toFixed(
+      `   Engineering Excellence: ${analytics.strategicMatrix.engineeringExcellence.avgFundingGrowth.toFixed(
         1
-      )}% growth`
+      )}% growth (${
+        analytics.strategicMatrix.engineeringExcellence.count
+      } companies)`
     );
     console.log(
-      `  Over-Engineering: ${analytics.strategicMatrix.overEngineering.avgFundingGrowth.toFixed(
+      `   Over-Engineering: ${analytics.strategicMatrix.overEngineering.avgFundingGrowth.toFixed(
         1
-      )}% growth`
+      )}% growth (${analytics.strategicMatrix.overEngineering.count} companies)`
     );
+
+    console.log(`\n💡 Key Insight:`);
+    console.log(`${analytics.keyFindings.primaryInsight}`);
   } catch (error) {
-    console.log("⚠️  No data yet. Run analysis first (option 1).");
+    console.log("⚠️  No analysis results available yet.");
+    console.log(
+      "Run complete analysis first (option 1) to generate statistical results."
+    );
+    console.log(`Error: ${(error as Error).message}`);
   }
 }
 
@@ -326,21 +440,26 @@ async function main() {
         await runCompleteAnalysis();
         break;
       case "2":
+        console.log("🌐 Starting dashboard server...");
         await startDashboardServer();
         break;
       case "3":
         await showQuickAnalytics();
         break;
       case "4":
+        console.log("🗑️ Cleaning repository cache...");
         GitHandler.cleanAllRepos();
-        console.log("✅ Repos cleaned");
+        console.log("✅ All cloned repositories cleaned");
         break;
       case "5":
-        console.log("👋 Good luck with your thesis!");
+        console.log("👋 Good luck with your master's thesis!");
+        console.log(
+          "🎓 Remember to clearly state your limitations and contributions in your write-up."
+        );
         process.exit(0);
         break;
       default:
-        console.log("❌ Invalid choice");
+        console.log("❌ Invalid choice. Please select 1-5.");
     }
 
     if (choice !== "2") {

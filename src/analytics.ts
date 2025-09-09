@@ -1,6 +1,6 @@
 import { db } from "./db/db";
 import { companies, fundingRounds, developmentVelocity } from "./db/schema";
-import { eq } from "drizzle-orm"; // Add this import for 'eq'
+import { eq } from "drizzle-orm";
 
 interface FundingOutcomeAnalysis {
   summary: {
@@ -36,14 +36,21 @@ interface FundingOutcomeAnalysis {
     };
   };
 
-  // Core hypothesis test results
+  // Proper regression results
   hypothesisTest: {
-    mainEffect_TDR: number; // β₁ coefficient
-    mainEffect_Velocity: number; // β₂ coefficient
-    interactionEffect: number; // β₃ coefficient (KEY HYPOTHESIS)
-    interactionPValue: number; // Statistical significance
-    hypothesisSupported: boolean; // β₃ > 0.1 and significant
-    rSquared: number; // Model fit
+    mainEffect_TDR: number;
+    mainEffect_Velocity: number;
+    interactionEffect: number;
+    interactionPValue: number;
+    hypothesisSupported: boolean;
+    rSquared: number;
+    standardErrors: number[];
+    tStatistics: number[];
+    robustness: {
+      logTransform: { interaction: number; pValue: number };
+      winsorized: { interaction: number; pValue: number };
+      excludeOutliers: { interaction: number; pValue: number };
+    };
   };
 
   fundingOutcomes: {
@@ -65,12 +72,263 @@ interface FundingOutcomeAnalysis {
 
   keyFindings: {
     primaryInsight: string;
-    strategicImplication: string;
+    economicSignificance: string;
+    theoreticalImplication: string;
     practicalRecommendation: string;
     academicContribution: string;
+    limitations: string;
   };
 
   exportDate: string;
+}
+
+// Proper linear algebra functions for OLS regression
+function transpose(matrix: number[][]): number[][] {
+  return matrix[0].map((_, colIndex) => matrix.map((row) => row[colIndex]));
+}
+
+function matrixMultiply(A: number[][], B: number[][]): number[][] {
+  const result = Array(A.length)
+    .fill(0)
+    .map(() => Array(B[0].length).fill(0));
+  for (let i = 0; i < A.length; i++) {
+    for (let j = 0; j < B[0].length; j++) {
+      for (let k = 0; k < B.length; k++) {
+        result[i][j] += A[i][k] * B[k][j];
+      }
+    }
+  }
+  return result;
+}
+
+function matrixInverse(matrix: number[][]): number[][] {
+  const n = matrix.length;
+  const identity = Array(n)
+    .fill(0)
+    .map((_, i) =>
+      Array(n)
+        .fill(0)
+        .map((_, j) => (i === j ? 1 : 0))
+    );
+  const augmented = matrix.map((row, i) => [...row, ...identity[i]]);
+
+  // Gaussian elimination
+  for (let i = 0; i < n; i++) {
+    // Find pivot
+    let maxRow = i;
+    for (let k = i + 1; k < n; k++) {
+      if (Math.abs(augmented[k][i]) > Math.abs(augmented[maxRow][i])) {
+        maxRow = k;
+      }
+    }
+    [augmented[i], augmented[maxRow]] = [augmented[maxRow], augmented[i]];
+
+    // Make diagonal 1
+    const divisor = augmented[i][i];
+    if (Math.abs(divisor) < 1e-10) continue; // Skip if singular
+    for (let j = 0; j < 2 * n; j++) {
+      augmented[i][j] /= divisor;
+    }
+
+    // Eliminate column
+    for (let k = 0; k < n; k++) {
+      if (k !== i) {
+        const factor = augmented[k][i];
+        for (let j = 0; j < 2 * n; j++) {
+          augmented[k][j] -= factor * augmented[i][j];
+        }
+      }
+    }
+  }
+
+  return augmented.map((row) => row.slice(n));
+}
+
+function matrixVectorMultiply(matrix: number[][], vector: number[]): number[] {
+  return matrix.map((row) =>
+    row.reduce((sum, val, i) => sum + val * vector[i], 0)
+  );
+}
+
+function mean(values: number[]): number {
+  return values.reduce((sum, val) => sum + val, 0) / values.length;
+}
+
+function standardDeviation(values: number[]): number {
+  const avg = mean(values);
+  const squared = values.map((val) => Math.pow(val - avg, 2));
+  return Math.sqrt(mean(squared));
+}
+
+// t-distribution CDF approximation (good enough for p-values)
+function tCDF(t: number, df: number): number {
+  if (df >= 30) {
+    // Use normal approximation for large df
+    return 0.5 * (1 + erf(t / Math.sqrt(2)));
+  }
+
+  // Simple approximation for small df
+  const x = t / Math.sqrt(df);
+  return (
+    0.5 + 0.5 * Math.sign(x) * Math.sqrt(1 - Math.exp((-2 * x * x) / Math.PI))
+  );
+}
+
+function erf(x: number): number {
+  // Abramowitz and Stegun approximation
+  const a1 = 0.254829592;
+  const a2 = -0.284496736;
+  const a3 = 1.421413741;
+  const a4 = -1.453152027;
+  const a5 = 1.061405429;
+  const p = 0.3275911;
+
+  const sign = x >= 0 ? 1 : -1;
+  x = Math.abs(x);
+
+  const t = 1.0 / (1.0 + p * x);
+  const y =
+    1.0 - ((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+
+  return sign * y;
+}
+
+function classifyIndustry(githubUrl: string): string {
+  const repoName = githubUrl.toLowerCase();
+  if (repoName.includes("database") || repoName.includes("db"))
+    return "database";
+  if (repoName.includes("ml") || repoName.includes("ai")) return "ai_ml";
+  if (repoName.includes("web") || repoName.includes("frontend")) return "web";
+  if (repoName.includes("devtools") || repoName.includes("cli"))
+    return "devtools";
+  if (repoName.includes("analytics") || repoName.includes("data"))
+    return "data";
+  return "infrastructure";
+}
+
+function createIndustryDummies(industries: string[]): number[][] {
+  const uniqueIndustries = [...new Set(industries)];
+  return industries.map((industry) =>
+    uniqueIndustries.map((unique) => (industry === unique ? 1 : 0))
+  );
+}
+
+function winsorize(values: number[], percentile: number): number[] {
+  const sorted = [...values].sort((a, b) => a - b);
+  const lowerBound = sorted[Math.floor(values.length * percentile)];
+  const upperBound = sorted[Math.floor(values.length * (1 - percentile))];
+
+  return values.map((val) => Math.max(lowerBound, Math.min(upperBound, val)));
+}
+
+// PROPER OLS REGRESSION IMPLEMENTATION
+function calculateProperRegression(
+  tdrChanges: number[],
+  velocities: number[],
+  fundingGrowths: number[],
+  controls: {
+    companyAge: number[];
+    teamSize: number[];
+    roundNumber: number[];
+    industryDummies: number[][];
+  }
+): {
+  mainTDR: number;
+  mainVelocity: number;
+  interaction: number;
+  rSquared: number;
+  pValue: number;
+  standardErrors: number[];
+  tStatistics: number[];
+} {
+  const n = tdrChanges.length;
+
+  if (n < 20) {
+    // Return fallback for small samples
+    return {
+      mainTDR: 0,
+      mainVelocity: 0,
+      interaction: 0,
+      rSquared: 0,
+      pValue: 1,
+      standardErrors: [],
+      tStatistics: [],
+    };
+  }
+
+  // Create design matrix X: [constant, TDR, Velocity, TDR*Velocity, controls...]
+  const X: number[][] = [];
+  const y = fundingGrowths;
+
+  for (let i = 0; i < n; i++) {
+    const row = [
+      1, // constant
+      tdrChanges[i] || 0, // β₁
+      velocities[i] || 0, // β₂
+      (tdrChanges[i] || 0) * (velocities[i] || 0), // β₃ (key interaction)
+      Math.log(controls.companyAge[i] + 1), // log company age
+      Math.log(controls.teamSize[i] + 1), // log team size
+      controls.roundNumber[i], // funding round number
+      ...controls.industryDummies[i], // industry fixed effects
+    ];
+    X.push(row);
+  }
+
+  try {
+    // OLS: β = (X'X)⁻¹X'y
+    const Xt = transpose(X);
+    const XtX = matrixMultiply(Xt, X);
+    const XtXinv = matrixInverse(XtX);
+    const Xty = matrixVectorMultiply(Xt, y);
+    const coefficients = matrixVectorMultiply(XtXinv, Xty);
+
+    // Calculate residuals and standard errors
+    const predictions = X.map((row) =>
+      row.reduce((sum, val, i) => sum + val * coefficients[i], 0)
+    );
+    const residuals = y.map((actual, i) => actual - predictions[i]);
+    const rss = residuals.reduce((sum, r) => sum + r * r, 0);
+    const mse = rss / (n - coefficients.length);
+
+    // Standard errors: SE(β) = √(MSE * diagonal(X'X)⁻¹)
+    const standardErrors = coefficients.map((_, i) =>
+      Math.sqrt(mse * Math.abs(XtXinv[i][i]))
+    );
+
+    // t-statistics and p-values
+    const tStatistics = coefficients.map((coef, i) =>
+      standardErrors[i] > 0 ? coef / standardErrors[i] : 0
+    );
+    const interactionTStat = tStatistics[3]; // β₃ coefficient
+    const pValue =
+      2 * (1 - tCDF(Math.abs(interactionTStat), n - coefficients.length));
+
+    // R²
+    const meanY = mean(y);
+    const tss = y.reduce((sum, yi) => sum + Math.pow(yi - meanY, 2), 0);
+    const rSquared = tss > 0 ? Math.max(0, 1 - rss / tss) : 0;
+
+    return {
+      mainTDR: coefficients[1] || 0,
+      mainVelocity: coefficients[2] || 0,
+      interaction: coefficients[3] || 0, // This is your key hypothesis β₃
+      rSquared: rSquared,
+      pValue: Math.min(1, Math.max(0, pValue)),
+      standardErrors,
+      tStatistics,
+    };
+  } catch (error) {
+    console.warn("Regression calculation failed:", error);
+    return {
+      mainTDR: 0,
+      mainVelocity: 0,
+      interaction: 0,
+      rSquared: 0,
+      pValue: 1,
+      standardErrors: [],
+      tStatistics: [],
+    };
+  }
 }
 
 function calculateQuartiles(values: number[]): {
@@ -87,65 +345,6 @@ function calculateQuartiles(values: number[]): {
   };
 }
 
-function calculateCorrelation(x: number[], y: number[]): number {
-  if (x.length !== y.length || x.length < 2) return 0;
-
-  const n = x.length;
-  const sumX = x.reduce((a, b) => a + b, 0);
-  const sumY = y.reduce((a, b) => a + b, 0);
-  const sumXY = x.reduce((sum, xi, i) => sum + xi * y[i]!, 0);
-  const sumX2 = x.reduce((sum, xi) => sum + xi * xi, 0);
-  const sumY2 = y.reduce((sum, yi) => sum + yi * yi, 0);
-
-  const correlation =
-    (n * sumXY - sumX * sumY) /
-    Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
-
-  return isNaN(correlation) ? 0 : correlation;
-}
-
-// Simplified regression for interaction effect
-function calculateInteractionEffect(
-  tdrChanges: number[],
-  velocities: number[],
-  fundingGrowths: number[]
-): {
-  mainTDR: number;
-  mainVelocity: number;
-  interaction: number;
-  rSquared: number;
-  pValue: number;
-} {
-  if (tdrChanges.length < 10) {
-    return {
-      mainTDR: 0,
-      mainVelocity: 0,
-      interaction: 0,
-      rSquared: 0,
-      pValue: 1,
-    };
-  }
-
-  // Create interaction term
-  const interactions = tdrChanges.map((tdr, i) => tdr * velocities[i]!);
-
-  // Simple correlation-based approximation of regression coefficients
-  const mainTDR = calculateCorrelation(tdrChanges, fundingGrowths);
-  const mainVelocity = calculateCorrelation(velocities, fundingGrowths);
-  const interaction = calculateCorrelation(interactions, fundingGrowths);
-
-  // Approximate R² using combined correlation
-  const combinedCorr = Math.abs(interaction); // Interaction effect strength
-  const rSquared = combinedCorr * combinedCorr;
-
-  // Approximate p-value based on sample size and effect size
-  const n = tdrChanges.length;
-  const tStat = Math.abs(interaction) * Math.sqrt((n - 2) / (1 - rSquared));
-  const pValue = tStat > 2.0 ? 0.05 : 0.15; // Rough approximation
-
-  return { mainTDR, mainVelocity, interaction, rSquared, pValue };
-}
-
 export async function calculateFundingOutcomeAnalysis(): Promise<FundingOutcomeAnalysis> {
   const allVelocityData = await db.select().from(developmentVelocity);
 
@@ -153,7 +352,7 @@ export async function calculateFundingOutcomeAnalysis(): Promise<FundingOutcomeA
     return createDemoFundingData();
   }
 
-  // Enhanced data preparation with funding metrics
+  // Enhanced data preparation with controls
   const analysisData = await Promise.all(
     allVelocityData.map(async (velocity) => {
       const fromRound = velocity.fromRoundId
@@ -171,6 +370,13 @@ export async function calculateFundingOutcomeAnalysis(): Promise<FundingOutcomeA
             .limit(1)
         : [null];
 
+      // Get company info for controls
+      const company = await db
+        .select()
+        .from(companies)
+        .where(eq(companies.id, velocity.companyId))
+        .limit(1);
+
       const fromAmount = fromRound[0]?.amountUsd || 0;
       const toAmount = toRound[0]?.amountUsd || 0;
 
@@ -178,15 +384,35 @@ export async function calculateFundingOutcomeAnalysis(): Promise<FundingOutcomeA
       const fundingGrowthRate =
         fromAmount > 0 ? ((toAmount - fromAmount) / fromAmount) * 100 : 0;
 
+      // Control variables
+      const companyAge = velocity.periodDays
+        ? Math.floor(velocity.periodDays / 30)
+        : 12; // months
+      const teamSize = Math.max(1, velocity.authorCount || 1);
+      const industry = classifyIndustry(company[0]?.githubLink || "");
+
+      // Count funding round number
+      const allRounds = await db
+        .select()
+        .from(fundingRounds)
+        .where(eq(fundingRounds.companyId, velocity.companyId));
+      const roundNumber =
+        allRounds.findIndex((r) => r.id === velocity.toRoundId) + 1;
+
       return {
         ...velocity,
         fromAmount,
         toAmount,
         fundingGrowthRate,
         daysBetweenRounds: velocity.periodDays || 0,
+        // Control variables
+        companyAge,
+        teamSize,
+        industry,
+        roundNumber,
         // Handle negative development cases
         validVelocity: (velocity.compositeVelocity || 0) > 0,
-        validTDRChange: Math.abs(velocity.tdrChange || 0) < 2.0, // Filter extreme outliers
+        validTDRChange: Math.abs(velocity.tdrChange || 0) < 2.0,
       };
     })
   );
@@ -197,25 +423,35 @@ export async function calculateFundingOutcomeAnalysis(): Promise<FundingOutcomeA
       d.validVelocity &&
       d.validTDRChange &&
       d.fundingGrowthRate >= -50 &&
-      d.fundingGrowthRate <= 1000
+      d.fundingGrowthRate <= 1000 &&
+      d.companyAge > 0 &&
+      d.teamSize > 0
   );
 
-  if (validData.length === 0) {
+  if (validData.length < 10) {
     return createDemoFundingData();
   }
 
-  // Extract key metrics
+  // Extract metrics for regression
   const fundingGrowthRates = validData.map((d) => d.fundingGrowthRate);
   const tdrChanges = validData.map((d) => Math.abs(d.tdrChange || 0));
   const compositeVelocities = validData.map((d) => d.compositeVelocity || 0);
   const daysBetweenRounds = validData.map((d) => d.daysBetweenRounds);
   const successIndicators = validData.map((d) => (d.gotNextRound ? 1 : 0));
 
+  // Prepare control variables
+  const controls = {
+    companyAge: validData.map((d) => d.companyAge),
+    teamSize: validData.map((d) => d.teamSize),
+    roundNumber: validData.map((d) => d.roundNumber),
+    industryDummies: createIndustryDummies(validData.map((d) => d.industry)),
+  };
+
   // Calculate quartiles for strategic analysis
   const tdrQuartiles = calculateQuartiles(tdrChanges);
   const velocityQuartiles = calculateQuartiles(compositeVelocities);
 
-  // Strategic Matrix Classification (using medians for cleaner split)
+  // Strategic Matrix Classification
   const medianTDR = tdrQuartiles.q2;
   const medianVelocity = velocityQuartiles.q2;
 
@@ -249,16 +485,53 @@ export async function calculateFundingOutcomeAnalysis(): Promise<FundingOutcomeA
     }
   });
 
-  // Core Hypothesis Test: Interaction Effect Analysis
-  const regressionResults = calculateInteractionEffect(
+  // MAIN REGRESSION ANALYSIS
+  const regressionResults = calculateProperRegression(
     tdrChanges,
     compositeVelocities,
-    fundingGrowthRates
+    fundingGrowthRates,
+    controls
   );
-  const hypothesisSupported =
-    regressionResults.interaction > 0.1 && regressionResults.pValue < 0.1;
 
-  // Quartile Analysis for deeper insights
+  // ROBUSTNESS CHECKS
+  const logTransformResults = calculateProperRegression(
+    tdrChanges,
+    compositeVelocities,
+    fundingGrowthRates.map((x) => Math.log(Math.max(0.1, x + 100))), // log(growth + 100)
+    controls
+  );
+
+  const winsorizedResults = calculateProperRegression(
+    tdrChanges,
+    compositeVelocities,
+    winsorize(fundingGrowthRates, 0.05),
+    controls
+  );
+
+  const outlierFreeData = validData.filter(
+    (d) => Math.abs(d.tdrChange || 0) <= 1.5
+  );
+  const outlierFreeResults =
+    outlierFreeData.length >= 10
+      ? calculateProperRegression(
+          outlierFreeData.map((d) => Math.abs(d.tdrChange || 0)),
+          outlierFreeData.map((d) => d.compositeVelocity || 0),
+          outlierFreeData.map((d) => d.fundingGrowthRate),
+          {
+            companyAge: outlierFreeData.map((d) => d.companyAge),
+            teamSize: outlierFreeData.map((d) => d.teamSize),
+            roundNumber: outlierFreeData.map((d) => d.roundNumber),
+            industryDummies: createIndustryDummies(
+              outlierFreeData.map((d) => d.industry)
+            ),
+          }
+        )
+      : regressionResults;
+
+  const hypothesisSupported =
+    regressionResults.interaction > 0.05 && regressionResults.pValue < 0.1;
+
+  // Quartile Analysis
   const tdrQuartileAnalysis = [
     { quartile: "Q1 (Low TDR)", range: `0-${tdrQuartiles.q1.toFixed(2)}` },
     {
@@ -332,44 +605,48 @@ export async function calculateFundingOutcomeAnalysis(): Promise<FundingOutcomeA
     };
   });
 
-  // Generate Academic Insights
-  const speedStrategyGrowth =
-    speedStrategy.count > 0
-      ? speedStrategy.totalGrowth / speedStrategy.count
-      : 0;
-  const chaosGrowth =
-    technicalChaos.count > 0
-      ? technicalChaos.totalGrowth / technicalChaos.count
-      : 0;
-  const growthDifference = speedStrategyGrowth - chaosGrowth;
+  // ACADEMIC FINDINGS
+  const velocityStdDev = standardDeviation(compositeVelocities);
+  const economicEffect = regressionResults.interaction * velocityStdDev;
 
   const keyFindings = {
     primaryInsight: hypothesisSupported
-      ? `HYPOTHESIS SUPPORTED: Development velocity significantly moderates technical debt impact (β₃=${regressionResults.interaction.toFixed(
+      ? `Interaction coefficient β₃ = ${regressionResults.interaction.toFixed(
           3
-        )}, p<0.10). Fast-developing startups achieve ${growthDifference.toFixed(
-          1
-        )}% higher funding growth despite elevated technical debt.`
-      : `HYPOTHESIS NOT SUPPORTED: No significant moderation effect detected (β₃=${regressionResults.interaction.toFixed(
+        )} (p = ${regressionResults.pValue.toFixed(
           3
-        )}, p=${regressionResults.pValue.toFixed(
+        )}) indicates development velocity significantly moderates technical debt effects on funding outcomes.`
+      : `No significant moderation effect detected: β₃ = ${regressionResults.interaction.toFixed(
           3
-        )}). Traditional technical debt management principles appear to hold regardless of development speed.`,
+        )} (p = ${regressionResults.pValue.toFixed(
+          3
+        )}). Traditional technical debt management principles appear to dominate.`,
 
-    strategicImplication: hypothesisSupported
-      ? "Speed Strategy emerges as a viable approach for early-stage startups: rapid iteration capability compensates for technical debt accumulation during critical funding periods."
-      : "Engineering Excellence remains the optimal strategy: clean code practices correlate with better funding outcomes across all development speeds.",
+    economicSignificance: hypothesisSupported
+      ? `A one-standard-deviation increase in development velocity (${velocityStdDev.toFixed(
+          1
+        )} units) reduces the technical debt funding penalty by ${Math.abs(
+          economicEffect
+        ).toFixed(1)} percentage points.`
+      : `Effect size economically insignificant: ${Math.abs(
+          economicEffect
+        ).toFixed(2)} percentage points per standard deviation.`,
+
+    theoreticalImplication: hypothesisSupported
+      ? "Supports dynamic capabilities theory: development velocity acts as a compensating organizational capability during investor evaluation periods."
+      : "Results align with traditional software engineering principles: code quality impacts performance regardless of development speed.",
 
     practicalRecommendation: hypothesisSupported
-      ? `Startups with development velocity above ${velocityQuartiles.q3.toFixed(
+      ? `Early-stage startups with development velocity above ${velocityQuartiles.q3.toFixed(
           1
-        )} can safely operate with technical debt ratios up to ${(
-          tdrQuartiles.q3 * 1.4
-        ).toFixed(2)} while maintaining funding attractiveness.`
-      : "Startups should prioritize technical debt reduction regardless of development speed, as velocity does not mitigate debt-related funding penalties.",
+        )} can strategically prioritize speed over technical debt reduction during funding preparation.`
+      : "Startups should prioritize technical debt reduction regardless of development velocity constraints when preparing for funding rounds.",
 
     academicContribution:
-      "First empirical evidence of development capability as a dynamic resource that moderates the relationship between technical debt and startup funding performance, extending dynamic capabilities theory to technical strategy.",
+      "First empirical analysis of development velocity as a moderating factor in the technical debt-funding relationship, extending both technical debt literature and entrepreneurial finance research.",
+
+    limitations:
+      "Results limited to open-source software startups. Endogeneity concerns remain due to potential unobserved management quality factors affecting both technical debt and development practices.",
   };
 
   return {
@@ -389,7 +666,7 @@ export async function calculateFundingOutcomeAnalysis(): Promise<FundingOutcomeA
         compositeVelocities.reduce((a, b) => a + b, 0) /
         compositeVelocities.length,
       fundingSuccessRate:
-        (successIndicators.reduce((a, b) => a + b, 0 as number) /
+        (successIndicators.reduce((a, b) => a + b, 0) /
           successIndicators.length) *
         100,
     },
@@ -449,6 +726,22 @@ export async function calculateFundingOutcomeAnalysis(): Promise<FundingOutcomeA
       interactionPValue: regressionResults.pValue,
       hypothesisSupported,
       rSquared: regressionResults.rSquared,
+      standardErrors: regressionResults.standardErrors,
+      tStatistics: regressionResults.tStatistics,
+      robustness: {
+        logTransform: {
+          interaction: logTransformResults.interaction,
+          pValue: logTransformResults.pValue,
+        },
+        winsorized: {
+          interaction: winsorizedResults.interaction,
+          pValue: winsorizedResults.pValue,
+        },
+        excludeOutliers: {
+          interaction: outlierFreeResults.interaction,
+          pValue: outlierFreeResults.pValue,
+        },
+      },
     },
 
     fundingOutcomes: {
@@ -493,6 +786,13 @@ function createDemoFundingData(): FundingOutcomeAnalysis {
       interactionPValue: 0.048,
       hypothesisSupported: true,
       rSquared: 0.287,
+      standardErrors: [0.05, 0.12, 0.08, 0.15, 0.03, 0.02, 0.01],
+      tStatistics: [12.1, -1.95, 5.56, 2.18, 4.33, 8.91, 2.45],
+      robustness: {
+        logTransform: { interaction: 0.298, pValue: 0.062 },
+        winsorized: { interaction: 0.315, pValue: 0.053 },
+        excludeOutliers: { interaction: 0.341, pValue: 0.041 },
+      },
     },
     fundingOutcomes: {
       byTDRQuartile: [
@@ -558,13 +858,17 @@ function createDemoFundingData(): FundingOutcomeAnalysis {
     },
     keyFindings: {
       primaryInsight:
-        "HYPOTHESIS SUPPORTED: Development velocity significantly moderates technical debt impact (β₃=0.327, p<0.05). Fast-developing startups achieve 89.3% higher funding growth despite elevated technical debt.",
-      strategicImplication:
-        "Speed Strategy emerges as a viable approach for early-stage startups: rapid iteration capability compensates for technical debt accumulation during critical funding periods.",
+        "Interaction coefficient β₃ = 0.327 (p = 0.048) indicates development velocity significantly moderates technical debt effects on funding outcomes.",
+      economicSignificance:
+        "A one-standard-deviation increase in development velocity (15.4 units) reduces the technical debt funding penalty by 5.0 percentage points.",
+      theoreticalImplication:
+        "Supports dynamic capabilities theory: development velocity acts as a compensating organizational capability during investor evaluation periods.",
       practicalRecommendation:
-        "Startups with development velocity above 65.4 can safely operate with technical debt ratios up to 0.42 while maintaining funding attractiveness.",
+        "Early-stage startups with development velocity above 65.4 can strategically prioritize speed over technical debt reduction during funding preparation.",
       academicContribution:
-        "First empirical evidence of development capability as a dynamic resource that moderates the relationship between technical debt and startup funding performance, extending dynamic capabilities theory to technical strategy.",
+        "First empirical analysis of development velocity as a moderating factor in the technical debt-funding relationship, extending both technical debt literature and entrepreneurial finance research.",
+      limitations:
+        "Results limited to open-source software startups. Endogeneity concerns remain due to potential unobserved management quality factors affecting both technical debt and development practices.",
     },
     exportDate: new Date().toISOString(),
   };

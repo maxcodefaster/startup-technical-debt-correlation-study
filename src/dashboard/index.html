@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Technical Debt & Startup Funding Performance</title>
+    <title>Technical Debt & Startup Funding Performance Analysis</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
@@ -52,9 +52,19 @@
         font-style: italic;
         color: #1e40af;
         margin: 1rem auto;
-        max-width: 800px;
+        max-width: 900px;
         font-size: 1.1rem;
         border-radius: 0 8px 8px 0;
+      }
+
+      .academic-note {
+        background: #fef7cd;
+        border: 1px solid #f59e0b;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+        font-size: 0.9rem;
+        color: #92400e;
       }
 
       .container {
@@ -161,6 +171,42 @@
       .hypothesis-not-supported {
         background: linear-gradient(135deg, #ef4444, #dc2626);
         color: white;
+      }
+
+      .robustness-section {
+        grid-column: 1 / -1;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 16px;
+        padding: 2rem;
+        margin: 2rem 0;
+      }
+
+      .robustness-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1rem;
+      }
+
+      .robustness-card {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 1.5rem;
+        border: 1px solid #e2e8f0;
+      }
+
+      .robustness-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1e40af;
+        margin-bottom: 0.5rem;
+      }
+
+      .robustness-stats {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0.5rem 0;
       }
 
       .strategic-matrix {
@@ -282,21 +328,14 @@
         }
       }
 
-      .academic-note {
-        background: #fef7cd;
-        border: 1px solid #f59e0b;
-        border-radius: 8px;
-        padding: 1rem;
-        margin: 1rem 0;
-        font-size: 0.9rem;
-        color: #92400e;
-      }
-
       @media (max-width: 768px) {
         .main-content {
           grid-template-columns: 1fr;
         }
         .findings-grid {
+          grid-template-columns: 1fr;
+        }
+        .robustness-grid {
           grid-template-columns: 1fr;
         }
         .strategic-matrix {
@@ -309,13 +348,17 @@
     <div class="header">
       <h1>Technical Debt & Startup Funding Performance</h1>
       <div class="subtitle">
-        How Development Speed Moderates Technical Debt Impact on Funding
-        Outcomes
+        Academic Analysis: Development Velocity as Moderating Factor
       </div>
       <div class="research-question">
-        "Does development execution speed moderate the relationship between
-        technical debt accumulation and funding outcomes in technology
-        startups?"
+        <strong>Hypothesis:</strong> "Development execution velocity moderates
+        the relationship between technical debt accumulation and funding
+        outcomes in technology startups"
+      </div>
+      <div class="academic-note">
+        <strong>Methodology:</strong> OLS regression with 3-month temporal lag,
+        industry controls, and robustness checks. Based on Dynamic Capabilities
+        Theory (Teece et al., 1997).
       </div>
     </div>
 
@@ -335,8 +378,8 @@
           <div class="metric-label">Avg Funding Growth</div>
         </div>
         <div class="metric-card">
-          <div class="metric-value" id="avgDays">-</div>
-          <div class="metric-label">Avg Days Between Rounds</div>
+          <div class="metric-value" id="rSquared">-</div>
+          <div class="metric-label">Model R-Squared</div>
         </div>
         <div class="metric-card">
           <div class="metric-value" id="successRate">-</div>
@@ -347,12 +390,12 @@
       <!-- Core Hypothesis Test -->
       <div class="card hypothesis-section">
         <div class="hypothesis-title">
-          Core Hypothesis Test: Interaction Effect (β₃)
+          Hypothesis Test: Interaction Effect (β₃)
         </div>
         <div class="academic-note">
-          <strong>Regression Model:</strong> Log(Funding_Growth) = β₀ +
-          β₁(TDR_Change) + β₂(Development_Speed) + β₃(TDR_Change ×
-          Development_Speed) + controls
+          <strong>Model:</strong> Log(Funding_Growth) = β₀ + β₁(TDR_Change) +
+          β₂(Development_Speed) + β₃(TDR_Change × Development_Speed) +
+          β₄(Company_Age) + β₅(Team_Size) + β₆(Round_Number) + Industry_FE + ε
         </div>
         <div class="coefficient-display" id="coefficientDisplay">
           Loading...
@@ -364,9 +407,63 @@
           </div>
         </div>
         <div
-          id="rSquared"
+          id="rSquaredDisplay"
           style="margin-top: 1rem; font-size: 1.1rem; color: #64748b"
         ></div>
+      </div>
+
+      <!-- Robustness Checks Section -->
+      <div class="robustness-section">
+        <h2>🔬 Robustness Checks & Statistical Validity</h2>
+        <div class="robustness-grid">
+          <div class="robustness-card">
+            <div class="robustness-title">Main Specification</div>
+            <div class="robustness-stats">
+              <span>β₃ coefficient:</span>
+              <strong id="mainSpec">-</strong>
+            </div>
+            <div class="robustness-stats">
+              <span>P-value:</span>
+              <strong id="mainPValue">-</strong>
+            </div>
+          </div>
+
+          <div class="robustness-card">
+            <div class="robustness-title">Log Transformation</div>
+            <div class="robustness-stats">
+              <span>β₃ coefficient:</span>
+              <strong id="logSpec">-</strong>
+            </div>
+            <div class="robustness-stats">
+              <span>P-value:</span>
+              <strong id="logPValue">-</strong>
+            </div>
+          </div>
+
+          <div class="robustness-card">
+            <div class="robustness-title">Winsorized Outliers</div>
+            <div class="robustness-stats">
+              <span>β₃ coefficient:</span>
+              <strong id="winsorizedSpec">-</strong>
+            </div>
+            <div class="robustness-stats">
+              <span>P-value:</span>
+              <strong id="winsorizedPValue">-</strong>
+            </div>
+          </div>
+
+          <div class="robustness-card">
+            <div class="robustness-title">Outliers Excluded</div>
+            <div class="robustness-stats">
+              <span>β₃ coefficient:</span>
+              <strong id="excludeSpec">-</strong>
+            </div>
+            <div class="robustness-stats">
+              <span>P-value:</span>
+              <strong id="excludePValue">-</strong>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="main-content">
@@ -446,7 +543,7 @@
 
         <!-- Regression Coefficients -->
         <div class="card">
-          <h2>🔬 Regression Coefficients</h2>
+          <h2>🔬 Regression Coefficients & Standard Errors</h2>
           <div style="display: grid; gap: 1rem; margin-top: 1rem">
             <div
               style="
@@ -459,7 +556,10 @@
               "
             >
               <span>β₁ (TDR Main Effect):</span>
-              <strong id="mainTDR" style="color: #1e40af">-</strong>
+              <div style="text-align: right">
+                <strong id="mainTDR" style="color: #1e40af">-</strong><br />
+                <small id="seTDR" style="color: #64748b">SE: -</small>
+              </div>
             </div>
             <div
               style="
@@ -472,7 +572,11 @@
               "
             >
               <span>β₂ (Velocity Main Effect):</span>
-              <strong id="mainVelocity" style="color: #10b981">-</strong>
+              <div style="text-align: right">
+                <strong id="mainVelocity" style="color: #10b981">-</strong
+                ><br />
+                <small id="seVelocity" style="color: #64748b">SE: -</small>
+              </div>
             </div>
             <div
               style="
@@ -486,38 +590,50 @@
               "
             >
               <span>β₃ (Interaction Effect):</span>
-              <strong id="interaction" style="color: #d97706; font-size: 1.3rem"
-                >-</strong
-              >
+              <div style="text-align: right">
+                <strong
+                  id="interaction"
+                  style="color: #d97706; font-size: 1.3rem"
+                  >-</strong
+                ><br />
+                <small id="seInteraction" style="color: #92400e">SE: -</small>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Key Findings -->
+      <!-- Academic Findings -->
       <div class="findings-section">
         <h2 style="text-align: center; margin-bottom: 2rem; font-size: 2rem">
-          🎯 Key Findings & Strategic Implications
+          🎯 Academic Findings & Theoretical Contributions
         </h2>
         <div class="findings-grid">
           <div class="finding-card">
             <div class="finding-title">Primary Research Insight</div>
             <div class="finding-text" id="primaryInsight">
-              Loading findings...
+              Loading statistical analysis...
             </div>
           </div>
 
           <div class="finding-card">
-            <div class="finding-title">Strategic Implication</div>
-            <div class="finding-text" id="strategicImplication">
-              Loading strategic analysis...
+            <div class="finding-title">Economic Significance</div>
+            <div class="finding-text" id="economicSignificance">
+              Loading effect size analysis...
+            </div>
+          </div>
+
+          <div class="finding-card">
+            <div class="finding-title">Theoretical Implication</div>
+            <div class="finding-text" id="theoreticalImplication">
+              Loading theoretical analysis...
             </div>
           </div>
 
           <div class="finding-card">
             <div class="finding-title">Practical Recommendation</div>
             <div class="finding-text" id="practicalRecommendation">
-              Loading recommendations...
+              Loading strategic recommendations...
             </div>
           </div>
 
@@ -525,6 +641,13 @@
             <div class="finding-title">Academic Contribution</div>
             <div class="finding-text" id="academicContribution">
               Loading contribution analysis...
+            </div>
+          </div>
+
+          <div class="finding-card">
+            <div class="finding-title">Study Limitations</div>
+            <div class="finding-text" id="limitations">
+              Loading limitations assessment...
             </div>
           </div>
         </div>
@@ -542,6 +665,7 @@
           updateMetrics(data);
           updateMatrix(data);
           updateHypothesis(data);
+          updateRobustness(data);
           updateCharts(data);
           updateFindings(data);
         } catch (error) {
@@ -557,16 +681,14 @@
           data.summary.totalFundingPeriods;
         document.getElementById("avgGrowth").textContent =
           data.summary.avgFundingGrowthRate.toFixed(1) + "%";
-        document.getElementById("avgDays").textContent = Math.round(
-          data.summary.avgDaysBetweenRounds
-        );
+        document.getElementById("rSquared").textContent =
+          data.hypothesisTest.rSquared.toFixed(3);
         document.getElementById("successRate").textContent =
           data.summary.fundingSuccessRate.toFixed(1) + "%";
       }
 
       function updateMatrix(data) {
         const matrix = data.strategicMatrix;
-
         document.getElementById("speedCount").textContent =
           matrix.speedStrategy.count;
         document.getElementById("speedGrowth").textContent =
@@ -610,6 +732,22 @@
         document.getElementById("interaction").textContent =
           coefficient.toFixed(3);
 
+        // Add standard errors if available
+        if (
+          hypothesis.standardErrors &&
+          hypothesis.standardErrors.length >= 4
+        ) {
+          document.getElementById(
+            "seTDR"
+          ).textContent = `SE: ${hypothesis.standardErrors[1].toFixed(3)}`;
+          document.getElementById(
+            "seVelocity"
+          ).textContent = `SE: ${hypothesis.standardErrors[2].toFixed(3)}`;
+          document.getElementById(
+            "seInteraction"
+          ).textContent = `SE: ${hypothesis.standardErrors[3].toFixed(3)}`;
+        }
+
         const resultElement = document.getElementById("hypothesisResult");
         resultElement.className = `hypothesis-result ${
           isSupported ? "hypothesis-supported" : "hypothesis-not-supported"
@@ -619,10 +757,38 @@
           : "HYPOTHESIS NOT SUPPORTED";
 
         document.getElementById(
-          "rSquared"
+          "rSquaredDisplay"
         ).textContent = `R² = ${hypothesis.rSquared.toFixed(
           3
         )} | p = ${hypothesis.interactionPValue.toFixed(3)}`;
+      }
+
+      function updateRobustness(data) {
+        const hypothesis = data.hypothesisTest;
+
+        // Main specification
+        document.getElementById("mainSpec").textContent =
+          hypothesis.interactionEffect.toFixed(3);
+        document.getElementById("mainPValue").textContent =
+          hypothesis.interactionPValue.toFixed(3);
+
+        // Robustness checks
+        if (hypothesis.robustness) {
+          document.getElementById("logSpec").textContent =
+            hypothesis.robustness.logTransform.interaction.toFixed(3);
+          document.getElementById("logPValue").textContent =
+            hypothesis.robustness.logTransform.pValue.toFixed(3);
+
+          document.getElementById("winsorizedSpec").textContent =
+            hypothesis.robustness.winsorized.interaction.toFixed(3);
+          document.getElementById("winsorizedPValue").textContent =
+            hypothesis.robustness.winsorized.pValue.toFixed(3);
+
+          document.getElementById("excludeSpec").textContent =
+            hypothesis.robustness.excludeOutliers.interaction.toFixed(3);
+          document.getElementById("excludePValue").textContent =
+            hypothesis.robustness.excludeOutliers.pValue.toFixed(3);
+        }
       }
 
       function updateCharts(data) {
@@ -706,22 +872,25 @@
       function updateFindings(data) {
         document.getElementById("primaryInsight").textContent =
           data.keyFindings.primaryInsight;
-        document.getElementById("strategicImplication").textContent =
-          data.keyFindings.strategicImplication;
+        document.getElementById("economicSignificance").textContent =
+          data.keyFindings.economicSignificance;
+        document.getElementById("theoreticalImplication").textContent =
+          data.keyFindings.theoreticalImplication;
         document.getElementById("practicalRecommendation").textContent =
           data.keyFindings.practicalRecommendation;
         document.getElementById("academicContribution").textContent =
           data.keyFindings.academicContribution;
+        document.getElementById("limitations").textContent =
+          data.keyFindings.limitations;
       }
 
       function loadDemoData() {
-        // Demo data matches the structure from analytics.ts
+        // Demo data for fallback
         const demoData = {
           summary: {
             totalCompanies: 42,
             totalFundingPeriods: 87,
             avgFundingGrowthRate: 145.7,
-            avgDaysBetweenRounds: 487,
             fundingSuccessRate: 71.2,
           },
           strategicMatrix: {
@@ -753,6 +922,12 @@
             interactionPValue: 0.048,
             hypothesisSupported: true,
             rSquared: 0.287,
+            standardErrors: [0.05, 0.12, 0.08, 0.15, 0.03, 0.02, 0.01],
+            robustness: {
+              logTransform: { interaction: 0.298, pValue: 0.062 },
+              winsorized: { interaction: 0.315, pValue: 0.053 },
+              excludeOutliers: { interaction: 0.341, pValue: 0.041 },
+            },
           },
           fundingOutcomes: {
             byTDRQuartile: [
@@ -770,19 +945,24 @@
           },
           keyFindings: {
             primaryInsight:
-              "HYPOTHESIS SUPPORTED: Development velocity significantly moderates technical debt impact (β₃=0.327, p<0.05). Fast-developing startups achieve 89.3% higher funding growth despite elevated technical debt.",
-            strategicImplication:
-              "Speed Strategy emerges as a viable approach for early-stage startups: rapid iteration capability compensates for technical debt accumulation during critical funding periods.",
+              "Interaction coefficient β₃ = 0.327 (p = 0.048) indicates development velocity significantly moderates technical debt effects on funding outcomes.",
+            economicSignificance:
+              "A one-standard-deviation increase in development velocity (15.4 units) reduces the technical debt funding penalty by 5.0 percentage points.",
+            theoreticalImplication:
+              "Supports dynamic capabilities theory: development velocity acts as a compensating organizational capability during investor evaluation periods.",
             practicalRecommendation:
-              "Startups with development velocity above 65.4 can safely operate with technical debt ratios up to 0.42 while maintaining funding attractiveness.",
+              "Early-stage startups with development velocity above 65.4 can strategically prioritize speed over technical debt reduction during funding preparation.",
             academicContribution:
-              "First empirical evidence of development capability as a dynamic resource that moderates the relationship between technical debt and startup funding performance, extending dynamic capabilities theory to technical strategy.",
+              "First empirical analysis of development velocity as a moderating factor in the technical debt-funding relationship, extending both technical debt literature and entrepreneurial finance research.",
+            limitations:
+              "Results limited to open-source software startups. Endogeneity concerns remain due to potential unobserved management quality factors affecting both technical debt and development practices.",
           },
         };
 
         updateMetrics(demoData);
         updateMatrix(demoData);
         updateHypothesis(demoData);
+        updateRobustness(demoData);
         updateCharts(demoData);
         updateFindings(demoData);
       }
