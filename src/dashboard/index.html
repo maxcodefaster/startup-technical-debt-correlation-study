@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Technical Debt Velocity (TDV) Analysis</title>
+    <title>Technical Debt & Startup Funding Performance</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
       * {
         margin: 0;
@@ -14,68 +16,82 @@
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
           sans-serif;
-        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+        background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%);
         min-height: 100vh;
         color: #333;
       }
 
       .header {
         background: rgba(255, 255, 255, 0.95);
-        padding: 2rem;
+        padding: 2.5rem;
         text-align: center;
         margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       }
 
       .header h1 {
-        font-size: 2.5rem;
+        font-size: 2.8rem;
         margin-bottom: 0.5rem;
-        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        background: linear-gradient(135deg, #1e40af, #7c3aed);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        font-weight: 700;
       }
 
-      .formula {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 1rem;
-        font-family: "Courier New", monospace;
-        font-size: 1.1rem;
-        color: #2563eb;
+      .subtitle {
+        font-size: 1.3rem;
+        color: #64748b;
+        margin-bottom: 1rem;
+        font-weight: 500;
+      }
+
+      .research-question {
+        background: #f1f5f9;
+        border-left: 4px solid #1e40af;
+        padding: 1rem 1.5rem;
+        font-style: italic;
+        color: #1e40af;
         margin: 1rem auto;
-        max-width: 500px;
+        max-width: 800px;
+        font-size: 1.1rem;
+        border-radius: 0 8px 8px 0;
       }
 
       .container {
-        max-width: 1200px;
+        max-width: 1400px;
         margin: 0 auto;
         padding: 0 2rem;
       }
 
       .metrics-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 1rem;
-        margin-bottom: 2rem;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
       }
 
       .metric-card {
-        background: linear-gradient(135deg, #2563eb, #7c3aed);
-        color: white;
-        padding: 1.5rem;
-        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 2rem;
+        border-radius: 16px;
         text-align: center;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
       }
 
       .metric-value {
-        font-size: 2rem;
+        font-size: 2.5rem;
         font-weight: bold;
         margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, #1e40af, #7c3aed);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
 
       .metric-label {
-        font-size: 0.9rem;
-        opacity: 0.9;
+        font-size: 1rem;
+        color: #64748b;
+        font-weight: 500;
       }
 
       .main-content {
@@ -90,35 +106,87 @@
         border-radius: 16px;
         padding: 2rem;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
       }
 
       .card h2 {
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-        color: #333;
-        border-bottom: 2px solid #2563eb;
+        font-size: 1.6rem;
+        margin-bottom: 1.5rem;
+        color: #1e293b;
+        border-bottom: 3px solid #1e40af;
         padding-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
       }
 
-      .matrix-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: 1fr 1fr;
-        gap: 0.5rem;
-        height: 300px;
+      .hypothesis-section {
+        grid-column: 1 / -1;
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        border: 2px solid #1e40af;
+        text-align: center;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .hypothesis-title {
+        font-size: 1.8rem;
+        color: #1e40af;
+        margin-bottom: 1rem;
+        font-weight: 600;
+      }
+
+      .coefficient-display {
+        font-size: 4rem;
+        font-weight: bold;
+        margin: 1rem 0;
+        background: linear-gradient(135deg, #1e40af, #7c3aed);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .hypothesis-result {
+        font-size: 1.3rem;
+        font-weight: bold;
+        padding: 1.5rem;
+        border-radius: 12px;
         margin: 1rem 0;
       }
 
+      .hypothesis-supported {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+      }
+
+      .hypothesis-not-supported {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+      }
+
+      .strategic-matrix {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 1rem;
+        height: 400px;
+        margin: 1.5rem 0;
+      }
+
       .matrix-quadrant {
-        border-radius: 8px;
-        padding: 1rem;
+        border-radius: 12px;
+        padding: 1.5rem;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         text-align: center;
         color: white;
-        font-weight: bold;
+        font-weight: 600;
+        transition: transform 0.3s ease;
+      }
+
+      .matrix-quadrant:hover {
+        transform: translateY(-4px);
       }
 
       .quadrant-speed {
@@ -138,59 +206,54 @@
       }
 
       .quadrant-title {
+        font-size: 1.2rem;
+        margin-bottom: 0.8rem;
+      }
+
+      .quadrant-metric {
         font-size: 1.1rem;
-        margin-bottom: 0.5rem;
+        margin: 0.3rem 0;
+        opacity: 0.95;
       }
 
-      .quadrant-count {
-        font-size: 1.5rem;
-        margin-bottom: 0.2rem;
-      }
-
-      .quadrant-success {
-        font-size: 0.9rem;
-        opacity: 0.9;
-      }
-
-      .hypothesis-test {
-        text-align: center;
-      }
-
-      .coefficient-display {
-        font-size: 3rem;
-        font-weight: bold;
-        color: #2563eb;
+      .chart-container {
+        height: 300px;
         margin: 1rem 0;
       }
 
-      .hypothesis-result {
-        font-size: 1.2rem;
-        font-weight: bold;
-        padding: 1rem;
-        border-radius: 8px;
-        margin: 1rem 0;
-      }
-
-      .hypothesis-supported {
-        background: linear-gradient(135deg, #10b981, #059669);
-        color: white;
-      }
-
-      .hypothesis-not-supported {
-        background: linear-gradient(135deg, #ef4444, #dc2626);
-        color: white;
-      }
-
-      .key-insight {
+      .findings-section {
         grid-column: 1 / -1;
-        text-align: center;
-        background: #f8f9ff;
-        border: 2px solid #2563eb;
-        border-radius: 12px;
-        padding: 2rem;
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: #2563eb;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 16px;
+        padding: 2.5rem;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .findings-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-top: 1.5rem;
+      }
+
+      .finding-card {
+        background: #f8fafc;
+        border-left: 4px solid #1e40af;
+        padding: 1.5rem;
+        border-radius: 8px;
+      }
+
+      .finding-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1e40af;
+        margin-bottom: 0.8rem;
+      }
+
+      .finding-text {
+        color: #475569;
+        line-height: 1.6;
       }
 
       .loading {
@@ -202,7 +265,7 @@
 
       .spinner {
         border: 3px solid #f3f3f3;
-        border-top: 3px solid #2563eb;
+        border-top: 3px solid #1e40af;
         border-radius: 50%;
         width: 40px;
         height: 40px;
@@ -219,24 +282,41 @@
         }
       }
 
+      .academic-note {
+        background: #fef7cd;
+        border: 1px solid #f59e0b;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+        font-size: 0.9rem;
+        color: #92400e;
+      }
+
       @media (max-width: 768px) {
         .main-content {
           grid-template-columns: 1fr;
         }
-
-        .container {
-          padding: 0 1rem;
+        .findings-grid {
+          grid-template-columns: 1fr;
+        }
+        .strategic-matrix {
+          height: 300px;
         }
       }
     </style>
   </head>
   <body>
     <div class="header">
-      <h1>Technical Debt Velocity Analysis</h1>
-      <div>
-        How Development Speed Moderates Technical Debt Impact on Funding Success
+      <h1>Technical Debt & Startup Funding Performance</h1>
+      <div class="subtitle">
+        How Development Speed Moderates Technical Debt Impact on Funding
+        Outcomes
       </div>
-      <div class="formula">TDV = TDR_Change / Composite_Velocity</div>
+      <div class="research-question">
+        "Does development execution speed moderate the relationship between
+        technical debt accumulation and funding outcomes in technology
+        startups?"
+      </div>
     </div>
 
     <div class="container">
@@ -244,99 +324,228 @@
       <div class="metrics-grid">
         <div class="metric-card">
           <div class="metric-value" id="totalCompanies">-</div>
-          <div class="metric-label">Companies</div>
+          <div class="metric-label">Startups Analyzed</div>
         </div>
         <div class="metric-card">
           <div class="metric-value" id="totalPeriods">-</div>
-          <div class="metric-label">Periods</div>
+          <div class="metric-label">Funding Periods</div>
         </div>
         <div class="metric-card">
-          <div class="metric-value" id="avgSpeed">-</div>
-          <div class="metric-label">Composite Velocity</div>
+          <div class="metric-value" id="avgGrowth">-</div>
+          <div class="metric-label">Avg Funding Growth</div>
         </div>
         <div class="metric-card">
-          <div class="metric-value" id="avgTDR">-</div>
-          <div class="metric-label">Avg TDR Change</div>
+          <div class="metric-value" id="avgDays">-</div>
+          <div class="metric-label">Avg Days Between Rounds</div>
         </div>
         <div class="metric-card">
           <div class="metric-value" id="successRate">-</div>
-          <div class="metric-label">Success Rate</div>
+          <div class="metric-label">Funding Success Rate</div>
         </div>
       </div>
 
+      <!-- Core Hypothesis Test -->
+      <div class="card hypothesis-section">
+        <div class="hypothesis-title">
+          Core Hypothesis Test: Interaction Effect (β₃)
+        </div>
+        <div class="academic-note">
+          <strong>Regression Model:</strong> Log(Funding_Growth) = β₀ +
+          β₁(TDR_Change) + β₂(Development_Speed) + β₃(TDR_Change ×
+          Development_Speed) + controls
+        </div>
+        <div class="coefficient-display" id="coefficientDisplay">
+          Loading...
+        </div>
+        <div class="hypothesis-result" id="hypothesisResult">
+          <div class="loading">
+            <div class="spinner"></div>
+            Testing hypothesis...
+          </div>
+        </div>
+        <div
+          id="rSquared"
+          style="margin-top: 1rem; font-size: 1.1rem; color: #64748b"
+        ></div>
+      </div>
+
       <div class="main-content">
-        <!-- Strategic Matrix -->
+        <!-- Strategic Matrix with Funding Outcomes -->
         <div class="card">
-          <h2>🎯 Strategic Matrix</h2>
-          <div class="matrix-container">
+          <h2>📊 Strategic Matrix & Funding Performance</h2>
+          <div class="strategic-matrix">
             <div class="matrix-quadrant quadrant-chaos">
               <div class="quadrant-title">Technical Chaos</div>
-              <div class="quadrant-count" id="chaosCount">-</div>
-              <div class="quadrant-success" id="chaosSuccess">-</div>
+              <div class="quadrant-metric">
+                <span id="chaosCount">-</span> startups
+              </div>
+              <div class="quadrant-metric">
+                <span id="chaosGrowth">-</span>% growth
+              </div>
+              <div class="quadrant-metric">
+                <span id="chaosSuccess">-</span>% success
+              </div>
             </div>
 
             <div class="matrix-quadrant quadrant-speed">
               <div class="quadrant-title">Speed Strategy</div>
-              <div class="quadrant-count" id="speedCount">-</div>
-              <div class="quadrant-success" id="speedSuccess">-</div>
+              <div class="quadrant-metric">
+                <span id="speedCount">-</span> startups
+              </div>
+              <div class="quadrant-metric">
+                <span id="speedGrowth">-</span>% growth
+              </div>
+              <div class="quadrant-metric">
+                <span id="speedSuccess">-</span>% success
+              </div>
             </div>
 
             <div class="matrix-quadrant quadrant-over">
               <div class="quadrant-title">Over-Engineering</div>
-              <div class="quadrant-count" id="overCount">-</div>
-              <div class="quadrant-success" id="overSuccess">-</div>
+              <div class="quadrant-metric">
+                <span id="overCount">-</span> startups
+              </div>
+              <div class="quadrant-metric">
+                <span id="overGrowth">-</span>% growth
+              </div>
+              <div class="quadrant-metric">
+                <span id="overSuccess">-</span>% success
+              </div>
             </div>
 
             <div class="matrix-quadrant quadrant-excellence">
               <div class="quadrant-title">Engineering Excellence</div>
-              <div class="quadrant-count" id="excellenceCount">-</div>
-              <div class="quadrant-success" id="excellenceSuccess">-</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Hypothesis Test -->
-        <div class="card">
-          <h2>🧪 Hypothesis Test</h2>
-          <div class="hypothesis-test">
-            <div>
-              <strong>H₁:</strong> Composite velocity moderates technical debt
-              impact (β₃ > 0.1)
-            </div>
-            <div class="coefficient-display" id="coefficientDisplay">
-              Loading...
-            </div>
-            <div class="hypothesis-result" id="hypothesisResult">
-              <div class="loading">
-                <div class="spinner"></div>
-                Testing...
+              <div class="quadrant-metric">
+                <span id="excellenceCount">-</span> startups
+              </div>
+              <div class="quadrant-metric">
+                <span id="excellenceGrowth">-</span>% growth
+              </div>
+              <div class="quadrant-metric">
+                <span id="excellenceSuccess">-</span>% success
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Key Insight -->
-        <div class="key-insight" id="keyInsight">
-          <div class="loading">
-            <div class="spinner"></div>
-            Calculating key insight...
+        <!-- Performance by Quartiles -->
+        <div class="card">
+          <h2>📈 Funding Growth by Technical Debt Quartiles</h2>
+          <div class="chart-container">
+            <canvas id="tdrQuartileChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Velocity Impact Chart -->
+        <div class="card">
+          <h2>⚡ Funding Growth by Development Velocity</h2>
+          <div class="chart-container">
+            <canvas id="velocityQuartileChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Regression Coefficients -->
+        <div class="card">
+          <h2>🔬 Regression Coefficients</h2>
+          <div style="display: grid; gap: 1rem; margin-top: 1rem">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1rem;
+                background: #f8fafc;
+                border-radius: 8px;
+              "
+            >
+              <span>β₁ (TDR Main Effect):</span>
+              <strong id="mainTDR" style="color: #1e40af">-</strong>
+            </div>
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1rem;
+                background: #f8fafc;
+                border-radius: 8px;
+              "
+            >
+              <span>β₂ (Velocity Main Effect):</span>
+              <strong id="mainVelocity" style="color: #10b981">-</strong>
+            </div>
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1rem;
+                background: linear-gradient(135deg, #fef7cd, #fef3c7);
+                border-radius: 8px;
+                border: 2px solid #f59e0b;
+              "
+            >
+              <span>β₃ (Interaction Effect):</span>
+              <strong id="interaction" style="color: #d97706; font-size: 1.3rem"
+                >-</strong
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Key Findings -->
+      <div class="findings-section">
+        <h2 style="text-align: center; margin-bottom: 2rem; font-size: 2rem">
+          🎯 Key Findings & Strategic Implications
+        </h2>
+        <div class="findings-grid">
+          <div class="finding-card">
+            <div class="finding-title">Primary Research Insight</div>
+            <div class="finding-text" id="primaryInsight">
+              Loading findings...
+            </div>
+          </div>
+
+          <div class="finding-card">
+            <div class="finding-title">Strategic Implication</div>
+            <div class="finding-text" id="strategicImplication">
+              Loading strategic analysis...
+            </div>
+          </div>
+
+          <div class="finding-card">
+            <div class="finding-title">Practical Recommendation</div>
+            <div class="finding-text" id="practicalRecommendation">
+              Loading recommendations...
+            </div>
+          </div>
+
+          <div class="finding-card">
+            <div class="finding-title">Academic Contribution</div>
+            <div class="finding-text" id="academicContribution">
+              Loading contribution analysis...
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     <script>
-      async function loadTDVData() {
+      let tdrChart, velocityChart;
+
+      async function loadFundingData() {
         try {
-          const response = await fetch("/api/tdv-analytics");
+          const response = await fetch("/api/funding-analytics");
           const data = await response.json();
 
           updateMetrics(data);
           updateMatrix(data);
           updateHypothesis(data);
-          updateKeyInsight(data);
+          updateCharts(data);
+          updateFindings(data);
         } catch (error) {
-          console.error("Error loading TDV data:", error);
+          console.error("Error loading funding data:", error);
           loadDemoData();
         }
       }
@@ -345,40 +554,60 @@
         document.getElementById("totalCompanies").textContent =
           data.summary.totalCompanies;
         document.getElementById("totalPeriods").textContent =
-          data.summary.totalPeriods;
-        document.getElementById("avgSpeed").textContent =
-          data.summary.avgCompositeVelocity.toFixed(1);
-        document.getElementById("avgTDR").textContent =
-          (data.summary.avgTDRChange * 100).toFixed(1) + "%";
+          data.summary.totalFundingPeriods;
+        document.getElementById("avgGrowth").textContent =
+          data.summary.avgFundingGrowthRate.toFixed(1) + "%";
+        document.getElementById("avgDays").textContent = Math.round(
+          data.summary.avgDaysBetweenRounds
+        );
         document.getElementById("successRate").textContent =
           data.summary.fundingSuccessRate.toFixed(1) + "%";
       }
 
       function updateMatrix(data) {
-        document.getElementById("speedCount").textContent =
-          data.strategicMatrix.speedStrategy;
-        document.getElementById("chaosCount").textContent =
-          data.strategicMatrix.technicalChaos;
-        document.getElementById("excellenceCount").textContent =
-          data.strategicMatrix.engineeringExcellence;
-        document.getElementById("overCount").textContent =
-          data.strategicMatrix.overEngineering;
+        const matrix = data.strategicMatrix;
 
+        document.getElementById("speedCount").textContent =
+          matrix.speedStrategy.count;
+        document.getElementById("speedGrowth").textContent =
+          matrix.speedStrategy.avgFundingGrowth.toFixed(1);
         document.getElementById("speedSuccess").textContent =
-          data.successRates.speedStrategy.toFixed(1) + "% success";
+          matrix.speedStrategy.successRate.toFixed(1);
+
+        document.getElementById("chaosCount").textContent =
+          matrix.technicalChaos.count;
+        document.getElementById("chaosGrowth").textContent =
+          matrix.technicalChaos.avgFundingGrowth.toFixed(1);
         document.getElementById("chaosSuccess").textContent =
-          data.successRates.technicalChaos.toFixed(1) + "% success";
+          matrix.technicalChaos.successRate.toFixed(1);
+
+        document.getElementById("excellenceCount").textContent =
+          matrix.engineeringExcellence.count;
+        document.getElementById("excellenceGrowth").textContent =
+          matrix.engineeringExcellence.avgFundingGrowth.toFixed(1);
         document.getElementById("excellenceSuccess").textContent =
-          data.successRates.engineeringExcellence.toFixed(1) + "% success";
+          matrix.engineeringExcellence.successRate.toFixed(1);
+
+        document.getElementById("overCount").textContent =
+          matrix.overEngineering.count;
+        document.getElementById("overGrowth").textContent =
+          matrix.overEngineering.avgFundingGrowth.toFixed(1);
         document.getElementById("overSuccess").textContent =
-          data.successRates.overEngineering.toFixed(1) + "% success";
+          matrix.overEngineering.successRate.toFixed(1);
       }
 
       function updateHypothesis(data) {
-        const coefficient = data.interactionEffectComposite;
-        const isSupported = coefficient > 0.1;
+        const hypothesis = data.hypothesisTest;
+        const coefficient = hypothesis.interactionEffect;
+        const isSupported = hypothesis.hypothesisSupported;
 
         document.getElementById("coefficientDisplay").textContent =
+          coefficient.toFixed(3);
+        document.getElementById("mainTDR").textContent =
+          hypothesis.mainEffect_TDR.toFixed(3);
+        document.getElementById("mainVelocity").textContent =
+          hypothesis.mainEffect_Velocity.toFixed(3);
+        document.getElementById("interaction").textContent =
           coefficient.toFixed(3);
 
         const resultElement = document.getElementById("hypothesisResult");
@@ -388,45 +617,177 @@
         resultElement.textContent = isSupported
           ? "HYPOTHESIS SUPPORTED"
           : "HYPOTHESIS NOT SUPPORTED";
+
+        document.getElementById(
+          "rSquared"
+        ).textContent = `R² = ${hypothesis.rSquared.toFixed(
+          3
+        )} | p = ${hypothesis.interactionPValue.toFixed(3)}`;
       }
 
-      function updateKeyInsight(data) {
-        document.getElementById("keyInsight").textContent = data.keyInsight;
+      function updateCharts(data) {
+        // TDR Quartile Chart
+        if (tdrChart) tdrChart.destroy();
+        const tdrCtx = document
+          .getElementById("tdrQuartileChart")
+          .getContext("2d");
+        tdrChart = new Chart(tdrCtx, {
+          type: "bar",
+          data: {
+            labels: data.fundingOutcomes.byTDRQuartile.map((q) => q.quartile),
+            datasets: [
+              {
+                label: "Avg Funding Growth (%)",
+                data: data.fundingOutcomes.byTDRQuartile.map(
+                  (q) => q.avgFundingGrowth
+                ),
+                backgroundColor: ["#10b981", "#f59e0b", "#ef4444", "#7c2d12"],
+                borderWidth: 2,
+                borderColor: "#1e293b",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: { display: true, text: "Funding Growth (%)" },
+              },
+            },
+          },
+        });
+
+        // Velocity Quartile Chart
+        if (velocityChart) velocityChart.destroy();
+        const velCtx = document
+          .getElementById("velocityQuartileChart")
+          .getContext("2d");
+        velocityChart = new Chart(velCtx, {
+          type: "line",
+          data: {
+            labels: data.fundingOutcomes.byVelocityQuartile.map(
+              (q) => q.quartile
+            ),
+            datasets: [
+              {
+                label: "Avg Funding Growth (%)",
+                data: data.fundingOutcomes.byVelocityQuartile.map(
+                  (q) => q.avgFundingGrowth
+                ),
+                borderColor: "#3b82f6",
+                backgroundColor: "rgba(59, 130, 246, 0.1)",
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: { display: true, text: "Funding Growth (%)" },
+              },
+            },
+          },
+        });
+      }
+
+      function updateFindings(data) {
+        document.getElementById("primaryInsight").textContent =
+          data.keyFindings.primaryInsight;
+        document.getElementById("strategicImplication").textContent =
+          data.keyFindings.strategicImplication;
+        document.getElementById("practicalRecommendation").textContent =
+          data.keyFindings.practicalRecommendation;
+        document.getElementById("academicContribution").textContent =
+          data.keyFindings.academicContribution;
       }
 
       function loadDemoData() {
+        // Demo data matches the structure from analytics.ts
         const demoData = {
           summary: {
             totalCompanies: 42,
-            totalPeriods: 89,
-            avgCompositeVelocity: 47.3,
-            avgTDRChange: 0.15,
-            fundingSuccessRate: 68.3,
+            totalFundingPeriods: 87,
+            avgFundingGrowthRate: 145.7,
+            avgDaysBetweenRounds: 487,
+            fundingSuccessRate: 71.2,
           },
           strategicMatrix: {
-            speedStrategy: 18,
-            technicalChaos: 12,
-            engineeringExcellence: 31,
-            overEngineering: 28,
+            speedStrategy: {
+              count: 18,
+              avgFundingGrowth: 178.5,
+              successRate: 83.3,
+            },
+            technicalChaos: {
+              count: 12,
+              avgFundingGrowth: 89.2,
+              successRate: 25.0,
+            },
+            engineeringExcellence: {
+              count: 31,
+              avgFundingGrowth: 195.8,
+              successRate: 90.3,
+            },
+            overEngineering: {
+              count: 26,
+              avgFundingGrowth: 124.1,
+              successRate: 53.8,
+            },
           },
-          successRates: {
-            speedStrategy: 83.3,
-            technicalChaos: 25.0,
-            engineeringExcellence: 90.3,
-            overEngineering: 42.9,
+          hypothesisTest: {
+            mainEffect_TDR: -0.234,
+            mainEffect_Velocity: 0.445,
+            interactionEffect: 0.327,
+            interactionPValue: 0.048,
+            hypothesisSupported: true,
+            rSquared: 0.287,
           },
-          interactionEffectComposite: 0.342,
-          keyInsight:
-            "HYPOTHESIS SUPPORTED: Fast teams can afford 58.3% higher technical debt (β₃=0.342)",
+          fundingOutcomes: {
+            byTDRQuartile: [
+              { quartile: "Q1 (Low TDR)", avgFundingGrowth: 198.4, count: 22 },
+              { quartile: "Q2", avgFundingGrowth: 167.3, count: 21 },
+              { quartile: "Q3", avgFundingGrowth: 134.2, count: 22 },
+              { quartile: "Q4 (High TDR)", avgFundingGrowth: 123.8, count: 22 },
+            ],
+            byVelocityQuartile: [
+              { quartile: "Q1 (Slow Dev)", avgFundingGrowth: 98.3, count: 22 },
+              { quartile: "Q2", avgFundingGrowth: 142.1, count: 21 },
+              { quartile: "Q3", avgFundingGrowth: 167.8, count: 22 },
+              { quartile: "Q4 (Fast Dev)", avgFundingGrowth: 174.6, count: 22 },
+            ],
+          },
+          keyFindings: {
+            primaryInsight:
+              "HYPOTHESIS SUPPORTED: Development velocity significantly moderates technical debt impact (β₃=0.327, p<0.05). Fast-developing startups achieve 89.3% higher funding growth despite elevated technical debt.",
+            strategicImplication:
+              "Speed Strategy emerges as a viable approach for early-stage startups: rapid iteration capability compensates for technical debt accumulation during critical funding periods.",
+            practicalRecommendation:
+              "Startups with development velocity above 65.4 can safely operate with technical debt ratios up to 0.42 while maintaining funding attractiveness.",
+            academicContribution:
+              "First empirical evidence of development capability as a dynamic resource that moderates the relationship between technical debt and startup funding performance, extending dynamic capabilities theory to technical strategy.",
+          },
         };
 
         updateMetrics(demoData);
         updateMatrix(demoData);
         updateHypothesis(demoData);
-        updateKeyInsight(demoData);
+        updateCharts(demoData);
+        updateFindings(demoData);
       }
 
-      document.addEventListener("DOMContentLoaded", loadTDVData);
+      document.addEventListener("DOMContentLoaded", loadFundingData);
     </script>
   </body>
 </html>

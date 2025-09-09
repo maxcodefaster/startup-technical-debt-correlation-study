@@ -10,19 +10,20 @@ import { eq } from "drizzle-orm";
 import { GitHandler } from "./git";
 import { QltyAnalyzer } from "./qlty";
 import { startDashboardServer } from "./server";
-import { calculateTDVAnalytics } from "./analytics";
+import { calculateFundingOutcomeAnalysis } from "./analytics";
 import fs from "fs";
 
 function displayMenu() {
-  console.log("\n🚀 Technical Debt Velocity (TDV) Analysis");
+  console.log("\n🚀 Technical Debt & Startup Funding Analysis");
   console.log(
-    "Thesis: Development speed moderates technical debt impact on funding"
+    "Research: How development speed moderates technical debt impact on funding outcomes"
   );
-  console.log("=".repeat(60));
-  console.log("1. 📊 Run TDV Analysis");
-  console.log("2. 🌐 View TDV Dashboard");
-  console.log("3. 🗑️ Clean repos");
-  console.log("4. ❌ Exit");
+  console.log("=".repeat(75));
+  console.log("1. 📊 Run Complete Analysis");
+  console.log("2. 📈 View Dashboard");
+  console.log("3. 🔍 Quick Preview");
+  console.log("4. 🗑️ Clean repos");
+  console.log("5. ❌ Exit");
 }
 
 async function getUserChoice(): Promise<string> {
@@ -30,7 +31,7 @@ async function getUserChoice(): Promise<string> {
   for await (const line of console) {
     return line.trim();
   }
-  return "4";
+  return "5";
 }
 
 async function processCompany(company: any) {
@@ -38,6 +39,7 @@ async function processCompany(company: any) {
 
   try {
     const repoPath = await gitHandler.cloneRepo(company.githubLink);
+
     const rounds = await db
       .select()
       .from(fundingRounds)
@@ -61,9 +63,10 @@ async function processCompany(company: any) {
         new Date(a.roundDate).getTime() - new Date(b.roundDate).getTime()
     );
 
+    console.log(`  → ${analysisPoints.length} events`);
     const snapshots: any[] = [];
 
-    for (const round of analysisPoints) {
+    for (const [index, round] of analysisPoints.entries()) {
       const commitHash = await gitHandler.checkoutDate(round.roundDate);
       if (!commitHash) continue;
 
@@ -137,15 +140,13 @@ async function processCompany(company: any) {
       });
     }
 
-    // Enhanced TDV calculation between consecutive rounds
+    // Development velocity between consecutive rounds
     for (let i = 1; i < snapshots.length; i++) {
       const fromSnapshot = snapshots[i - 1];
       const toSnapshot = snapshots[i];
-
       const fromRound = fromSnapshot.roundInfo;
       const toRound = toSnapshot.roundInfo;
 
-      // Use enhanced velocity calculation instead of simple one
       const velocityMetrics = await gitHandler.calculateDevelopmentVelocity(
         fromRound.roundDate,
         toRound.roundDate
@@ -155,82 +156,75 @@ async function processCompany(company: any) {
       const endTDR = toSnapshot.technicalDebtRatio || 0;
       const tdrChange = startTDR > 0 ? (endTDR - startTDR) / startTDR : 0;
 
-      // Calculate both TDV measures for comparison
-      const tdvSimple =
-        velocityMetrics.linesAdded > 0
-          ? tdrChange /
-            (velocityMetrics.linesAdded / velocityMetrics.periodDays)
-          : 0;
-      const tdvComposite =
-        velocityMetrics.compositeVelocity > 0
-          ? tdrChange / velocityMetrics.compositeVelocity
-          : 0;
+      const safeCompositeVelocity = Math.max(
+        0.1,
+        velocityMetrics.compositeVelocity
+      );
+      const safeDevelopmentSpeed = Math.max(
+        0.1,
+        velocityMetrics.linesAdded / velocityMetrics.periodDays
+      );
 
-      // Check if company got next round
+      const tdvSimple = Math.abs(tdrChange) / safeDevelopmentSpeed;
+      const tdvComposite = Math.abs(tdrChange) / safeCompositeVelocity;
+
       const futureRounds = analysisPoints.filter(
         (r) => new Date(r.roundDate) > new Date(toRound.roundDate) && r.id > 0
       );
       const gotNextRound = futureRounds.length > 0;
 
-      // Store enhanced velocity data
       await db.insert(developmentVelocity).values({
         companyId: company.id,
         fromRoundId: fromRound.id > 0 ? fromRound.id : null,
         toRoundId: toRound.id > 0 ? toRound.id : null,
-
-        // Period and raw metrics
         periodDays: velocityMetrics.periodDays,
         commitCount: velocityMetrics.commitCount,
         authorCount: velocityMetrics.authorCount,
         linesAdded: velocityMetrics.linesAdded,
         linesDeleted: velocityMetrics.linesDeleted,
         linesChanged: velocityMetrics.linesChanged,
-
-        // Velocity metrics
         commitVelocity: velocityMetrics.commitVelocity,
         authorActivity: velocityMetrics.authorActivity,
         codeChurn: velocityMetrics.codeChurn,
         compositeVelocity: velocityMetrics.compositeVelocity,
-
-        // Legacy simple metric (for comparison)
-        developmentSpeed:
-          velocityMetrics.linesAdded / velocityMetrics.periodDays,
-
-        // Technical debt metrics
+        developmentSpeed: safeDevelopmentSpeed,
         startTDR,
         endTDR,
         tdrChange,
-
-        // Enhanced TDV calculations
         tdvSimple,
         tdvComposite,
-
-        // Funding outcome
         gotNextRound,
       });
     }
+
+    console.log(`  ✅ ${company.name}`);
   } catch (error) {
-    console.error(`❌ Failed: ${company.name}`);
+    console.error(`  ❌ ${company.name}: ${(error as Error).message}`);
   } finally {
     gitHandler.cleanup();
   }
 }
 
-async function runTDVAnalysis() {
-  console.log("🚀 Starting TDV Analysis");
+async function runCompleteAnalysis() {
+  console.log("🚀 Starting Analysis");
 
-  const csvPath = process.argv[2] || "./data/startup_seed_data.csv";
-  if (csvPath && fs.existsSync(csvPath)) {
+  // Import CSV
+  const csvPath = "./data/startup_seed_data.csv";
+  if (fs.existsSync(csvPath)) {
+    console.log("📊 Importing CSV...");
     await importCSV(csvPath);
+  } else {
+    console.log("❌ CSV not found: ./data/startup_seed_data.csv");
+    return;
   }
 
   const allCompanies = await db.select().from(companies);
   if (allCompanies.length === 0) {
-    console.log("❌ No companies found. Import CSV data first.");
+    console.log("❌ No companies found");
     return;
   }
 
-  console.log(`Processing ${allCompanies.length} companies...`);
+  console.log(`🏢 Processing ${allCompanies.length} startups...`);
 
   for (let i = 0; i < allCompanies.length; i++) {
     const company = allCompanies[i];
@@ -238,7 +232,88 @@ async function runTDVAnalysis() {
     await processCompany(company);
   }
 
-  console.log("✅ TDV Analysis Complete!");
+  // Final analytics
+  console.log("📈 Generating results...");
+  const analytics = await calculateFundingOutcomeAnalysis();
+
+  console.log("\n🎯 RESULTS");
+  console.log("=".repeat(40));
+  console.log(`Companies: ${analytics.summary.totalCompanies}`);
+  console.log(`Periods: ${analytics.summary.totalFundingPeriods}`);
+  console.log(
+    `Avg funding growth: ${analytics.summary.avgFundingGrowthRate.toFixed(1)}%`
+  );
+  console.log(
+    `Success rate: ${analytics.summary.fundingSuccessRate.toFixed(1)}%`
+  );
+
+  if (analytics.hypothesisTest.hypothesisSupported) {
+    console.log(
+      `\n🎉 HYPOTHESIS SUPPORTED (β₃=${analytics.hypothesisTest.interactionEffect.toFixed(
+        3
+      )})`
+    );
+  } else {
+    console.log(
+      `\n📋 HYPOTHESIS NOT SUPPORTED (β₃=${analytics.hypothesisTest.interactionEffect.toFixed(
+        3
+      )})`
+    );
+  }
+
+  console.log(`\n💡 ${analytics.keyFindings.primaryInsight}`);
+  console.log("\n🌐 View full dashboard (option 2)");
+}
+
+async function showQuickAnalytics() {
+  console.log("📊 Quick Preview");
+
+  try {
+    const analytics = await calculateFundingOutcomeAnalysis();
+
+    console.log(`Companies: ${analytics.summary.totalCompanies}`);
+    console.log(`Periods: ${analytics.summary.totalFundingPeriods}`);
+    console.log(
+      `Funding growth: ${analytics.summary.avgFundingGrowthRate.toFixed(1)}%`
+    );
+    console.log(
+      `Success rate: ${analytics.summary.fundingSuccessRate.toFixed(1)}%`
+    );
+
+    console.log(
+      `\nHypothesis: β₃=${analytics.hypothesisTest.interactionEffect.toFixed(
+        3
+      )} (${
+        analytics.hypothesisTest.hypothesisSupported
+          ? "SUPPORTED"
+          : "NOT SUPPORTED"
+      })`
+    );
+
+    console.log(`\nStrategy Performance:`);
+    console.log(
+      `  Speed Strategy: ${analytics.strategicMatrix.speedStrategy.avgFundingGrowth.toFixed(
+        1
+      )}% growth`
+    );
+    console.log(
+      `  Tech Chaos: ${analytics.strategicMatrix.technicalChaos.avgFundingGrowth.toFixed(
+        1
+      )}% growth`
+    );
+    console.log(
+      `  Excellence: ${analytics.strategicMatrix.engineeringExcellence.avgFundingGrowth.toFixed(
+        1
+      )}% growth`
+    );
+    console.log(
+      `  Over-Engineering: ${analytics.strategicMatrix.overEngineering.avgFundingGrowth.toFixed(
+        1
+      )}% growth`
+    );
+  } catch (error) {
+    console.log("⚠️  No data yet. Run analysis first (option 1).");
+  }
 }
 
 async function main() {
@@ -248,17 +323,20 @@ async function main() {
 
     switch (choice) {
       case "1":
-        await runTDVAnalysis();
+        await runCompleteAnalysis();
         break;
       case "2":
         await startDashboardServer();
         break;
       case "3":
+        await showQuickAnalytics();
+        break;
+      case "4":
         GitHandler.cleanAllRepos();
         console.log("✅ Repos cleaned");
         break;
-      case "4":
-        console.log("👋 Goodbye!");
+      case "5":
+        console.log("👋 Good luck with your thesis!");
         process.exit(0);
         break;
       default:
