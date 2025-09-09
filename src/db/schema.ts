@@ -15,7 +15,7 @@ export const fundingRounds = sqliteTable("funding_rounds", {
   companyId: integer("company_id")
     .notNull()
     .references(() => companies.id),
-  roundType: text("round_type").notNull(), // 'seed', 'series_a', etc.
+  roundType: text("round_type").notNull(),
   roundDate: text("round_date").notNull(),
   amountUsd: real("amount_usd"),
   isExtension: integer("is_extension", { mode: "boolean" }).default(false),
@@ -28,14 +28,11 @@ export const repositoryInfo = sqliteTable("repository_info", {
     .notNull()
     .references(() => companies.id),
   analysisDate: text("analysis_date").notNull(),
-
-  // Repository characteristics
   totalFiles: integer("total_files"),
   repoSizeMB: real("repo_size_mb"),
   commitCount: integer("commit_count"),
   firstCommitDate: text("first_commit_date"),
   lastCommitDate: text("last_commit_date"),
-
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
@@ -53,30 +50,23 @@ export const codeSnapshots = sqliteTable("code_snapshots", {
   snapshotDate: text("snapshot_date").notNull(),
   commitHash: text("commit_hash").notNull(),
 
-  // Core Metrics from Qlty metrics.txt
-  linesOfCode: integer("lines_of_code"), // LOC column
-  totalLines: integer("total_lines"), // lines column (includes comments/whitespace)
-  complexity: integer("complexity"), // cyclo column
-  cognitiveComplexity: integer("cognitive_complexity"), // complex column
-  totalFunctions: integer("total_functions"), // funcs column
-  totalClasses: integer("total_classes"), // classes column
-  totalFields: integer("total_fields"), // fields column
-  lackOfCohesion: integer("lack_of_cohesion"), // LCOM column
+  // Core Metrics from Qlty metrics.txt (keep original)
+  linesOfCode: integer("lines_of_code"),
+  totalLines: integer("total_lines"),
+  complexity: integer("complexity"),
+  cognitiveComplexity: integer("cognitive_complexity"),
+  totalFunctions: integer("total_functions"),
+  totalClasses: integer("total_classes"),
+  totalFields: integer("total_fields"),
+  lackOfCohesion: integer("lack_of_cohesion"),
 
-  // Code Smells Aggregations from smells.json
+  // Code Smells (keep original)
   totalIssues: integer("total_issues"),
-  totalEffortMinutes: integer("total_effort_minutes"), // Sum of all effortMinutes
+  totalEffortMinutes: integer("total_effort_minutes"),
   averageEffortPerIssue: real("average_effort_per_issue"),
-
-  // Issues by category (JSON: {CATEGORY_DUPLICATION: count, CATEGORY_STRUCTURE: count})
   issuesByCategory: text("issues_by_category"),
-
-  // Issues by level (JSON: {LEVEL_HIGH: count, LEVEL_MEDIUM: count, LEVEL_LOW: count})
   issuesByLevel: text("issues_by_level"),
-
-  // Issues by language (JSON: {LANGUAGE_PYTHON: count, LANGUAGE_JAVA: count, ...})
   issuesByLanguage: text("issues_by_language"),
-
   highComplexityFunctions: integer("high_complexity_functions"),
   highComplexityFiles: integer("high_complexity_files"),
   manyParameterFunctions: integer("many_parameter_functions"),
@@ -84,16 +74,16 @@ export const codeSnapshots = sqliteTable("code_snapshots", {
   deeplyNestedCode: integer("deeply_nested_code"),
   manyReturnStatements: integer("many_return_statements"),
 
-  // Derived Quality Metrics for Technical Debt Calculation
+  // Derived Quality Metrics (keep original)
   totalCodeSmells: integer("total_code_smells"),
   averageComplexity: real("average_complexity"),
   maxComplexity: integer("max_complexity"),
-  complexityDensity: real("complexity_density"), // complexity per 1000 LOC
-  issuesDensity: real("issues_density"), // issues per 1000 LOC
-  technicalDebtMinutes: real("technical_debt_minutes"), // totalEffortMinutes
-  technicalDebtRatio: real("technical_debt_ratio"), // effort minutes / development hours estimate
+  complexityDensity: real("complexity_density"),
+  issuesDensity: real("issues_density"),
+  technicalDebtMinutes: real("technical_debt_minutes"),
+  technicalDebtRatio: real("technical_debt_ratio"),
 
-  // Analysis metadata
+  // Analysis metadata (keep original)
   analysisSuccess: integer("analysis_success", { mode: "boolean" }).default(
     true
   ),
@@ -102,7 +92,30 @@ export const codeSnapshots = sqliteTable("code_snapshots", {
   analysisDate: text("analysis_date").default(sql`CURRENT_TIMESTAMP`),
 });
 
-// Type exports for TypeScript
+// NEW: Simple table for TDV calculation between rounds
+export const developmentVelocity = sqliteTable("development_velocity", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  companyId: integer("company_id")
+    .notNull()
+    .references(() => companies.id),
+  fromRoundId: integer("from_round_id").references(() => fundingRounds.id),
+  toRoundId: integer("to_round_id").references(() => fundingRounds.id),
+
+  periodDays: integer("period_days").notNull(),
+  linesAdded: integer("lines_added"),
+  developmentSpeed: real("development_speed"), // lines_added / period_days
+
+  startTDR: real("start_tdr"),
+  endTDR: real("end_tdr"),
+  tdrChange: real("tdr_change"), // (end - start) / start
+
+  tdv: real("tdv"), // tdrChange / developmentSpeed
+  gotNextRound: integer("got_next_round", { mode: "boolean" }),
+
+  createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+// Type exports
 export type Company = typeof companies.$inferSelect;
 export type NewCompany = typeof companies.$inferInsert;
 export type FundingRound = typeof fundingRounds.$inferSelect;
@@ -111,3 +124,5 @@ export type RepositoryInfo = typeof repositoryInfo.$inferSelect;
 export type NewRepositoryInfo = typeof repositoryInfo.$inferInsert;
 export type CodeSnapshot = typeof codeSnapshots.$inferSelect;
 export type NewCodeSnapshot = typeof codeSnapshots.$inferInsert;
+export type DevelopmentVelocity = typeof developmentVelocity.$inferSelect;
+export type NewDevelopmentVelocity = typeof developmentVelocity.$inferInsert;
