@@ -168,7 +168,15 @@ export class GitHandler {
     };
   }
 
-  // Enhanced development velocity calculation inspired by CNCF approach
+  /**
+   * Calculates development velocity metrics for a given time period.
+   * This composite metric is designed to model the internal execution speed of a startup,
+   * prioritizing code output and team activity, which differs from metrics like CNCF's that https://github.com/cncf/velocity/blob/main/README.md
+   * focus on broader open-source community health (e.g., issues, PRs).
+   * @param startDate - The start date of the period.
+   * @param endDate - The end date of the period.
+   * @returns A promise resolving to DevelopmentVelocityMetrics.
+   */
   async calculateDevelopmentVelocity(
     startDate: string,
     endDate: string
@@ -227,18 +235,29 @@ export class GitHandler {
 
       const linesChanged = linesAdded + linesDeleted;
 
-      // Calculate velocity metrics
+      // Calculate time-normalized velocity metrics
       const commitVelocity = commitCount / periodDays;
       const authorActivity = authorCount / periodDays;
       const codeChurn = linesChanged / periodDays;
 
-      // Composite velocity metric (weighted combination)
-      // Weight: 40% code churn, 35% commit velocity, 25% author activity
-      // This balances code output with team activity and commit frequency
+      // --- Composite Velocity Model Rationale ---
+      // This model creates a single velocity score. It's a heuristic designed to balance
+      // three key aspects of development speed in a startup context.
+      // 1. Code Churn: The primary measure of raw output. Weighted highest.
+      // 2. Commit Velocity: A proxy for iteration frequency and agile practices.
+      // 3. Author Activity: Represents team breadth and engagement.
+      const WEIGHT_CHURN = 0.4; // Weight for code output
+      const WEIGHT_COMMITS = 0.35; // Weight for iteration frequency
+      const WEIGHT_AUTHORS = 0.25; // Weight for team engagement
+
+      // Scaling factors are used to bring the different metrics to a comparable order of magnitude.
+      const SCALE_COMMITS = 50;
+      const SCALE_AUTHORS = 100;
+
       const compositeVelocity =
-        codeChurn * 0.4 +
-        commitVelocity * 50 * 0.35 + // scale commits by 50 to match line scale
-        authorActivity * 100 * 0.25; // scale authors by 100 to match line scale
+        codeChurn * WEIGHT_CHURN +
+        commitVelocity * SCALE_COMMITS * WEIGHT_COMMITS +
+        authorActivity * SCALE_AUTHORS * WEIGHT_AUTHORS;
 
       return {
         periodDays,

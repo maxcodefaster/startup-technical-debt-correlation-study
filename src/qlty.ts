@@ -85,22 +85,42 @@ export class QltyAnalyzer {
       const issuesDensity =
         linesOfCode > 0 ? (totalIssues / linesOfCode) * 1000 : 0;
 
-      // FIXED: Proper COCOMO-based TDR calculation
-      // Using COCOMO basic model: Effort = 2.4 * (KLOC)^1.05 person-months
-      // Convert to minutes: 1 person-month = 152 hours = 9120 minutes
+      // --- Technical Debt Ratio (TDR) Calculation Rationale ---
+      // This calculation adheres to the industry-standard methodology popularized by tools like
+      // SonarQube and explicitly follows the definition provided by the Qlty documentation.
+      // The formula is: TDR = (Remediation Cost) / (Development Cost)
       let technicalDebtRatio = 0;
       if (linesOfCode > 0) {
+        // 1. Numerator: Remediation Cost
+        // This is the `totalEffortMinutes` provided directly by Qlty's analysis of
+        // structural and duplication issues.
+        const remediationCostMinutes = totalEffortMinutes;
+
+        // 2. Denominator: Development Cost
+        // As per Qlty's documentation, this is estimated using the Basic COCOMO model,
+        // which calculates development effort based on lines of code.
         const kloc = linesOfCode / 1000;
+
+        // The Basic COCOMO formula: Effort = a * (KLOC)^b
+        // For organic projects (like most startups), the standard coefficients are a=2.4 and b=1.05.
         const effortPersonMonths = 2.4 * Math.pow(kloc, 1.05);
-        const estimatedDevMinutes = effortPersonMonths * 152 * 60; // Convert to minutes
 
-        // Calculate TDR as percentage (0-1 scale)
-        technicalDebtRatio = totalEffortMinutes / estimatedDevMinutes;
+        // We convert person-months to minutes to match the numerator's units.
+        // This assumes a standard of ~152 productive hours per person-month.
+        // (40 hours/week * 4.33 weeks/month ≈ 173 hours, minus overhead)
+        const estimatedDevMinutes = effortPersonMonths * 152 * 60;
 
-        // Cap at 100% (1.0) - technical debt cannot exceed development effort
+        // 3. Final TDR Calculation
+        // The ratio of the time to fix vs. the time to build.
+        if (estimatedDevMinutes > 0) {
+          technicalDebtRatio = remediationCostMinutes / estimatedDevMinutes;
+        }
+
+        // The TDR is capped at 1.0 (100%) because the cost to fix cannot logically
+        // exceed the cost to rewrite the entire system from scratch.
         technicalDebtRatio = Math.min(technicalDebtRatio, 1.0);
 
-        // Handle edge cases
+        // Handle edge cases where calculation might result in NaN or negative values.
         if (!isFinite(technicalDebtRatio) || technicalDebtRatio < 0) {
           technicalDebtRatio = 0;
         }
