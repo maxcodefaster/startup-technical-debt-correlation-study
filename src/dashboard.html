@@ -32,6 +32,7 @@
         margin-bottom: 0.5rem;
         background: linear-gradient(135deg, #1e40af, #7c3aed);
         -webkit-background-clip: text;
+        background-clip: text;
         -webkit-text-fill-color: transparent;
         font-weight: 700;
       }
@@ -86,6 +87,7 @@
         margin-bottom: 0.5rem;
         background: linear-gradient(135deg, #1e40af, #7c3aed);
         -webkit-background-clip: text;
+        background-clip: text;
         -webkit-text-fill-color: transparent;
       }
       .metric-label {
@@ -136,6 +138,7 @@
         margin: 1rem 0;
         background: linear-gradient(135deg, #1e40af, #7c3aed);
         -webkit-background-clip: text;
+        background-clip: text;
         -webkit-text-fill-color: transparent;
       }
       .association-result {
@@ -576,7 +579,7 @@
 
       async function loadData() {
         try {
-          const response = await fetch("/api/entrepreneurship-analytics");
+          const response = await fetch("/api/analytics");
           const data = await response.json();
           render(data);
         } catch (error) {

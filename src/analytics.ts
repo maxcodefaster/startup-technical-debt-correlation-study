@@ -110,14 +110,13 @@ interface EntrepreneurshipAnalysis {
   exportDate: string;
 }
 
-// Helper function for robust statistics
 function calculateMedian(values: number[]): number {
   if (values.length === 0) return 0;
   const sorted = [...values].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
   return sorted.length % 2 !== 0
-    ? sorted[mid]
-    : (sorted[mid - 1] + sorted[mid]) / 2;
+    ? sorted[mid]! // It's good practice to add it here too
+    : (sorted[mid - 1]! + sorted[mid]!) / 2; // Fix is here
 }
 
 function removeOutliers(values: number[]): number[] {
@@ -125,6 +124,11 @@ function removeOutliers(values: number[]): number[] {
   const sorted = [...values].sort((a, b) => a - b);
   const q1 = sorted[Math.floor(sorted.length * 0.25)];
   const q3 = sorted[Math.floor(sorted.length * 0.75)];
+
+  if (q1 === undefined || q3 === undefined) {
+    return values; // Not enough data to determine outliers
+  }
+
   const iqr = q3 - q1;
   const lowerBound = q1 - 1.5 * iqr;
   const upperBound = q3 + 1.5 * iqr;
@@ -133,11 +137,12 @@ function removeOutliers(values: number[]): number[] {
 
 function calculateCorrelation(x: number[], y: number[]): number {
   const n = x.length;
-  if (n === 0) return 0;
+  if (n === 0 || y.length !== n) return 0;
+
   const meanX = x.reduce((sum, val) => sum + val, 0) / n;
   const meanY = y.reduce((sum, val) => sum + val, 0) / n;
   const numerator = x.reduce(
-    (sum, val, i) => sum + (val - meanX) * (y[i] - meanY),
+    (sum, val, i) => sum + (val - meanX) * (y[i]! - meanY),
     0
   );
   const denomX = Math.sqrt(
@@ -212,11 +217,11 @@ export async function calculateEntrepreneurshipAnalysis(): Promise<Entrepreneurs
         eq(toSnapshot.fundingRoundId, developmentVelocity.toRoundId!)
       )
     )
-    .leftJoin(companies, eq(companies.id, developmentVelocity.companyId)); // Added join to companies
+    .leftJoin(companies, eq(companies.id, developmentVelocity.companyId));
 
   const totalRecords = allVelocityData.length;
 
-  // Enhanced data preparation with quality filtering
+  // Data preparation with quality filtering
   const processedData = await Promise.all(
     allVelocityData.map(async (row) => {
       const velocity = row.velocity;
@@ -248,7 +253,7 @@ export async function calculateEntrepreneurshipAnalysis(): Promise<Entrepreneurs
 
       return {
         ...velocity,
-        marketCategory: row.company.marketCategory, // Added market category
+        marketCategory: row.company?.marketCategory ?? "Unknown",
         fromAmount,
         toAmount,
         fundingGrowthRate,
@@ -272,7 +277,9 @@ export async function calculateEntrepreneurshipAnalysis(): Promise<Entrepreneurs
 
     // Must have reasonable velocity (not zero, not extreme)
     const validVelocity =
-      d.compositeVelocity > 0 && d.compositeVelocity < 10000;
+      d.compositeVelocity !== null && // Fix: Add an explicit null check.
+      d.compositeVelocity > 0 &&
+      d.compositeVelocity < 10000;
 
     // Must have reasonable funding growth (-90% to +500%)
     const validFunding = d.fundingGrowthRate > -90 && d.fundingGrowthRate < 500;

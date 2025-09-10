@@ -11,7 +11,7 @@ export async function startDashboardServer() {
     routes: {
       "/": dashboard,
 
-      "/api/entrepreneurship-analytics": async () => {
+      "/api/analytics": async () => {
         try {
           const data = await calculateEntrepreneurshipAnalysis();
           return Response.json(data);
@@ -23,33 +23,6 @@ export async function startDashboardServer() {
           );
         }
       },
-
-      // Keep legacy endpoints for backward compatibility
-      "/api/funding-analytics": async () => {
-        try {
-          const data = await calculateEntrepreneurshipAnalysis();
-          return Response.json(data);
-        } catch (error) {
-          console.error("Analytics error:", error);
-          return Response.json(
-            { error: "Failed to calculate funding analytics" },
-            { status: 500 }
-          );
-        }
-      },
-
-      "/api/tdv-analytics": async () => {
-        try {
-          const data = await calculateEntrepreneurshipAnalysis();
-          return Response.json(data);
-        } catch (error) {
-          return Response.json(
-            { error: "Failed to calculate analytics" },
-            { status: 500 }
-          );
-        }
-      },
-
       "/api/*": () =>
         Response.json({ error: "API endpoint not found" }, { status: 404 }),
     },
@@ -65,10 +38,6 @@ export async function startDashboardServer() {
   });
 
   console.log(`✅ Entrepreneurship Analytics Dashboard: ${server.url}`);
-  console.log(
-    "📊 Analysis: Technical debt associations with venture execution"
-  );
-  console.log("🔍 Press Ctrl+C to stop");
 
   return new Promise((resolve) => {
     process.on("SIGINT", () => {
