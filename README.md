@@ -1,183 +1,58 @@
-# Startup Technical Debt Analysis
+# Master's Thesis: An Empirical Analysis of Technical Debt and Execution Speed in Venture-Backed Startups
 
-Automated analysis of technical debt in startup repositories using Qlty CLI for comprehensive code quality metrics.
+This repository contains the source code and data for the master's thesis, "Technical Debt as a Strategic Trade-Off: An Empirical Analysis of Execution Speed and Funding Success in Venture-Backed Startups."
 
-## Quick Start
+## Abstract
 
-### 1. Install Dependencies
-```bash
-bun install
-```
+This study investigates the relationship between technical debt and performance in technology startups, challenging the conventional wisdom that technical debt is universally detrimental. The core conflict for startups between the need for high-speed execution and the risk of accumulating technical debt is well-documented but lacks large-scale empirical analysis. This research addresses that gap through a novel, automated analysis of 70 open-source, venture-backed companies, examining code quality (via Technical Debt Ratio) and development speed (using a composite velocity metric) across 120 distinct inter-funding periods.
 
-### 2. Create and seed sqlite
-```bash
-bun run generate
-```
+The key finding is a weak, marginally significant negative correlation (r=−0.155, p=0.089) between technical debt and development velocity. However, the analysis reveals that development velocity is a far more significant predictor of a startup's ability to secure subsequent funding. Notably, ventures characterized by both **High Technical Debt and High Development Velocity** achieved the highest rates of funding success (69%). This suggests that, in an early-stage venture context, technical debt may be a rational strategic trade-off undertaken to achieve the speed necessary to secure market traction and investor confidence. This thesis contributes a reproducible, large-scale methodology for technical debt analysis and provides empirical evidence that reframes technical debt as a nuanced strategic instrument rather than a simple liability.
 
-### 3. Run Analysis
-```bash
-bun run start
-```
+## Research Questions
 
-The system will automatically:
-- Install Qlty CLI if not present
-- Import startup data from CSV
-- Analyze each repository at funding dates
-- Store results in SQLite database
+* **RQ1:** What is the statistical relationship between the accumulation of technical debt and development velocity in venture-backed software companies?
+* **RQ2:** How do technical debt and development velocity, individually and in combination, associate with a startup's ability to secure subsequent rounds of funding?
 
-## What It Does
+## Methodology Overview
 
-- ✅ Analyzes code at each funding round + exit date
-- ✅ Collects technical debt metrics via Qlty CLI
-- ✅ Stores results in SQLite database  
-- ✅ Handles 50+ programming languages
-- ✅ No Docker containers required - pure CLI tool
+The research employs a quantitative, longitudinal design. The analysis pipeline, detailed in the source code, automates the following process:
 
-## Key Metrics Collected
+1.  **Data Ingestion:** Company and funding data are imported from `data/startup_seed_data.csv`.
+2.  **Repository Analysis:** For each of the 70 companies, their public Git repository is cloned.
+3.  **Longitudinal Snapshotting:** The codebase is checked out at the specific date of each funding round to create a series of historical snapshots.
+4.  **Metric Calculation:**
+    * **Technical Debt Ratio (TDR):** The Qlty CLI is used to analyze each snapshot, calculating the TDR as the ratio of remediation cost (total effort in minutes) to estimated development cost (based on the Basic COCOMO model).
+    * **Development Velocity:** A composite metric is calculated for the period between each funding round, balancing code output (churn), iteration frequency (commits), and team engagement (authors).
+5.  **Statistical Analysis:** The collected data is subjected to correlation, regression, and quadrant analysis to identify statistical relationships and patterns.
 
-### Code Quality Metrics
-- **Lines of Code**: Total lines analyzed
-- **Complexity**: Cyclomatic and cognitive complexity
-- **Code Structure**: Function/class counts, nesting depth
+## How to Run the Analysis
 
-### Code Smells Detected
-- **Duplication**: Identical and similar code blocks
-- **High Complexity**: Complex functions and files
-- **Poor Structure**: Many parameters, deep nesting, multiple returns
-- **Boolean Logic**: Complex conditional statements
+This project uses `bun` as the package manager.
 
-### Quality Indicators
-- **Total Code Smells**: Aggregate count of all issues
-- **Duplication Percentage**: % of duplicated lines
-- **Average/Max Complexity**: Complexity distribution
+1.  **Install Dependencies:**
+    ```bash
+    bun install
+    ```
+2.  **Generate Database Schema:**
+    ```bash
+    bun run generate
+    ```
+3.  **Run the Complete Analysis Pipeline:**
+    ```bash
+    bun run start
+    ```
+    The script will process all companies and output the final statistical results to the console.
 
-## Commands
+4.  **View the Interactive Dashboard:**
+    ```bash
+    bun run start
+    # Then select option 2 from the menu
+    ```
+    The dashboard will be available at `http://localhost:3000`.
 
-```bash
-# Run full analysis
-bun run start
+## Thesis Contribution
 
-# Analyze specific CSV file
-bun run start companies.csv
-
-# View database in browser
-bun run studio
-
-# Generate new migrations
-bun run generate
-```
-
-## Expected Runtime
-
-- **~1-3 minutes** per repository (cloning + analysis)
-- **2-4 hours** for full dataset (74 companies)
-- **Sequential processing** for stability
-- **No external services** required
-
-## How It Works
-
-The analysis pipeline:
-
-1. **Generate Migrations** → `bun run generate` creates database schema
-2. **Apply Migrations** → Database tables created automatically on first import
-3. **Import CSV** → Parse funding data into SQLite
-4. **For Each Company:**
-   - Clone repository
-   - For each funding date + exit date:
-     - Checkout code at that date (or closest available)
-     - Initialize Qlty configuration
-     - Run code smells analysis (`qlty smells --all`)
-     - Run metrics analysis (`qlty metrics --all`)
-     - Store all metrics in database
-   - Cleanup repository
-
-## Qlty Strategy
-
-**Language Agnostic**: Qlty analyzes source code structure for:
-- ✅ JavaScript/TypeScript, Python, Go, PHP, Ruby, Java, C++, Rust
-- ✅ Works without compilation - pure AST analysis
-- ✅ Automatic language detection and configuration
-
-**Smart Fallbacks**: When exact funding dates don't have commits:
-- Uses first commit after the date
-- Falls back to first commit in repository
-- Logs which strategy was used
-
-**Auto-Installation**: Qlty CLI is automatically installed if missing:
-```bash
-curl https://qlty.sh | sh
-```
-
-## Database Schema
-
-- **companies** → Company info + exit data
-- **funding_rounds** → All funding events
-- **repository_info** → Repository characteristics per date
-- **code_snapshots** → Qlty metrics per date
-- **analysis_log** → Detailed execution logs
-
-## Key Metrics Collected
-
-### Core Metrics
-- **Lines of Code**: Total analyzed lines
-- **Complexity**: Cognitive and cyclomatic complexity  
-- **Functions/Classes**: Code structure counts
-
-### Code Smells
-- **Duplication**: Identical and similar code blocks
-- **High Complexity**: Functions and files exceeding thresholds
-- **Structure Issues**: Parameter count, nesting, returns
-- **Logic Complexity**: Boolean expressions and conditions
-
-### Quality Indicators  
-- **Total Code Smells**: Aggregate issue count
-- **Duplication %**: Percentage of duplicated code
-- **Complexity Stats**: Average, maximum complexity
-
-## Analysis Points
-
-For each company, code is analyzed at:
-- ✅ Series A date
-- ✅ Series B date (if exists)
-- ✅ All other funding rounds  
-- ✅ Exit date (if applicable)
-
-## Expected Runtime
-
-For 74 companies with ~3 funding rounds each:
-- **Repository cloning**: ~1-2 minutes per repo
-- **Qlty analysis**: ~30-90 seconds per snapshot
-- **Total estimated time**: ~2-4 hours for full dataset
-
-## Troubleshooting
-
-### ❌ "qlty: command not found"
-The system auto-installs Qlty CLI. If manual installation needed:
-```bash
-curl https://qlty.sh | sh
-```
-
-### ❌ "Permission denied" during installation
-```bash
-chmod +x ~/.local/bin/qlty
-# Or install with sudo if needed
-```
-
-### ❌ Repository clone failures
-Check internet connection and GitHub access. Private repos require authentication.
-
-## Architecture Benefits
-
-**Simplified**: No Docker containers or external services
-**Portable**: Runs on macOS, Linux, Windows
-**Reliable**: Pure CLI tool with consistent output
-**Fast**: Direct file analysis without compilation
-**Comprehensive**: 50+ languages supported
-
-## Research Focus
-
-This tool is designed for research into technical debt evolution:
-- **Longitudinal Analysis**: Track metrics over funding rounds
-- **Comparative Studies**: Compare across companies/languages
-- **Correlation Research**: Funding success vs code quality
-- **Trend Analysis**: Technical debt accumulation patterns
+This work makes three primary contributions:
+1.  **Methodological:** It introduces a novel, automated, and reproducible pipeline for the longitudinal analysis of code quality and development velocity in startup ecosystems.
+2.  **Empirical:** It provides large-scale, quantitative data to a debate on technical debt that has been largely anecdotal, offering concrete evidence on its real-world impact.
+3.  **Theoretical:** It proposes and validates a strategic framework for understanding technical debt not merely as a liability, but as a potential tool for achieving strategic goals in an entrepreneurial context.

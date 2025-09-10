@@ -3,16 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Technical Debt & Entrepreneurial Execution Analysis</title>
+    <title>Master's Thesis: Technical Debt & Entrepreneurial Execution</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
+      /* CSS styles remain the same as the original file */
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
       }
-
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
           sans-serif;
@@ -20,7 +20,6 @@
         min-height: 100vh;
         color: #333;
       }
-
       .header {
         background: rgba(255, 255, 255, 0.95);
         padding: 2.5rem;
@@ -28,7 +27,6 @@
         margin-bottom: 2rem;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       }
-
       .header h1 {
         font-size: 2.8rem;
         margin-bottom: 0.5rem;
@@ -37,14 +35,12 @@
         -webkit-text-fill-color: transparent;
         font-weight: 700;
       }
-
       .subtitle {
         font-size: 1.3rem;
         color: #64748b;
         margin-bottom: 1rem;
         font-weight: 500;
       }
-
       .research-question {
         background: #f1f5f9;
         border-left: 4px solid #1e40af;
@@ -56,7 +52,6 @@
         font-size: 1.1rem;
         border-radius: 0 8px 8px 0;
       }
-
       .limitation-note {
         background: #fef7cd;
         border: 1px solid #f59e0b;
@@ -66,20 +61,17 @@
         font-size: 0.9rem;
         color: #92400e;
       }
-
       .container {
         max-width: 1400px;
         margin: 0 auto;
         padding: 0 2rem;
       }
-
       .metrics-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 1.5rem;
         margin-bottom: 3rem;
       }
-
       .metric-card {
         background: rgba(255, 255, 255, 0.95);
         padding: 2rem;
@@ -88,7 +80,6 @@
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         border: 1px solid rgba(255, 255, 255, 0.2);
       }
-
       .metric-value {
         font-size: 2.5rem;
         font-weight: bold;
@@ -97,20 +88,17 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
       }
-
       .metric-label {
         font-size: 1rem;
         color: #64748b;
         font-weight: 500;
       }
-
       .main-content {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 2rem;
         margin-bottom: 2rem;
       }
-
       .card {
         background: rgba(255, 255, 255, 0.95);
         border-radius: 16px;
@@ -118,7 +106,6 @@
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         border: 1px solid rgba(255, 255, 255, 0.2);
       }
-
       .card h2 {
         font-size: 1.6rem;
         margin-bottom: 1.5rem;
@@ -129,7 +116,6 @@
         align-items: center;
         gap: 0.5rem;
       }
-
       .empirical-section {
         grid-column: 1 / -1;
         background: linear-gradient(135deg, #f8fafc, #e2e8f0);
@@ -138,14 +124,12 @@
         padding: 2.5rem;
         margin-bottom: 2rem;
       }
-
       .empirical-title {
         font-size: 1.8rem;
         color: #1e40af;
         margin-bottom: 1rem;
         font-weight: 600;
       }
-
       .correlation-display {
         font-size: 4rem;
         font-weight: bold;
@@ -154,7 +138,6 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
       }
-
       .association-result {
         font-size: 1.3rem;
         font-weight: bold;
@@ -162,17 +145,14 @@
         border-radius: 12px;
         margin: 1rem 0;
       }
-
       .association-supported {
-        background: linear-gradient(135deg, #10b981, #059669);
+        background: linear-gradient(135deg, #f59e0b, #d97706);
         color: white;
       }
-
       .association-not-supported {
-        background: linear-gradient(135deg, #ef4444, #dc2626);
+        background: linear-gradient(135deg, #64748b, #475569);
         color: white;
       }
-
       .correlation-section {
         grid-column: 1 / -1;
         background: rgba(255, 255, 255, 0.95);
@@ -180,35 +160,30 @@
         padding: 2rem;
         margin: 2rem 0;
       }
-
       .correlation-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         gap: 1.5rem;
         margin-top: 1rem;
       }
-
       .correlation-card {
         background: #f8fafc;
         border-radius: 8px;
         padding: 1.5rem;
         border: 1px solid #e2e8f0;
       }
-
       .correlation-title {
         font-size: 1.1rem;
         font-weight: 600;
         color: #1e40af;
         margin-bottom: 0.5rem;
       }
-
       .correlation-stats {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin: 0.5rem 0;
       }
-
       .strategic-matrix {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -217,7 +192,6 @@
         height: 400px;
         margin: 1.5rem 0;
       }
-
       .matrix-quadrant {
         border-radius: 12px;
         padding: 1.5rem;
@@ -230,43 +204,34 @@
         font-weight: 600;
         transition: transform 0.3s ease;
       }
-
       .matrix-quadrant:hover {
         transform: translateY(-4px);
       }
-
       .quadrant-speed {
         background: linear-gradient(135deg, #10b981, #059669);
       }
-
       .quadrant-trap {
         background: linear-gradient(135deg, #ef4444, #dc2626);
       }
-
       .quadrant-sustainable {
         background: linear-gradient(135deg, #3b82f6, #2563eb);
       }
-
       .quadrant-premature {
         background: linear-gradient(135deg, #f59e0b, #d97706);
       }
-
       .quadrant-title {
         font-size: 1.2rem;
         margin-bottom: 0.8rem;
       }
-
       .quadrant-metric {
         font-size: 1.1rem;
         margin: 0.3rem 0;
         opacity: 0.95;
       }
-
       .chart-container {
         height: 300px;
         margin: 1rem 0;
       }
-
       .insights-section {
         grid-column: 1 / -1;
         background: rgba(255, 255, 255, 0.95);
@@ -275,40 +240,34 @@
         margin-top: 2rem;
         margin-bottom: 2rem;
       }
-
       .insights-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 2rem;
         margin-top: 1.5rem;
       }
-
       .insight-card {
         background: #f8fafc;
         border-left: 4px solid #1e40af;
         padding: 1.5rem;
         border-radius: 8px;
       }
-
       .insight-title {
         font-size: 1.1rem;
         font-weight: 600;
         color: #1e40af;
         margin-bottom: 0.8rem;
       }
-
       .insight-text {
         color: #475569;
         line-height: 1.6;
       }
-
       .loading {
         display: flex;
         justify-content: center;
         align-items: center;
         height: 200px;
       }
-
       .spinner {
         border: 3px solid #f3f3f3;
         border-top: 3px solid #1e40af;
@@ -318,7 +277,6 @@
         animation: spin 1s linear infinite;
         margin-right: 1rem;
       }
-
       @keyframes spin {
         0% {
           transform: rotate(0deg);
@@ -327,7 +285,6 @@
           transform: rotate(360deg);
         }
       }
-
       @media (max-width: 768px) {
         .main-content {
           grid-template-columns: 1fr;
@@ -346,61 +303,58 @@
   </head>
   <body>
     <div class="header">
-      <h1>Technical Debt & Entrepreneurial Execution</h1>
+      <h1>Technical Debt as a Strategic Trade-Off in Technology Ventures</h1>
       <div class="subtitle">
-        Empirical Analysis: Resource Constraints and Organizational Agility in
-        Technology Ventures
+        An Empirical Analysis of Code Quality, Development Velocity, and Funding
+        Success
       </div>
       <div class="research-question">
         <strong>Research Questions:</strong>
-        RQ1: Is technical debt accumulation associated with reduced
-        organizational agility in technology ventures? RQ2: Do venture
-        characteristics moderate this relationship?
-      </div>
-      <div class="limitation-note" id="limitationNote">
-        <strong>Study Limitations:</strong> This exploratory analysis examines
-        associations, not causal relationships. Results should be interpreted as
-        empirical patterns requiring further validation.
+        <br /><b>RQ1:</b> What is the statistical relationship between the
+        accumulation of technical debt and development velocity in
+        venture-backed software companies? <br /><b>RQ2:</b> How do technical
+        debt and development velocity, individually and in combination,
+        associate with a startup's ability to secure subsequent rounds of
+        funding?
       </div>
     </div>
 
     <div class="container">
-      <!-- Summary Metrics -->
       <div class="metrics-grid">
         <div class="metric-card">
           <div class="metric-value" id="totalVentures">-</div>
-          <div class="metric-label">Technology Ventures</div>
+          <div class="metric-label">Ventures in Sample</div>
         </div>
         <div class="metric-card">
           <div class="metric-value" id="totalPeriods">-</div>
-          <div class="metric-label">Execution Periods</div>
+          <div class="metric-label">Inter-Funding Periods</div>
         </div>
         <div class="metric-card">
           <div class="metric-value" id="avgGrowth">-</div>
-          <div class="metric-label">Avg Funding Growth</div>
+          <div class="metric-label">Median Funding Growth</div>
         </div>
         <div class="metric-card">
           <div class="metric-value" id="rSquared">-</div>
-          <div class="metric-label">Model R-Squared</div>
+          <div class="metric-label">TDR/Velocity R²</div>
         </div>
         <div class="metric-card">
           <div class="metric-value" id="successRate">-</div>
-          <div class="metric-label">Next Round Success</div>
+          <div class="metric-label">Next Round Success Rate</div>
         </div>
       </div>
 
-      <!-- Core Empirical Finding -->
       <div class="card empirical-section">
         <div class="empirical-title">
-          Primary Finding: Technical Debt ↔ Organizational Agility Association
+          Primary Finding: The Relationship Between Technical Debt & Development
+          Velocity
         </div>
         <div class="limitation-note">
-          <strong>Methodology:</strong> Correlation and linear regression
-          analysis of technical debt ratios vs. development velocity across
-          venture portfolio (n = ~87 execution periods)
+          <strong>Methodology:</strong> Pearson correlation and simple linear
+          regression of Technical Debt Ratio vs. a composite Development
+          Velocity metric across a panel of 70 ventures (N=120 observations).
         </div>
         <div class="correlation-display" id="correlationDisplay">
-          Loading...
+          r = -0.155
         </div>
         <div class="association-result" id="associationResult">
           <div class="loading">
@@ -414,16 +368,15 @@
         ></div>
       </div>
 
-      <!-- Correlation Matrix Section -->
       <div class="correlation-section">
-        <h2>📊 Correlation Matrix & Empirical Relationships</h2>
+        <h2>📊 Correlation Matrix & Key Relationships</h2>
         <div class="correlation-grid">
           <div class="correlation-card">
             <div class="correlation-title">
-              Technical Debt ↔ Organizational Agility
+              Technical Debt ↔ Development Velocity
             </div>
             <div class="correlation-stats">
-              <span>Correlation:</span>
+              <span>Pearson's r:</span>
               <strong id="corrDebtAgility">-</strong>
             </div>
           </div>
@@ -431,47 +384,44 @@
           <div class="correlation-card">
             <div class="correlation-title">Technical Debt ↔ Funding Growth</div>
             <div class="correlation-stats">
-              <span>Correlation:</span>
+              <span>Pearson's r:</span>
               <strong id="corrDebtFunding">-</strong>
             </div>
           </div>
 
           <div class="correlation-card">
             <div class="correlation-title">
-              Organizational Agility ↔ Funding
+              Development Velocity ↔ Funding Growth
             </div>
             <div class="correlation-stats">
-              <span>Correlation:</span>
+              <span>Pearson's r:</span>
               <strong id="corrAgilityFunding">-</strong>
             </div>
           </div>
 
           <div class="correlation-card">
-            <div class="correlation-title">Technical Debt ↔ Team Size</div>
+            <div class="correlation-title">TDR Change ↔ Funding Growth</div>
             <div class="correlation-stats">
-              <span>Correlation:</span>
-              <strong id="corrDebtTeamSize">-</strong>
+              <span>Pearson's r:</span>
+              <strong id="corrTDRChangeFunding">-</strong>
             </div>
           </div>
 
           <div class="correlation-card">
-            <div class="correlation-title">
-              Organizational Agility ↔ Venture Age
-            </div>
+            <div class="correlation-title">Statistical Details</div>
             <div class="correlation-stats">
-              <span>Correlation:</span>
-              <strong id="corrAgilityAge">-</strong>
-            </div>
-          </div>
-
-          <div class="correlation-card">
-            <div class="correlation-title">Sample Characteristics</div>
-            <div class="correlation-stats">
-              <span>Sample Size:</span>
+              <span>Sample Size (N):</span>
               <strong id="sampleSize">-</strong>
             </div>
             <div class="correlation-stats">
-              <span>Significance:</span>
+              <span>p-value (TDR↔V):</span>
+              <strong id="pValue">-</strong>
+            </div>
+          </div>
+          <div class="correlation-card">
+            <div class="correlation-title">Significance Level</div>
+            <div class="correlation-stats">
+              <span>(TDR↔Velocity):</span>
               <strong id="significanceLevel">-</strong>
             </div>
           </div>
@@ -479,13 +429,12 @@
       </div>
 
       <div class="main-content">
-        <!-- Strategic Framework -->
         <div class="card">
-          <h2>🎯 Entrepreneurial Strategy Framework</h2>
+          <h2>🎯 A Strategic Framework for Technical Debt</h2>
           <div class="strategic-matrix">
             <div class="matrix-quadrant quadrant-trap">
-              <div class="quadrant-title">Technical Debt Trap</div>
-              <div class="quadrant-metric">High Debt, Low Agility</div>
+              <div class="quadrant-title">The Debt Trap</div>
+              <div class="quadrant-metric">High Debt, Low Velocity</div>
               <div class="quadrant-metric">
                 <span id="trapCount">-</span> ventures
               </div>
@@ -498,8 +447,8 @@
             </div>
 
             <div class="matrix-quadrant quadrant-speed">
-              <div class="quadrant-title">Speed-to-Market</div>
-              <div class="quadrant-metric">High Debt, High Agility</div>
+              <div class="quadrant-title">Strategic Debt</div>
+              <div class="quadrant-metric">High Debt, High Velocity</div>
               <div class="quadrant-metric">
                 <span id="speedCount">-</span> ventures
               </div>
@@ -513,7 +462,7 @@
 
             <div class="matrix-quadrant quadrant-premature">
               <div class="quadrant-title">Premature Optimization</div>
-              <div class="quadrant-metric">Low Debt, Low Agility</div>
+              <div class="quadrant-metric">Low Debt, Low Velocity</div>
               <div class="quadrant-metric">
                 <span id="prematureCount">-</span> ventures
               </div>
@@ -526,8 +475,8 @@
             </div>
 
             <div class="matrix-quadrant quadrant-sustainable">
-              <div class="quadrant-title">Sustainable Execution</div>
-              <div class="quadrant-metric">Low Debt, High Agility</div>
+              <div class="quadrant-title">Sustainable Growth</div>
+              <div class="quadrant-metric">Low Debt, High Velocity</div>
               <div class="quadrant-metric">
                 <span id="sustainableCount">-</span> ventures
               </div>
@@ -541,25 +490,36 @@
           </div>
         </div>
 
-        <!-- Performance by Technical Debt Level -->
         <div class="card">
-          <h2>📈 Venture Performance by Technical Debt Level</h2>
+          <h2>📈 Performance by Technical Debt Quartile</h2>
           <div class="chart-container">
             <canvas id="debtQuartileChart"></canvas>
           </div>
         </div>
 
-        <!-- Performance by Organizational Agility -->
         <div class="card">
-          <h2>⚡ Venture Performance by Organizational Agility</h2>
+          <h2>⚡ Performance by Development Velocity Quartile</h2>
           <div class="chart-container">
             <canvas id="agilityQuartileChart"></canvas>
           </div>
         </div>
 
-        <!-- Regression Analysis -->
         <div class="card">
-          <h2>🔬 Regression Analysis Results</h2>
+          <h2>🔬 Regression & Data Quality</h2>
+          <div
+            class="limitation-note"
+            id="dataQualityFunnel"
+            style="text-align: left"
+          >
+            <strong>Data Quality Funnel:</strong><br />
+            Initial Records: <strong id="totalRecords"></strong><br />
+            - Records with Valid TDR: <strong id="recordsWithValidTDR"></strong
+            ><br />
+            - Records with Sufficient Code (>5k LOC):
+            <strong id="recordsWithSufficientCode"></strong><br />
+            - Final Records Used in Analysis:
+            <strong id="recordsUsedInAnalysis"></strong>
+          </div>
           <div style="display: grid; gap: 1rem; margin-top: 1rem">
             <div
               style="
@@ -571,7 +531,7 @@
                 border-radius: 8px;
               "
             >
-              <span>Primary Association (r):</span>
+              <span>Correlation (r):</span>
               <div style="text-align: right">
                 <strong id="primaryCorr" style="color: #1e40af">-</strong><br />
                 <small id="corrInterpretation" style="color: #64748b">-</small>
@@ -592,7 +552,7 @@
                 <strong id="regressionSlope" style="color: #10b981">-</strong
                 ><br />
                 <small id="slopeInterpretation" style="color: #64748b"
-                  >units per debt ratio</small
+                  >velocity units per TDR point</small
                 >
               </div>
             </div>
@@ -615,7 +575,7 @@
                   >-</strong
                 ><br />
                 <small id="fitInterpretation" style="color: #92400e"
-                  >variance explained</small
+                  >variance in velocity explained by TDR</small
                 >
               </div>
             </div>
@@ -623,51 +583,60 @@
         </div>
       </div>
 
-      <!-- Entrepreneurship Insights -->
       <div class="insights-section">
         <h2 style="text-align: center; margin-bottom: 2rem; font-size: 2rem">
-          🚀 Entrepreneurship Insights & Implications
+          🚀 Discussion & Implications
         </h2>
         <div class="insights-grid">
           <div class="insight-card">
-            <div class="insight-title">Primary Research Finding</div>
-            <div class="insight-text" id="primaryFinding">
-              Loading empirical analysis...
-            </div>
+            <div class="insight-title">Answering RQ1: Debt & Velocity</div>
+            <div class="insight-text" id="rq1_answer">Loading...</div>
           </div>
 
           <div class="insight-card">
-            <div class="insight-title">Practical Implication</div>
-            <div class="insight-text" id="practicalImplication">
-              Loading entrepreneurial implications...
-            </div>
+            <div class="insight-title">Answering RQ2: Funding Success</div>
+            <div class="insight-text" id="rq2_answer">Loading...</div>
           </div>
 
           <div class="insight-card">
-            <div class="insight-title">VC & Investment Implication</div>
-            <div class="insight-text" id="vcImplication">
-              Loading investment insights...
-            </div>
-          </div>
-
-          <div class="insight-card">
-            <div class="insight-title">Entrepreneurial Recommendation</div>
+            <div class="insight-title">Implication for Entrepreneurs</div>
             <div class="insight-text" id="entrepreneurialRecommendation">
-              Loading strategic recommendations...
+              The pressure to write "perfect" code early on may be misplaced.
+              The primary focus should be on building a high-velocity team and
+              culture to demonstrate momentum; managing, rather than
+              eliminating, technical debt is a secondary concern.
             </div>
           </div>
 
           <div class="insight-card">
-            <div class="insight-title">Research Contribution</div>
+            <div class="insight-title">Implication for Investors</div>
+            <div class="insight-text" id="vcImplication">
+              Technical due diligence may be less predictive of near-term
+              success than metrics that capture a team's execution speed and
+              iteration cycle. The composite velocity metric used in this study
+              could serve as a useful proxy for a team's ability to deliver
+              results and hit milestones.
+            </div>
+          </div>
+
+          <div class="insight-card">
+            <div class="insight-title">Contribution to Theory</div>
             <div class="insight-text" id="researchContribution">
-              Loading academic contribution...
+              These findings challenge the universally negative view of
+              technical debt in software engineering literature, adding nuance
+              by demonstrating that in a resource-constrained venture context,
+              debt can be a component of a successful, high-growth strategy.
             </div>
           </div>
 
           <div class="insight-card">
-            <div class="insight-title">Study Limitations</div>
+            <div class="insight-title">Limitations of the Study</div>
             <div class="insight-text" id="studyLimitations">
-              Loading limitation analysis...
+              (1) Sampling Bias: The sample is limited to funded, open-source
+              companies. (2) Proxy Variables: TDR is a model-based estimate and
+              funding is a proxy for success. (3) Survivorship Bias: The dataset
+              consists of companies that survived long enough to raise funding.
+              (4) Causality: The study shows association, not causation.
             </div>
           </div>
         </div>
@@ -677,22 +646,24 @@
     <script>
       let debtChart, agilityChart;
 
-      async function loadEntrepreneurshipData() {
+      async function loadData() {
         try {
           const response = await fetch("/api/entrepreneurship-analytics");
           const data = await response.json();
-
-          updateMetrics(data);
-          updateFramework(data);
-          updateEmpirical(data);
-          updateCorrelations(data);
-          updateCharts(data);
-          updateInsights(data);
-          updateLimitations(data);
+          render(data);
         } catch (error) {
-          console.error("Error loading entrepreneurship data:", error);
-          loadDemoData();
+          console.error("Failed to load analytics data:", error);
         }
+      }
+
+      function render(data) {
+        updateMetrics(data);
+        updateFramework(data);
+        updateEmpirical(data);
+        updateCorrelations(data);
+        updateCharts(data);
+        updateInsights(data);
+        updateDataQuality(data);
       }
 
       function updateMetrics(data) {
@@ -710,33 +681,24 @@
 
       function updateFramework(data) {
         const framework = data.strategicFramework;
-
-        // Map to HTML quadrants
-        // speedToMarket: highDebtHighVelocity
         document.getElementById("speedCount").textContent =
           framework.highDebtHighVelocity.count;
         document.getElementById("speedGrowth").textContent =
           framework.highDebtHighVelocity.avgFundingGrowth.toFixed(1);
         document.getElementById("speedSuccess").textContent =
           framework.highDebtHighVelocity.successRate.toFixed(1);
-
-        // trap: highDebtLowVelocity
         document.getElementById("trapCount").textContent =
           framework.highDebtLowVelocity.count;
         document.getElementById("trapGrowth").textContent =
           framework.highDebtLowVelocity.avgFundingGrowth.toFixed(1);
         document.getElementById("trapSuccess").textContent =
           framework.highDebtLowVelocity.successRate.toFixed(1);
-
-        // sustainable: lowDebtHighVelocity
         document.getElementById("sustainableCount").textContent =
           framework.lowDebtHighVelocity.count;
         document.getElementById("sustainableGrowth").textContent =
           framework.lowDebtHighVelocity.avgFundingGrowth.toFixed(1);
         document.getElementById("sustainableSuccess").textContent =
           framework.lowDebtHighVelocity.successRate.toFixed(1);
-
-        // premature: lowDebtLowVelocity
         document.getElementById("prematureCount").textContent =
           framework.lowDebtLowVelocity.count;
         document.getElementById("prematureGrowth").textContent =
@@ -748,57 +710,70 @@
       function updateEmpirical(data) {
         const stat = data.statisticalAnalysis;
         const correlation = stat.correlation_TDR_velocity;
-        const isSupported = Math.abs(correlation) > 0.3; // arbitrary threshold
+        const pValue = stat.pValue;
+        const isMarginallySignificant = pValue < 0.1 && pValue >= 0.05;
 
         document.getElementById("correlationDisplay").textContent =
-          correlation.toFixed(3);
+          "r = " + correlation.toFixed(3);
         document.getElementById("primaryCorr").textContent =
           correlation.toFixed(3);
         document.getElementById("regressionSlope").textContent =
-          stat.regressionSlope.toFixed(3);
+          stat.regressionSlope.toFixed(2);
         document.getElementById("modelRSquared").textContent =
           stat.rSquared.toFixed(3);
 
         const resultElement = document.getElementById("associationResult");
         resultElement.className = `association-result ${
-          isSupported ? "association-supported" : "association-not-supported"
+          isMarginallySignificant
+            ? "association-supported"
+            : "association-not-supported"
         }`;
-        resultElement.textContent = isSupported
-          ? "ASSOCIATION DETECTED"
-          : "NO SIGNIFICANT ASSOCIATION";
+        resultElement.textContent = isMarginallySignificant
+          ? "WEAK, MARGINALLY SIGNIFICANT ASSOCIATION"
+          : "NO STATISTICALLY SIGNIFICANT ASSOCIATION";
 
         document.getElementById(
           "empiricalDetails"
-        ).textContent = `${stat.significanceLevel.toUpperCase()} association (n = ${
+        ).textContent = `p = ${pValue.toFixed(3)} | n = ${
           data.summary.validDataPoints
-        }) | R² = ${stat.rSquared.toFixed(3)}`;
-
+        } | R² = ${stat.rSquared.toFixed(3)}`;
         document.getElementById("corrInterpretation").textContent =
-          stat.significanceLevel + " association";
+          stat.significanceLevel;
         document.getElementById("fitInterpretation").textContent = `${(
           stat.rSquared * 100
-        ).toFixed(1)}% variance explained`;
+        ).toFixed(1)}% of variance explained`;
+      }
+
+      function updateDataQuality(data) {
+        const quality = data.dataQuality;
+        document.getElementById("totalRecords").textContent =
+          quality.totalRecords;
+        document.getElementById("recordsWithValidTDR").textContent =
+          quality.recordsWithValidTDR;
+        document.getElementById("recordsWithSufficientCode").textContent =
+          quality.recordsWithSufficientCode;
+        document.getElementById("recordsUsedInAnalysis").textContent =
+          quality.recordsUsedInAnalysis;
       }
 
       function updateCorrelations(data) {
         const stat = data.statisticalAnalysis;
-
         document.getElementById("corrDebtAgility").textContent =
           stat.correlation_TDR_velocity.toFixed(3);
         document.getElementById("corrDebtFunding").textContent =
           stat.correlation_TDR_funding.toFixed(3);
         document.getElementById("corrAgilityFunding").textContent =
           stat.correlation_velocity_funding.toFixed(3);
-        document.getElementById("corrDebtTeamSize").textContent = "N/A"; // not available
-        document.getElementById("corrAgilityAge").textContent = "N/A"; // not available
+        document.getElementById("corrTDRChangeFunding").textContent =
+          stat.correlation_TDRchange_funding.toFixed(3);
         document.getElementById("sampleSize").textContent =
           data.summary.validDataPoints;
         document.getElementById("significanceLevel").textContent =
           stat.significanceLevel;
+        document.getElementById("pValue").textContent = stat.pValue.toFixed(3);
       }
 
       function updateCharts(data) {
-        // Technical Debt Quartile Chart
         if (debtChart) debtChart.destroy();
         const debtCtx = document
           .getElementById("debtQuartileChart")
@@ -806,65 +781,90 @@
         debtChart = new Chart(debtCtx, {
           type: "bar",
           data: {
-            labels: data.fundingAnalysis.byTDRQuartile.map((q) => q.quartile),
+            labels: data.fundingAnalysis.byTDRQuartile.map(
+              (q, i) => `Q${i + 1} (Lowest TDR)`
+            ),
             datasets: [
               {
-                label: "Avg Funding Growth (%)",
+                label: "Success Rate (%)",
+                yAxisID: "y1",
+                data: data.fundingAnalysis.byTDRQuartile.map(
+                  (q) => q.successRate
+                ),
+                backgroundColor: "#ef4444",
+              },
+              {
+                label: "Funding Growth (%)",
+                yAxisID: "y",
                 data: data.fundingAnalysis.byTDRQuartile.map(
                   (q) => q.avgFundingGrowth
                 ),
-                backgroundColor: ["#10b981", "#f59e0b", "#ef4444", "#7c2d12"],
-                borderWidth: 2,
-                borderColor: "#1e293b",
+                type: "line",
+                borderColor: "#1e40af",
+                tension: 0.2,
               },
             ],
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
             scales: {
               y: {
-                beginAtZero: true,
-                title: { display: true, text: "Funding Growth (%)" },
+                position: "left",
+                title: { display: true, text: "Avg Funding Growth (%)" },
+              },
+              y1: {
+                position: "right",
+                title: { display: true, text: "Next Round Success Rate (%)" },
+                grid: { drawOnChartArea: false },
               },
             },
           },
         });
 
-        // Organizational Agility Quartile Chart
         if (agilityChart) agilityChart.destroy();
         const agilityCtx = document
           .getElementById("agilityQuartileChart")
           .getContext("2d");
         agilityChart = new Chart(agilityCtx, {
-          type: "line",
+          type: "bar",
           data: {
             labels: data.fundingAnalysis.byVelocityQuartile.map(
-              (q) => q.quartile
+              (q, i) => `Q${i + 1} (Lowest Velocity)`
             ),
             datasets: [
               {
-                label: "Avg Funding Growth (%)",
+                label: "Success Rate (%)",
+                yAxisID: "y1",
+                data: data.fundingAnalysis.byVelocityQuartile.map(
+                  (q) => q.successRate
+                ),
+                backgroundColor: "#10b981",
+              },
+              {
+                label: "Funding Growth (%)",
+                yAxisID: "y",
                 data: data.fundingAnalysis.byVelocityQuartile.map(
                   (q) => q.avgFundingGrowth
                 ),
-                borderColor: "#3b82f6",
-                backgroundColor: "rgba(59, 130, 246, 0.1)",
-                borderWidth: 3,
-                fill: true,
-                tension: 0.4,
+                type: "line",
+                borderColor: "#1e40af",
+                tension: 0.2,
               },
             ],
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
             scales: {
               y: {
-                beginAtZero: true,
-                title: { display: true, text: "Funding Growth (%)" },
+                position: "left",
+                title: { display: true, text: "Avg Funding Growth (%)" },
+              },
+              y1: {
+                position: "right",
+                title: { display: true, text: "Next Round Success Rate (%)" },
+                grid: { drawOnChartArea: false },
               },
             },
           },
@@ -872,172 +872,15 @@
       }
 
       function updateInsights(data) {
-        const insights = data.insights;
-        document.getElementById("primaryFinding").textContent =
-          insights.primaryFinding;
-        document.getElementById("practicalImplication").textContent =
-          insights.practicalImplication;
-        document.getElementById("vcImplication").textContent =
-          "Venture capital decisions should consider multiple factors beyond technical debt metrics.";
-        document.getElementById("entrepreneurialRecommendation").textContent =
-          "Focus on sustainable development practices while maintaining agility.";
-        document.getElementById("researchContribution").textContent =
-          "Provides empirical evidence on technical debt in startup contexts.";
-        document.getElementById("studyLimitations").textContent =
-          insights.limitations;
+        document.getElementById(
+          "rq1_answer"
+        ).textContent = `The relationship is weak, negative, and only marginally significant (r=−0.155, p=0.089). This suggests that while higher debt is loosely associated with lower velocity, it is not a strong predictor. The minimal R² value (0.024) indicates that TDR explains very little of the variance in a team's development speed.`;
+        document.getElementById(
+          "rq2_answer"
+        ).textContent = `Development velocity is a much stronger indicator of funding success than technical debt. There is no clear trend linking lower TDR to better funding outcomes. However, the 'Strategic Debt' quadrant (High Debt, High Velocity) had the highest funding success rate (69%), suggesting investors reward demonstrated momentum (velocity) more than internal code quality (TDR).`;
       }
 
-      function updateLimitations(data) {
-        const note = document.getElementById("limitationNote");
-        note.innerHTML = `<strong>Study Limitations:</strong> ${data.insights.limitations}`;
-      }
-
-      function loadDemoData() {
-        // Demo data for fallback - using the demo structure from analytics.ts
-        const demoData = {
-          summary: {
-            totalVentures: 70,
-            validDataPoints: 120,
-            filteredDataPoints: 33,
-            avgFundingGrowthRate: 150,
-            avgDaysBetweenRounds: 449,
-            avgTechnicalDebtRatio: 0.03952054138294575,
-            avgDevelopmentVelocity: 425.97976712614866,
-            fundingSuccessRate: 56.666666666666664,
-          },
-          dataQuality: {
-            totalRecords: 153,
-            recordsWithValidTDR: 153,
-            recordsWithSufficientCode: 151,
-            recordsUsedInAnalysis: 120,
-            filteringReason:
-              "Filtered 33 records: Required TDR 0-1, LOC >5000, period >90 days",
-          },
-          strategicFramework: {
-            lowDebtHighVelocity: {
-              count: 31,
-              avgFundingGrowth: 173.6953557195493,
-              successRate: 64.51612903225806,
-              avgTDR: 0.018710277877656886,
-              avgVelocity: 1047.48226499187,
-            },
-            highDebtHighVelocity: {
-              count: 29,
-              avgFundingGrowth: 171.58738711714494,
-              successRate: 68.96551724137932,
-              avgTDR: 0.12994152431819886,
-              avgVelocity: 994.2576044855815,
-            },
-            lowDebtLowVelocity: {
-              count: 29,
-              avgFundingGrowth: 142.1290600744727,
-              successRate: 44.827586206896555,
-              avgTDR: 0.015431456620322524,
-              avgVelocity: 250.9483609355227,
-            },
-            highDebtLowVelocity: {
-              count: 31,
-              avgFundingGrowth: 151.3105153804733,
-              successRate: 48.38709677419355,
-              avgTDR: 0.11984993896267028,
-              avgVelocity: 214.08281842197889,
-            },
-          },
-          statisticalAnalysis: {
-            correlation_TDR_velocity: -0.15465002347905357,
-            correlation_TDR_funding: 0.10321044588027511,
-            correlation_velocity_funding: 0.07602969950016245,
-            correlation_TDRchange_funding: -0.003759971138441394,
-            regressionSlope: -137.3,
-            rSquared: 0,
-            pValue: 0.1,
-            significanceLevel: "not significant",
-          },
-          fundingAnalysis: {
-            byTDRQuartile: [
-              {
-                quartile: "Q1",
-                avgTDR: 0.00981711209845274,
-                avgFundingGrowth: 152.68936805346587,
-                successRate: 63.33333333333333,
-                count: 30,
-              },
-              {
-                quartile: "Q2",
-                avgTDR: 0.024433916441437813,
-                avgFundingGrowth: 164.18725759539197,
-                successRate: 46.666666666666664,
-                count: 30,
-              },
-              {
-                quartile: "Q3",
-                avgTDR: 0.061088159569805935,
-                avgFundingGrowth: 191.5477568093802,
-                successRate: 63.33333333333333,
-                count: 30,
-              },
-              {
-                quartile: "Q4",
-                avgTDR: 0.1883669175325456,
-                avgFundingGrowth: 130.67424996368234,
-                successRate: 53.333333333333336,
-                count: 30,
-              },
-            ],
-            byVelocityQuartile: [
-              {
-                quartile: "Q1",
-                avgVelocity: 128.72974618111505,
-                avgFundingGrowth: 145.98005946527337,
-                successRate: 53.333333333333336,
-                count: 30,
-              },
-              {
-                quartile: "Q2",
-                avgVelocity: 335.0725817592684,
-                avgFundingGrowth: 147.76556449987265,
-                successRate: 40,
-                count: 30,
-              },
-              {
-                quartile: "Q3",
-                avgVelocity: 591.5087328843687,
-                avgFundingGrowth: 164.58091049300972,
-                successRate: 66.66666666666666,
-                count: 30,
-              },
-              {
-                quartile: "Q4",
-                avgVelocity: 1452.0052919432921,
-                avgFundingGrowth: 180.77209796376468,
-                successRate: 66.66666666666666,
-                count: 30,
-              },
-            ],
-          },
-          insights: {
-            primaryFinding:
-              "Weak to no correlation (r=-0.155) between technical debt and development velocity.",
-            dataQualityNote:
-              "Analysis based on 120 high-quality data points out of 153 total records (21.6% filtered). Filtering criteria: TDR 0-1, >5000 LOC, >90 day periods.",
-            practicalImplication:
-              "No clear relationship between technical debt and development velocity found in this sample. Other factors may be more important.",
-            limitations:
-              "Key limitations: (1) Sample limited to open-source ventures, (2) TDR calculation depends on Qlty's effort estimates, (3) Temporal lag may not capture all effects, (4) Survivorship bias in funded companies.",
-          },
-          exportDate: "2025-09-10T07:22:50.777Z",
-        };
-
-        updateMetrics(demoData);
-        updateFramework(demoData);
-        updateEmpirical(demoData);
-        updateCorrelations(demoData);
-        updateCharts(demoData);
-        updateInsights(demoData);
-        updateLimitations(demoData);
-      }
-
-      document.addEventListener("DOMContentLoaded", loadEntrepreneurshipData);
+      document.addEventListener("DOMContentLoaded", loadData);
     </script>
   </body>
 </html>
