@@ -115,8 +115,8 @@ function calculateMedian(values: number[]): number {
   const sorted = [...values].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
   return sorted.length % 2 !== 0
-    ? sorted[mid]! // It's good practice to add it here too
-    : (sorted[mid - 1]! + sorted[mid]!) / 2; // Fix is here
+    ? sorted[mid]!
+    : (sorted[mid - 1]! + sorted[mid]!) / 2;
 }
 
 function removeOutliers(values: number[]): number[] {
