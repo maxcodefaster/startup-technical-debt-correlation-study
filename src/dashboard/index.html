@@ -357,7 +357,7 @@
         organizational agility in technology ventures? RQ2: Do venture
         characteristics moderate this relationship?
       </div>
-      <div class="limitation-note">
+      <div class="limitation-note" id="limitationNote">
         <strong>Study Limitations:</strong> This exploratory analysis examines
         associations, not causal relationships. Results should be interpreted as
         empirical patterns requiring further validation.
@@ -688,6 +688,7 @@
           updateCorrelations(data);
           updateCharts(data);
           updateInsights(data);
+          updateLimitations(data);
         } catch (error) {
           console.error("Error loading entrepreneurship data:", error);
           loadDemoData();
@@ -698,60 +699,65 @@
         document.getElementById("totalVentures").textContent =
           data.summary.totalVentures;
         document.getElementById("totalPeriods").textContent =
-          data.summary.totalExecutionPeriods;
+          data.summary.validDataPoints;
         document.getElementById("avgGrowth").textContent =
           data.summary.avgFundingGrowthRate.toFixed(1) + "%";
         document.getElementById("rSquared").textContent =
-          data.empiricalFindings.rSquared.toFixed(3);
+          data.statisticalAnalysis.rSquared.toFixed(3);
         document.getElementById("successRate").textContent =
-          data.summary.executionSuccessRate.toFixed(1) + "%";
+          data.summary.fundingSuccessRate.toFixed(1) + "%";
       }
 
       function updateFramework(data) {
         const framework = data.strategicFramework;
 
+        // Map to HTML quadrants
+        // speedToMarket: highDebtHighVelocity
         document.getElementById("speedCount").textContent =
-          framework.speedToMarket.count;
+          framework.highDebtHighVelocity.count;
         document.getElementById("speedGrowth").textContent =
-          framework.speedToMarket.avgFundingGrowth.toFixed(1);
+          framework.highDebtHighVelocity.avgFundingGrowth.toFixed(1);
         document.getElementById("speedSuccess").textContent =
-          framework.speedToMarket.successRate.toFixed(1);
+          framework.highDebtHighVelocity.successRate.toFixed(1);
 
+        // trap: highDebtLowVelocity
         document.getElementById("trapCount").textContent =
-          framework.technicalDebtTrap.count;
+          framework.highDebtLowVelocity.count;
         document.getElementById("trapGrowth").textContent =
-          framework.technicalDebtTrap.avgFundingGrowth.toFixed(1);
+          framework.highDebtLowVelocity.avgFundingGrowth.toFixed(1);
         document.getElementById("trapSuccess").textContent =
-          framework.technicalDebtTrap.successRate.toFixed(1);
+          framework.highDebtLowVelocity.successRate.toFixed(1);
 
+        // sustainable: lowDebtHighVelocity
         document.getElementById("sustainableCount").textContent =
-          framework.sustainableExecution.count;
+          framework.lowDebtHighVelocity.count;
         document.getElementById("sustainableGrowth").textContent =
-          framework.sustainableExecution.avgFundingGrowth.toFixed(1);
+          framework.lowDebtHighVelocity.avgFundingGrowth.toFixed(1);
         document.getElementById("sustainableSuccess").textContent =
-          framework.sustainableExecution.successRate.toFixed(1);
+          framework.lowDebtHighVelocity.successRate.toFixed(1);
 
+        // premature: lowDebtLowVelocity
         document.getElementById("prematureCount").textContent =
-          framework.prematureOptimization.count;
+          framework.lowDebtLowVelocity.count;
         document.getElementById("prematureGrowth").textContent =
-          framework.prematureOptimization.avgFundingGrowth.toFixed(1);
+          framework.lowDebtLowVelocity.avgFundingGrowth.toFixed(1);
         document.getElementById("prematureSuccess").textContent =
-          framework.prematureOptimization.successRate.toFixed(1);
+          framework.lowDebtLowVelocity.successRate.toFixed(1);
       }
 
       function updateEmpirical(data) {
-        const findings = data.empiricalFindings;
-        const correlation = findings.primaryAssociation;
-        const isSupported = findings.associationSupported;
+        const stat = data.statisticalAnalysis;
+        const correlation = stat.correlation_TDR_velocity;
+        const isSupported = Math.abs(correlation) > 0.3; // arbitrary threshold
 
         document.getElementById("correlationDisplay").textContent =
           correlation.toFixed(3);
         document.getElementById("primaryCorr").textContent =
           correlation.toFixed(3);
         document.getElementById("regressionSlope").textContent =
-          findings.regressionSlope.toFixed(3);
+          stat.regressionSlope.toFixed(3);
         document.getElementById("modelRSquared").textContent =
-          findings.rSquared.toFixed(3);
+          stat.rSquared.toFixed(3);
 
         const resultElement = document.getElementById("associationResult");
         resultElement.className = `association-result ${
@@ -763,34 +769,32 @@
 
         document.getElementById(
           "empiricalDetails"
-        ).textContent = `${findings.significanceLevel.toUpperCase()} association (n = ${
-          findings.sampleSize
-        }) | R² = ${findings.rSquared.toFixed(3)}`;
+        ).textContent = `${stat.significanceLevel.toUpperCase()} association (n = ${
+          data.summary.validDataPoints
+        }) | R² = ${stat.rSquared.toFixed(3)}`;
 
         document.getElementById("corrInterpretation").textContent =
-          findings.significanceLevel + " association";
+          stat.significanceLevel + " association";
         document.getElementById("fitInterpretation").textContent = `${(
-          findings.rSquared * 100
+          stat.rSquared * 100
         ).toFixed(1)}% variance explained`;
       }
 
       function updateCorrelations(data) {
-        const corr = data.correlationMatrix;
-        const findings = data.empiricalFindings;
+        const stat = data.statisticalAnalysis;
 
         document.getElementById("corrDebtAgility").textContent =
-          corr.debtAgility.toFixed(3);
+          stat.correlation_TDR_velocity.toFixed(3);
         document.getElementById("corrDebtFunding").textContent =
-          corr.debtFunding.toFixed(3);
+          stat.correlation_TDR_funding.toFixed(3);
         document.getElementById("corrAgilityFunding").textContent =
-          corr.agilityFunding.toFixed(3);
-        document.getElementById("corrDebtTeamSize").textContent =
-          corr.debtTeamSize.toFixed(3);
-        document.getElementById("corrAgilityAge").textContent =
-          corr.agilityAge.toFixed(3);
-        document.getElementById("sampleSize").textContent = findings.sampleSize;
+          stat.correlation_velocity_funding.toFixed(3);
+        document.getElementById("corrDebtTeamSize").textContent = "N/A"; // not available
+        document.getElementById("corrAgilityAge").textContent = "N/A"; // not available
+        document.getElementById("sampleSize").textContent =
+          data.summary.validDataPoints;
         document.getElementById("significanceLevel").textContent =
-          findings.significanceLevel;
+          stat.significanceLevel;
       }
 
       function updateCharts(data) {
@@ -802,11 +806,11 @@
         debtChart = new Chart(debtCtx, {
           type: "bar",
           data: {
-            labels: data.ventureOutcomes.byDebtQuartile.map((q) => q.quartile),
+            labels: data.fundingAnalysis.byTDRQuartile.map((q) => q.quartile),
             datasets: [
               {
                 label: "Avg Funding Growth (%)",
-                data: data.ventureOutcomes.byDebtQuartile.map(
+                data: data.fundingAnalysis.byTDRQuartile.map(
                   (q) => q.avgFundingGrowth
                 ),
                 backgroundColor: ["#10b981", "#f59e0b", "#ef4444", "#7c2d12"],
@@ -836,13 +840,13 @@
         agilityChart = new Chart(agilityCtx, {
           type: "line",
           data: {
-            labels: data.ventureOutcomes.byAgilityQuartile.map(
+            labels: data.fundingAnalysis.byVelocityQuartile.map(
               (q) => q.quartile
             ),
             datasets: [
               {
                 label: "Avg Funding Growth (%)",
-                data: data.ventureOutcomes.byAgilityQuartile.map(
+                data: data.fundingAnalysis.byVelocityQuartile.map(
                   (q) => q.avgFundingGrowth
                 ),
                 borderColor: "#3b82f6",
@@ -868,19 +872,24 @@
       }
 
       function updateInsights(data) {
-        const insights = data.entrepreneurshipInsights;
+        const insights = data.insights;
         document.getElementById("primaryFinding").textContent =
           insights.primaryFinding;
         document.getElementById("practicalImplication").textContent =
           insights.practicalImplication;
         document.getElementById("vcImplication").textContent =
-          insights.vcImplication;
+          "Venture capital decisions should consider multiple factors beyond technical debt metrics.";
         document.getElementById("entrepreneurialRecommendation").textContent =
-          insights.entrepreneurialRecommendation;
+          "Focus on sustainable development practices while maintaining agility.";
         document.getElementById("researchContribution").textContent =
-          insights.researchContribution;
+          "Provides empirical evidence on technical debt in startup contexts.";
         document.getElementById("studyLimitations").textContent =
-          insights.studyLimitations;
+          insights.limitations;
+      }
+
+      function updateLimitations(data) {
+        const note = document.getElementById("limitationNote");
+        note.innerHTML = `<strong>Study Limitations:</strong> ${data.insights.limitations}`;
       }
 
       function loadDemoData() {
@@ -1023,7 +1032,9 @@
         updateFramework(demoData);
         updateEmpirical(demoData);
         updateCorrelations(demoData);
-        // updateCharts and updateInsights would need the full demo data structure
+        updateCharts(demoData);
+        updateInsights(demoData);
+        updateLimitations(demoData);
       }
 
       document.addEventListener("DOMContentLoaded", loadEntrepreneurshipData);
