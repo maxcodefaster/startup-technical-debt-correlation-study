@@ -12,6 +12,14 @@ import {
   linearRegression,
 } from "simple-statistics";
 
+interface MarketCategoryAnalysis {
+  category: string;
+  count: number;
+  avgTDR: number;
+  avgVelocity: number;
+  successRate: number;
+}
+
 interface EntrepreneurshipAnalysis {
   summary: {
     totalVentures: number;
@@ -89,6 +97,7 @@ interface EntrepreneurshipAnalysis {
       successRate: number;
       count: number;
     }>;
+    byMarketCategory: MarketCategoryAnalysis[]; // Added this line
   };
 
   insights: {
@@ -186,6 +195,7 @@ export async function calculateEntrepreneurshipAnalysis(): Promise<Entrepreneurs
       velocity: developmentVelocity,
       fromSnapshot: fromSnapshot,
       toSnapshot: toSnapshot,
+      company: companies,
     })
     .from(developmentVelocity)
     .leftJoin(
@@ -201,7 +211,8 @@ export async function calculateEntrepreneurshipAnalysis(): Promise<Entrepreneurs
         eq(toSnapshot.companyId, developmentVelocity.companyId),
         eq(toSnapshot.fundingRoundId, developmentVelocity.toRoundId!)
       )
-    );
+    )
+    .leftJoin(companies, eq(companies.id, developmentVelocity.companyId)); // Added join to companies
 
   const totalRecords = allVelocityData.length;
 
@@ -237,6 +248,7 @@ export async function calculateEntrepreneurshipAnalysis(): Promise<Entrepreneurs
 
       return {
         ...velocity,
+        marketCategory: row.company.marketCategory, // Added market category
         fromAmount,
         toAmount,
         fundingGrowthRate,
@@ -422,6 +434,25 @@ export async function calculateEntrepreneurshipAnalysis(): Promise<Entrepreneurs
     velocitySorted.slice(quartileSize * 3),
   ];
 
+  // Market Category Analysis
+  const byMarketCategory = validData.reduce((acc, d) => {
+    const category = d.marketCategory || "Other";
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(d);
+    return acc;
+  }, {} as Record<string, any[]>);
+
+  const marketCategoryAnalysis: MarketCategoryAnalysis[] = Object.entries(
+    byMarketCategory
+  )
+    .map(([category, data]) => ({
+      category,
+      ...calculateQuadrantMetrics(data),
+    }))
+    .sort((a, b) => b.count - a.count);
+
   // Generate insights
   const insights = generateInsights(
     correlations.tdr_velocity,
@@ -519,6 +550,7 @@ export async function calculateEntrepreneurshipAnalysis(): Promise<Entrepreneurs
             : 0,
         count: q.length,
       })),
+      byMarketCategory: marketCategoryAnalysis,
     },
 
     insights,
@@ -630,6 +662,7 @@ function createEmptyAnalysis(
     fundingAnalysis: {
       byTDRQuartile: [],
       byVelocityQuartile: [],
+      byMarketCategory: [],
     },
     insights: {
       primaryFinding: reason,

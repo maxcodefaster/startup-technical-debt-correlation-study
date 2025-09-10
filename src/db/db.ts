@@ -28,6 +28,7 @@ try {
 // CSV Import functionality
 interface CSVRow {
   "Company Name": string;
+  "Market Category": string; // Added this line
   "GitHub Link": string;
   "Seed Date": string;
   "Seed Amount": string;
@@ -135,6 +136,7 @@ export async function importCSV(filePath: string) {
           .update(companies)
           .set({
             githubLink: row["GitHub Link"],
+            marketCategory: row["Market Category"], // Added this line
             exitState: row["Exit State"] || "none",
             exitDate: parseDate(row["Exit Date"]),
           })
@@ -154,6 +156,7 @@ export async function importCSV(filePath: string) {
           .values({
             name: row["Company Name"],
             githubLink: row["GitHub Link"],
+            marketCategory: row["Market Category"], // Added this line
             exitState: row["Exit State"] || "none",
             exitDate: parseDate(row["Exit Date"]),
           })

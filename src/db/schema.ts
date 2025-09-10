@@ -5,6 +5,7 @@ export const companies = sqliteTable("companies", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull().unique(),
   githubLink: text("github_link").notNull(),
+  marketCategory: text("market_category"),
   exitState: text("exit_state").default("none"),
   exitDate: text("exit_date"),
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
@@ -74,7 +75,6 @@ export const codeSnapshots = sqliteTable("code_snapshots", {
   deeplyNestedCode: integer("deeply_nested_code"),
   manyReturnStatements: integer("many_return_statements"),
 
-  // Derived Quality Metrics (keep original)
   totalCodeSmells: integer("total_code_smells"),
   averageComplexity: real("average_complexity"),
   maxComplexity: integer("max_complexity"),
@@ -83,7 +83,6 @@ export const codeSnapshots = sqliteTable("code_snapshots", {
   technicalDebtMinutes: real("technical_debt_minutes"),
   technicalDebtRatio: real("technical_debt_ratio"),
 
-  // Analysis metadata (keep original)
   analysisSuccess: integer("analysis_success", { mode: "boolean" }).default(
     true
   ),

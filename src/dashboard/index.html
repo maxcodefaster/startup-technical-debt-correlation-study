@@ -429,7 +429,7 @@
       </div>
 
       <div class="main-content">
-        <div class="card">
+        <div class="card" style="grid-column: 1 / -1">
           <h2>🎯 A Strategic Framework for Technical Debt</h2>
           <div class="strategic-matrix">
             <div class="matrix-quadrant quadrant-trap">
@@ -503,82 +503,10 @@
             <canvas id="agilityQuartileChart"></canvas>
           </div>
         </div>
-
-        <div class="card">
-          <h2>🔬 Regression & Data Quality</h2>
-          <div
-            class="limitation-note"
-            id="dataQualityFunnel"
-            style="text-align: left"
-          >
-            <strong>Data Quality Funnel:</strong><br />
-            Initial Records: <strong id="totalRecords"></strong><br />
-            - Records with Valid TDR: <strong id="recordsWithValidTDR"></strong
-            ><br />
-            - Records with Sufficient Code (>5k LOC):
-            <strong id="recordsWithSufficientCode"></strong><br />
-            - Final Records Used in Analysis:
-            <strong id="recordsUsedInAnalysis"></strong>
-          </div>
-          <div style="display: grid; gap: 1rem; margin-top: 1rem">
-            <div
-              style="
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 1rem;
-                background: #f8fafc;
-                border-radius: 8px;
-              "
-            >
-              <span>Correlation (r):</span>
-              <div style="text-align: right">
-                <strong id="primaryCorr" style="color: #1e40af">-</strong><br />
-                <small id="corrInterpretation" style="color: #64748b">-</small>
-              </div>
-            </div>
-            <div
-              style="
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 1rem;
-                background: #f8fafc;
-                border-radius: 8px;
-              "
-            >
-              <span>Regression Slope (β):</span>
-              <div style="text-align: right">
-                <strong id="regressionSlope" style="color: #10b981">-</strong
-                ><br />
-                <small id="slopeInterpretation" style="color: #64748b"
-                  >velocity units per TDR point</small
-                >
-              </div>
-            </div>
-            <div
-              style="
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 1rem;
-                background: linear-gradient(135deg, #fef7cd, #fef3c7);
-                border-radius: 8px;
-                border: 2px solid #f59e0b;
-              "
-            >
-              <span>Model Fit (R²):</span>
-              <div style="text-align: right">
-                <strong
-                  id="modelRSquared"
-                  style="color: #d97706; font-size: 1.3rem"
-                  >-</strong
-                ><br />
-                <small id="fitInterpretation" style="color: #92400e"
-                  >variance in velocity explained by TDR</small
-                >
-              </div>
-            </div>
+        <div class="card" style="grid-column: 1 / -1">
+          <h2>🚀 Performance by Market Category</h2>
+          <div class="chart-container">
+            <canvas id="marketCategoryChart"></canvas>
           </div>
         </div>
       </div>
@@ -644,7 +572,7 @@
     </div>
 
     <script>
-      let debtChart, agilityChart;
+      let debtChart, agilityChart, marketCategoryChart;
 
       async function loadData() {
         try {
@@ -663,7 +591,6 @@
         updateCorrelations(data);
         updateCharts(data);
         updateInsights(data);
-        updateDataQuality(data);
       }
 
       function updateMetrics(data) {
@@ -715,12 +642,6 @@
 
         document.getElementById("correlationDisplay").textContent =
           "r = " + correlation.toFixed(3);
-        document.getElementById("primaryCorr").textContent =
-          correlation.toFixed(3);
-        document.getElementById("regressionSlope").textContent =
-          stat.regressionSlope.toFixed(2);
-        document.getElementById("modelRSquared").textContent =
-          stat.rSquared.toFixed(3);
 
         const resultElement = document.getElementById("associationResult");
         resultElement.className = `association-result ${
@@ -737,23 +658,6 @@
         ).textContent = `p = ${pValue.toFixed(3)} | n = ${
           data.summary.validDataPoints
         } | R² = ${stat.rSquared.toFixed(3)}`;
-        document.getElementById("corrInterpretation").textContent =
-          stat.significanceLevel;
-        document.getElementById("fitInterpretation").textContent = `${(
-          stat.rSquared * 100
-        ).toFixed(1)}% of variance explained`;
-      }
-
-      function updateDataQuality(data) {
-        const quality = data.dataQuality;
-        document.getElementById("totalRecords").textContent =
-          quality.totalRecords;
-        document.getElementById("recordsWithValidTDR").textContent =
-          quality.recordsWithValidTDR;
-        document.getElementById("recordsWithSufficientCode").textContent =
-          quality.recordsWithSufficientCode;
-        document.getElementById("recordsUsedInAnalysis").textContent =
-          quality.recordsUsedInAnalysis;
       }
 
       function updateCorrelations(data) {
@@ -864,6 +768,52 @@
               y1: {
                 position: "right",
                 title: { display: true, text: "Next Round Success Rate (%)" },
+                grid: { drawOnChartArea: false },
+              },
+            },
+          },
+        });
+        if (marketCategoryChart) marketCategoryChart.destroy();
+        const marketCtx = document
+          .getElementById("marketCategoryChart")
+          .getContext("2d");
+        marketCategoryChart = new Chart(marketCtx, {
+          type: "bar",
+          data: {
+            labels: data.fundingAnalysis.byMarketCategory.map(
+              (c) => c.category
+            ),
+            datasets: [
+              {
+                label: "Success Rate (%)",
+                data: data.fundingAnalysis.byMarketCategory.map(
+                  (c) => c.successRate
+                ),
+                backgroundColor: "#7c3aed",
+              },
+              {
+                label: "Avg TDR",
+                data: data.fundingAnalysis.byMarketCategory.map(
+                  (c) => c.avgTDR
+                ),
+                type: "line",
+                borderColor: "#f59e0b",
+                tension: 0.2,
+                yAxisID: "y1",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: { display: true, text: "Success Rate (%)" },
+              },
+              y1: {
+                position: "right",
+                title: { display: true, text: "Avg TDR" },
                 grid: { drawOnChartArea: false },
               },
             },
