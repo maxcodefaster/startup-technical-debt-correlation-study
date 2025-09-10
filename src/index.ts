@@ -14,10 +14,8 @@ import { calculateEntrepreneurshipAnalysis } from "./analytics";
 import fs from "fs";
 
 function displayMenu() {
-  console.log("\n🚀 Technical Debt & Entrepreneurial Execution Analysis");
-  console.log(
-    "Master's Thesis: Resource constraints and organizational agility in technology ventures"
-  );
+  console.log("\n🚀 Technical Debt & Funding Analysis");
+  console.log("Master's Thesis: Technical debt patterns in venture portfolios");
   console.log("=".repeat(85));
   console.log("1. 📊 Run Complete Analysis");
   console.log("2. 📈 View Dashboard");
@@ -34,11 +32,19 @@ async function getUserChoice(): Promise<string> {
   return "5";
 }
 
-// FIXED: Add proper temporal lag for investment due diligence timing
-function getAnalysisDate(fundingDate: string): string {
-  const date = new Date(fundingDate);
-  date.setMonth(date.getMonth() - 3); // 3 months before funding announcement
-  return date.toISOString().split("T")[0];
+// Analyze at funding date (when decision was made) and 3 months before
+function getAnalysisDates(fundingDate: string): {
+  atFunding: string;
+  beforeFunding: string;
+} {
+  const fundingDateObj = new Date(fundingDate);
+  const beforeDateObj = new Date(fundingDate);
+  beforeDateObj.setMonth(beforeDateObj.getMonth() - 3);
+
+  return {
+    atFunding: fundingDateObj.toISOString().split("T")[0],
+    beforeFunding: beforeDateObj.toISOString().split("T")[0],
+  };
 }
 
 async function processVenture(company: any) {
@@ -75,11 +81,9 @@ async function processVenture(company: any) {
     const snapshots: any[] = [];
 
     for (const [index, round] of analysisPoints.entries()) {
-      // FIXED: Use proper temporal lag (3 months before funding for due diligence)
-      const analysisDate = getAnalysisDate(round.roundDate);
-      console.log(
-        `  → Analyzing ${round.roundType} at ${analysisDate} (3mo before ${round.roundDate})`
-      );
+      // Use funding date for analysis (represents state at funding decision)
+      const analysisDate = round.roundDate;
+      console.log(`  → Analyzing ${round.roundType} at ${analysisDate}`);
 
       const commitHash = await gitHandler.checkoutDate(analysisDate);
       if (!commitHash) {
@@ -90,11 +94,20 @@ async function processVenture(company: any) {
       }
 
       const repoInfo = await gitHandler.analyzeRepository();
+
+      // Skip if repository is too small
+      if (repoInfo.totalFiles < 10) {
+        console.log(
+          `  ⚠️ Repository too small at ${analysisDate} (${repoInfo.totalFiles} files), skipping`
+        );
+        continue;
+      }
+
       const [repositoryInfoRecord] = await db
         .insert(repositoryInfo)
         .values({
           companyId: company.id,
-          analysisDate: analysisDate, // Use analysis date, not funding date
+          analysisDate: analysisDate,
           totalFiles: repoInfo.totalFiles,
           repoSizeMB: repoInfo.repoSizeMB,
           commitCount: repoInfo.commitCount,
@@ -107,7 +120,7 @@ async function processVenture(company: any) {
         repoPath,
         "./data/analysis_results",
         company.name,
-        analysisDate, // Use analysis date for file naming
+        analysisDate,
         round.roundType
       );
 
@@ -116,13 +129,21 @@ async function processVenture(company: any) {
       );
       const qltyMetrics = await qltyAnalyzer.runAnalysis();
 
+      // Skip if no meaningful code
+      if (qltyMetrics.linesOfCode < 100) {
+        console.log(
+          `  ⚠️ Insufficient code at ${analysisDate} (${qltyMetrics.linesOfCode} LOC), skipping`
+        );
+        continue;
+      }
+
       const [snapshotRecord] = await db
         .insert(codeSnapshots)
         .values({
           companyId: company.id,
           fundingRoundId: round.id > 0 ? round.id : null,
           repositoryInfoId: repositoryInfoRecord!.id,
-          snapshotDate: analysisDate, // Store analysis date
+          snapshotDate: analysisDate,
           commitHash,
           linesOfCode: qltyMetrics.linesOfCode,
           totalLines: qltyMetrics.totalLines,
@@ -163,26 +184,38 @@ async function processVenture(company: any) {
       });
     }
 
-    // Calculate organizational agility between consecutive analysis points
+    // Calculate development velocity between consecutive funding rounds
     for (let i = 1; i < snapshots.length; i++) {
       const fromSnapshot = snapshots[i - 1];
       const toSnapshot = snapshots[i];
       const fromRound = fromSnapshot.roundInfo;
       const toRound = toSnapshot.roundInfo;
 
+      // Skip if either snapshot has insufficient code
+      if (fromSnapshot.linesOfCode < 1000 || toSnapshot.linesOfCode < 1000) {
+        console.log(
+          `  ⚠️ Insufficient code for velocity calculation, skipping ${fromRound.roundType} to ${toRound.roundType}`
+        );
+        continue;
+      }
+
       console.log(
-        `  → Calculating organizational agility from ${fromRound.roundType} to ${toRound.roundType}...`
+        `  → Calculating development velocity from ${fromRound.roundType} to ${toRound.roundType}...`
       );
 
-      // Calculate development velocity between the analysis dates (not funding dates)
       const velocityMetrics = await gitHandler.calculateDevelopmentVelocity(
-        fromSnapshot.snapshotDate, // Use analysis dates
+        fromSnapshot.snapshotDate,
         toSnapshot.snapshotDate
       );
 
       const startTDR = fromSnapshot.technicalDebtRatio || 0;
       const endTDR = toSnapshot.technicalDebtRatio || 0;
-      const tdrChange = startTDR > 0 ? (endTDR - startTDR) / startTDR : 0;
+
+      // Calculate TDR change only if both values are valid
+      let tdrChange = 0;
+      if (startTDR > 0 && startTDR <= 1 && endTDR > 0 && endTDR <= 1) {
+        tdrChange = (endTDR - startTDR) / startTDR;
+      }
 
       const safeCompositeVelocity = Math.max(
         0.1,
@@ -193,10 +226,17 @@ async function processVenture(company: any) {
         velocityMetrics.linesChanged / velocityMetrics.periodDays
       );
 
-      const tdvSimple = Math.abs(tdrChange) / safeDevelopmentSpeed;
-      const tdvComposite = Math.abs(tdrChange) / safeCompositeVelocity;
+      // Only calculate TDV if we have valid TDR change
+      const tdvSimple =
+        Math.abs(tdrChange) > 0
+          ? Math.abs(tdrChange) / safeDevelopmentSpeed
+          : 0;
+      const tdvComposite =
+        Math.abs(tdrChange) > 0
+          ? Math.abs(tdrChange) / safeCompositeVelocity
+          : 0;
 
-      // Check if venture secured next funding round after the "to" round
+      // Check if venture secured next funding round
       const futureRounds = analysisPoints.filter(
         (r) => new Date(r.roundDate) > new Date(toRound.roundDate) && r.id > 0
       );
@@ -229,7 +269,7 @@ async function processVenture(company: any) {
     console.log(
       `  ✅ ${company.name} - ${snapshots.length} snapshots, ${
         snapshots.length - 1
-      } execution periods`
+      } velocity periods`
     );
   } catch (error) {
     console.error(`  ❌ ${company.name}: ${(error as Error).message}`);
@@ -239,12 +279,8 @@ async function processVenture(company: any) {
 }
 
 async function runCompleteAnalysis() {
-  console.log(
-    "🚀 Starting Entrepreneurship Analysis with Proper Temporal Controls"
-  );
-  console.log(
-    "📋 Research: Technical debt associations with organizational agility"
-  );
+  console.log("🚀 Starting Technical Debt Analysis with Improved Data Quality");
+  console.log("📋 Research: Technical debt patterns in venture portfolios");
 
   // Import venture data
   const csvPath = "./data/startup_seed_data.csv";
@@ -262,12 +298,8 @@ async function runCompleteAnalysis() {
     return;
   }
 
-  console.log(
-    `🏢 Processing ${allVentures.length} technology ventures with 3-month temporal lag...`
-  );
-  console.log(
-    "📝 Note: Analyzing code state 3 months before each funding date (due diligence period)"
-  );
+  console.log(`🏢 Processing ${allVentures.length} technology ventures...`);
+  console.log("📝 Note: Analyzing code state at each funding round");
 
   for (let i = 0; i < allVentures.length; i++) {
     const venture = allVentures[i];
@@ -275,118 +307,74 @@ async function runCompleteAnalysis() {
     await processVenture(venture);
   }
 
-  // Generate entrepreneurship analytics
-  console.log("\n📈 Running Entrepreneurship Statistical Analysis...");
+  // Generate analysis
+  console.log("\n📈 Running Statistical Analysis...");
   const analytics = await calculateEntrepreneurshipAnalysis();
 
-  console.log("\n🎯 ENTREPRENEURSHIP RESEARCH RESULTS");
+  console.log("\n🎯 TECHNICAL DEBT ANALYSIS RESULTS");
   console.log("=".repeat(60));
+  console.log(`📊 Data Quality:`);
+  console.log(`   Total records: ${analytics.dataQuality.totalRecords}`);
   console.log(
-    `📊 Sample: ${analytics.summary.totalVentures} ventures, ${analytics.summary.totalExecutionPeriods} execution periods`
+    `   Valid TDR (0-1): ${analytics.dataQuality.recordsWithValidTDR}`
   );
   console.log(
-    `💰 Average funding growth: ${analytics.summary.avgFundingGrowthRate.toFixed(
-      1
-    )}%`
+    `   Sufficient code (>5K LOC): ${analytics.dataQuality.recordsWithSufficientCode}`
   );
   console.log(
-    `📈 Next round success rate: ${analytics.summary.executionSuccessRate.toFixed(
-      1
-    )}%`
-  );
-  console.log(
-    `📉 Model R-squared: ${analytics.empiricalFindings.rSquared.toFixed(3)}`
+    `   Used in analysis: ${analytics.dataQuality.recordsUsedInAnalysis}`
   );
 
-  if (analytics.empiricalFindings.associationSupported) {
-    console.log(`\n✅ ASSOCIATION DETECTED`);
-    console.log(
-      `🔬 Primary correlation: r = ${analytics.empiricalFindings.primaryAssociation.toFixed(
-        3
-      )}`
-    );
-    console.log(
-      `📊 Association strength: ${analytics.empiricalFindings.significanceLevel}`
-    );
-    console.log(
-      `📈 Sample size: n = ${analytics.empiricalFindings.sampleSize}`
-    );
-    console.log(
-      `💡 ${analytics.entrepreneurshipInsights.practicalImplication}`
-    );
-  } else {
-    console.log(`\n❌ NO SIGNIFICANT ASSOCIATION`);
-    console.log(
-      `🔬 Primary correlation: r = ${analytics.empiricalFindings.primaryAssociation.toFixed(
-        3
-      )}`
-    );
-    console.log(
-      `📊 Association strength: ${analytics.empiricalFindings.significanceLevel}`
-    );
-    console.log(
-      `📈 Sample size: n = ${analytics.empiricalFindings.sampleSize}`
-    );
-    console.log(
-      `💡 ${analytics.entrepreneurshipInsights.practicalImplication}`
-    );
-  }
-
-  console.log(`\n🎓 Research Contribution:`);
-  console.log(`${analytics.entrepreneurshipInsights.researchContribution}`);
-
-  console.log(`\n⚠️  Study Limitations:`);
-  console.log(`${analytics.entrepreneurshipInsights.studyLimitations}`);
-
-  console.log(`\n🔄 Correlation Matrix:`);
+  console.log(`\n📈 Statistical Results:`);
   console.log(
-    `   Technical Debt ↔ Organizational Agility: r = ${analytics.correlationMatrix.debtAgility.toFixed(
+    `   TDR ↔ Velocity: r = ${analytics.statisticalAnalysis.correlation_TDR_velocity.toFixed(
       3
     )}`
   );
   console.log(
-    `   Technical Debt ↔ Funding Growth: r = ${analytics.correlationMatrix.debtFunding.toFixed(
-      3
-    )}`
+    `   Significance: ${analytics.statisticalAnalysis.significanceLevel}`
   );
+  console.log(`   R² = ${analytics.statisticalAnalysis.rSquared.toFixed(3)}`);
   console.log(
-    `   Organizational Agility ↔ Funding: r = ${analytics.correlationMatrix.agilityFunding.toFixed(
-      3
-    )}`
-  );
-  console.log(
-    `   Technical Debt ↔ Team Size: r = ${analytics.correlationMatrix.debtTeamSize.toFixed(
-      3
-    )}`
+    `   p-value = ${analytics.statisticalAnalysis.pValue.toFixed(3)}`
   );
 
-  console.log(`\n📊 Strategic Framework Performance:`);
+  console.log(`\n📊 Strategic Framework:`);
+  const framework = analytics.strategicFramework;
   console.log(
-    `   Speed-to-Market Strategy: ${analytics.strategicFramework.speedToMarket.avgFundingGrowth.toFixed(
+    `   Low Debt, High Velocity: ${
+      framework.lowDebtHighVelocity.count
+    } ventures, ${framework.lowDebtHighVelocity.avgFundingGrowth.toFixed(
       1
-    )}% growth (${analytics.strategicFramework.speedToMarket.count} ventures)`
+    )}% growth`
   );
   console.log(
-    `   Technical Debt Trap: ${analytics.strategicFramework.technicalDebtTrap.avgFundingGrowth.toFixed(
+    `   High Debt, High Velocity: ${
+      framework.highDebtHighVelocity.count
+    } ventures, ${framework.highDebtHighVelocity.avgFundingGrowth.toFixed(
       1
-    )}% growth (${
-      analytics.strategicFramework.technicalDebtTrap.count
-    } ventures)`
+    )}% growth`
   );
   console.log(
-    `   Sustainable Execution: ${analytics.strategicFramework.sustainableExecution.avgFundingGrowth.toFixed(
+    `   Low Debt, Low Velocity: ${
+      framework.lowDebtLowVelocity.count
+    } ventures, ${framework.lowDebtLowVelocity.avgFundingGrowth.toFixed(
       1
-    )}% growth (${
-      analytics.strategicFramework.sustainableExecution.count
-    } ventures)`
+    )}% growth`
   );
   console.log(
-    `   Premature Optimization: ${analytics.strategicFramework.prematureOptimization.avgFundingGrowth.toFixed(
+    `   High Debt, Low Velocity: ${
+      framework.highDebtLowVelocity.count
+    } ventures, ${framework.highDebtLowVelocity.avgFundingGrowth.toFixed(
       1
-    )}% growth (${
-      analytics.strategicFramework.prematureOptimization.count
-    } ventures)`
+    )}% growth`
   );
+
+  console.log(`\n💡 Key Finding:`);
+  console.log(`   ${analytics.insights.primaryFinding}`);
+
+  console.log(`\n⚠️ Data Quality Note:`);
+  console.log(`   ${analytics.insights.dataQualityNote}`);
 
   console.log(
     "\n🌐 Launch dashboard (option 2) to see detailed visual results"
@@ -394,94 +382,46 @@ async function runCompleteAnalysis() {
 }
 
 async function showQuickAnalytics() {
-  console.log("📊 Quick Preview of Current Entrepreneurship Results");
+  console.log("📊 Quick Preview of Analysis Results");
 
   try {
     const analytics = await calculateEntrepreneurshipAnalysis();
 
     console.log(`\n📈 Dataset Summary:`);
+    console.log(`   Ventures analyzed: ${analytics.summary.totalVentures}`);
+    console.log(`   Valid data points: ${analytics.summary.validDataPoints}`);
+    console.log(`   Filtered out: ${analytics.summary.filteredDataPoints}`);
     console.log(
-      `   Technology ventures analyzed: ${analytics.summary.totalVentures}`
-    );
-    console.log(
-      `   Execution periods: ${analytics.summary.totalExecutionPeriods}`
-    );
-    console.log(
-      `   Average funding growth: ${analytics.summary.avgFundingGrowthRate.toFixed(
+      `   Median funding growth: ${analytics.summary.avgFundingGrowthRate.toFixed(
         1
       )}%`
     );
     console.log(
-      `   Overall next round success: ${analytics.summary.executionSuccessRate.toFixed(
+      `   Median TDR: ${analytics.summary.avgTechnicalDebtRatio.toFixed(3)}`
+    );
+    console.log(
+      `   Median velocity: ${analytics.summary.avgDevelopmentVelocity.toFixed(
         1
-      )}%`
+      )}`
     );
 
-    console.log(`\n🔬 Empirical Results:`);
+    console.log(`\n🔬 Statistical Analysis:`);
     console.log(
-      `   Model R-squared: ${analytics.empiricalFindings.rSquared.toFixed(3)}`
-    );
-    console.log(
-      `   Primary association (r): ${analytics.empiricalFindings.primaryAssociation.toFixed(
+      `   TDR-Velocity correlation: ${analytics.statisticalAnalysis.correlation_TDR_velocity.toFixed(
         3
       )}`
     );
     console.log(
-      `   Regression slope (β): ${analytics.empiricalFindings.regressionSlope.toFixed(
-        3
-      )}`
+      `   Significance: ${analytics.statisticalAnalysis.significanceLevel}`
     );
     console.log(
-      `   Sample size: n = ${analytics.empiricalFindings.sampleSize}`
-    );
-    console.log(
-      `   Association strength: ${analytics.empiricalFindings.significanceLevel}`
+      `   R-squared: ${analytics.statisticalAnalysis.rSquared.toFixed(3)}`
     );
 
-    const result = analytics.empiricalFindings.associationSupported
-      ? "✅ ASSOCIATION DETECTED"
-      : "❌ NO SIGNIFICANT ASSOCIATION";
-    console.log(`   Research finding: ${result}`);
-
-    console.log(`\n📊 Strategic Framework Performance:`);
-    console.log(
-      `   Speed-to-Market: ${analytics.strategicFramework.speedToMarket.avgFundingGrowth.toFixed(
-        1
-      )}% growth (${analytics.strategicFramework.speedToMarket.count} ventures)`
-    );
-    console.log(
-      `   Technical Debt Trap: ${analytics.strategicFramework.technicalDebtTrap.avgFundingGrowth.toFixed(
-        1
-      )}% growth (${
-        analytics.strategicFramework.technicalDebtTrap.count
-      } ventures)`
-    );
-    console.log(
-      `   Sustainable Execution: ${analytics.strategicFramework.sustainableExecution.avgFundingGrowth.toFixed(
-        1
-      )}% growth (${
-        analytics.strategicFramework.sustainableExecution.count
-      } ventures)`
-    );
-    console.log(
-      `   Premature Optimization: ${analytics.strategicFramework.prematureOptimization.avgFundingGrowth.toFixed(
-        1
-      )}% growth (${
-        analytics.strategicFramework.prematureOptimization.count
-      } ventures)`
-    );
-
-    console.log(`\n💡 Key Finding:`);
-    console.log(`${analytics.entrepreneurshipInsights.primaryFinding}`);
-
-    console.log(`\n🚀 Entrepreneurial Implication:`);
-    console.log(`${analytics.entrepreneurshipInsights.practicalImplication}`);
+    console.log(`\n💡 Finding: ${analytics.insights.primaryFinding}`);
   } catch (error) {
-    console.log("⚠️  No analysis results available yet.");
-    console.log(
-      "Run complete analysis first (option 1) to generate empirical results."
-    );
-    console.log(`Error: ${(error as Error).message}`);
+    console.log("⚠️ No analysis results available yet.");
+    console.log("Run complete analysis first (option 1).");
   }
 }
 
@@ -495,7 +435,7 @@ async function main() {
         await runCompleteAnalysis();
         break;
       case "2":
-        console.log("🌐 Starting entrepreneurship dashboard server...");
+        console.log("🌐 Starting dashboard server...");
         await startDashboardServer();
         break;
       case "3":
@@ -507,10 +447,7 @@ async function main() {
         console.log("✅ All cloned repositories cleaned");
         break;
       case "5":
-        console.log("👋 Good luck with your entrepreneurship master's thesis!");
-        console.log(
-          "🎓 Remember: This analysis shows associations, not causation. Be transparent about limitations in your write-up."
-        );
+        console.log("👋 Good luck with your thesis!");
         process.exit(0);
         break;
       default:

@@ -14,7 +14,8 @@
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
         background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%);
         min-height: 100vh;
         color: #333;
@@ -319,15 +320,27 @@
       }
 
       @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
       }
 
       @media (max-width: 768px) {
-        .main-content { grid-template-columns: 1fr; }
-        .insights-grid { grid-template-columns: 1fr; }
-        .correlation-grid { grid-template-columns: 1fr; }
-        .strategic-matrix { height: 300px; }
+        .main-content {
+          grid-template-columns: 1fr;
+        }
+        .insights-grid {
+          grid-template-columns: 1fr;
+        }
+        .correlation-grid {
+          grid-template-columns: 1fr;
+        }
+        .strategic-matrix {
+          height: 300px;
+        }
       }
     </style>
   </head>
@@ -335,16 +348,19 @@
     <div class="header">
       <h1>Technical Debt & Entrepreneurial Execution</h1>
       <div class="subtitle">
-        Empirical Analysis: Resource Constraints and Organizational Agility in Technology Ventures
+        Empirical Analysis: Resource Constraints and Organizational Agility in
+        Technology Ventures
       </div>
       <div class="research-question">
-        <strong>Research Questions:</strong> 
-        RQ1: Is technical debt accumulation associated with reduced organizational agility in technology ventures? 
-        RQ2: Do venture characteristics moderate this relationship?
+        <strong>Research Questions:</strong>
+        RQ1: Is technical debt accumulation associated with reduced
+        organizational agility in technology ventures? RQ2: Do venture
+        characteristics moderate this relationship?
       </div>
       <div class="limitation-note">
-        <strong>Study Limitations:</strong> This exploratory analysis examines associations, not causal relationships. 
-        Results should be interpreted as empirical patterns requiring further validation.
+        <strong>Study Limitations:</strong> This exploratory analysis examines
+        associations, not causal relationships. Results should be interpreted as
+        empirical patterns requiring further validation.
       </div>
     </div>
 
@@ -379,8 +395,9 @@
           Primary Finding: Technical Debt ↔ Organizational Agility Association
         </div>
         <div class="limitation-note">
-          <strong>Methodology:</strong> Correlation and linear regression analysis of technical debt ratios 
-          vs. development velocity across venture portfolio (n = ~87 execution periods)
+          <strong>Methodology:</strong> Correlation and linear regression
+          analysis of technical debt ratios vs. development velocity across
+          venture portfolio (n = ~87 execution periods)
         </div>
         <div class="correlation-display" id="correlationDisplay">
           Loading...
@@ -391,7 +408,10 @@
             Analyzing empirical associations...
           </div>
         </div>
-        <div id="empiricalDetails" style="margin-top: 1rem; font-size: 1.1rem; color: #64748b"></div>
+        <div
+          id="empiricalDetails"
+          style="margin-top: 1rem; font-size: 1.1rem; color: #64748b"
+        ></div>
       </div>
 
       <!-- Correlation Matrix Section -->
@@ -399,7 +419,9 @@
         <h2>📊 Correlation Matrix & Empirical Relationships</h2>
         <div class="correlation-grid">
           <div class="correlation-card">
-            <div class="correlation-title">Technical Debt ↔ Organizational Agility</div>
+            <div class="correlation-title">
+              Technical Debt ↔ Organizational Agility
+            </div>
             <div class="correlation-stats">
               <span>Correlation:</span>
               <strong id="corrDebtAgility">-</strong>
@@ -415,7 +437,9 @@
           </div>
 
           <div class="correlation-card">
-            <div class="correlation-title">Organizational Agility ↔ Funding</div>
+            <div class="correlation-title">
+              Organizational Agility ↔ Funding
+            </div>
             <div class="correlation-stats">
               <span>Correlation:</span>
               <strong id="corrAgilityFunding">-</strong>
@@ -431,7 +455,9 @@
           </div>
 
           <div class="correlation-card">
-            <div class="correlation-title">Organizational Agility ↔ Venture Age</div>
+            <div class="correlation-title">
+              Organizational Agility ↔ Venture Age
+            </div>
             <div class="correlation-stats">
               <span>Correlation:</span>
               <strong id="corrAgilityAge">-</strong>
@@ -460,33 +486,57 @@
             <div class="matrix-quadrant quadrant-trap">
               <div class="quadrant-title">Technical Debt Trap</div>
               <div class="quadrant-metric">High Debt, Low Agility</div>
-              <div class="quadrant-metric"><span id="trapCount">-</span> ventures</div>
-              <div class="quadrant-metric"><span id="trapGrowth">-</span>% growth</div>
-              <div class="quadrant-metric"><span id="trapSuccess">-</span>% success</div>
+              <div class="quadrant-metric">
+                <span id="trapCount">-</span> ventures
+              </div>
+              <div class="quadrant-metric">
+                <span id="trapGrowth">-</span>% growth
+              </div>
+              <div class="quadrant-metric">
+                <span id="trapSuccess">-</span>% success
+              </div>
             </div>
 
             <div class="matrix-quadrant quadrant-speed">
               <div class="quadrant-title">Speed-to-Market</div>
               <div class="quadrant-metric">High Debt, High Agility</div>
-              <div class="quadrant-metric"><span id="speedCount">-</span> ventures</div>
-              <div class="quadrant-metric"><span id="speedGrowth">-</span>% growth</div>
-              <div class="quadrant-metric"><span id="speedSuccess">-</span>% success</div>
+              <div class="quadrant-metric">
+                <span id="speedCount">-</span> ventures
+              </div>
+              <div class="quadrant-metric">
+                <span id="speedGrowth">-</span>% growth
+              </div>
+              <div class="quadrant-metric">
+                <span id="speedSuccess">-</span>% success
+              </div>
             </div>
 
             <div class="matrix-quadrant quadrant-premature">
               <div class="quadrant-title">Premature Optimization</div>
               <div class="quadrant-metric">Low Debt, Low Agility</div>
-              <div class="quadrant-metric"><span id="prematureCount">-</span> ventures</div>
-              <div class="quadrant-metric"><span id="prematureGrowth">-</span>% growth</div>
-              <div class="quadrant-metric"><span id="prematureSuccess">-</span>% success</div>
+              <div class="quadrant-metric">
+                <span id="prematureCount">-</span> ventures
+              </div>
+              <div class="quadrant-metric">
+                <span id="prematureGrowth">-</span>% growth
+              </div>
+              <div class="quadrant-metric">
+                <span id="prematureSuccess">-</span>% success
+              </div>
             </div>
 
             <div class="matrix-quadrant quadrant-sustainable">
               <div class="quadrant-title">Sustainable Execution</div>
               <div class="quadrant-metric">Low Debt, High Agility</div>
-              <div class="quadrant-metric"><span id="sustainableCount">-</span> ventures</div>
-              <div class="quadrant-metric"><span id="sustainableGrowth">-</span>% growth</div>
-              <div class="quadrant-metric"><span id="sustainableSuccess">-</span>% success</div>
+              <div class="quadrant-metric">
+                <span id="sustainableCount">-</span> ventures
+              </div>
+              <div class="quadrant-metric">
+                <span id="sustainableGrowth">-</span>% growth
+              </div>
+              <div class="quadrant-metric">
+                <span id="sustainableSuccess">-</span>% success
+              </div>
             </div>
           </div>
         </div>
@@ -511,25 +561,62 @@
         <div class="card">
           <h2>🔬 Regression Analysis Results</h2>
           <div style="display: grid; gap: 1rem; margin-top: 1rem">
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f8fafc; border-radius: 8px;">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1rem;
+                background: #f8fafc;
+                border-radius: 8px;
+              "
+            >
               <span>Primary Association (r):</span>
               <div style="text-align: right">
                 <strong id="primaryCorr" style="color: #1e40af">-</strong><br />
                 <small id="corrInterpretation" style="color: #64748b">-</small>
               </div>
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f8fafc; border-radius: 8px;">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1rem;
+                background: #f8fafc;
+                border-radius: 8px;
+              "
+            >
               <span>Regression Slope (β):</span>
               <div style="text-align: right">
-                <strong id="regressionSlope" style="color: #10b981">-</strong><br />
-                <small id="slopeInterpretation" style="color: #64748b">units per debt ratio</small>
+                <strong id="regressionSlope" style="color: #10b981">-</strong
+                ><br />
+                <small id="slopeInterpretation" style="color: #64748b"
+                  >units per debt ratio</small
+                >
               </div>
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: linear-gradient(135deg, #fef7cd, #fef3c7); border-radius: 8px; border: 2px solid #f59e0b;">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1rem;
+                background: linear-gradient(135deg, #fef7cd, #fef3c7);
+                border-radius: 8px;
+                border: 2px solid #f59e0b;
+              "
+            >
               <span>Model Fit (R²):</span>
               <div style="text-align: right">
-                <strong id="modelRSquared" style="color: #d97706; font-size: 1.3rem">-</strong><br />
-                <small id="fitInterpretation" style="color: #92400e">variance explained</small>
+                <strong
+                  id="modelRSquared"
+                  style="color: #d97706; font-size: 1.3rem"
+                  >-</strong
+                ><br />
+                <small id="fitInterpretation" style="color: #92400e"
+                  >variance explained</small
+                >
               </div>
             </div>
           </div>
@@ -608,31 +695,48 @@
       }
 
       function updateMetrics(data) {
-        document.getElementById("totalVentures").textContent = data.summary.totalVentures;
-        document.getElementById("totalPeriods").textContent = data.summary.totalExecutionPeriods;
-        document.getElementById("avgGrowth").textContent = data.summary.avgFundingGrowthRate.toFixed(1) + "%";
-        document.getElementById("rSquared").textContent = data.empiricalFindings.rSquared.toFixed(3);
-        document.getElementById("successRate").textContent = data.summary.executionSuccessRate.toFixed(1) + "%";
+        document.getElementById("totalVentures").textContent =
+          data.summary.totalVentures;
+        document.getElementById("totalPeriods").textContent =
+          data.summary.totalExecutionPeriods;
+        document.getElementById("avgGrowth").textContent =
+          data.summary.avgFundingGrowthRate.toFixed(1) + "%";
+        document.getElementById("rSquared").textContent =
+          data.empiricalFindings.rSquared.toFixed(3);
+        document.getElementById("successRate").textContent =
+          data.summary.executionSuccessRate.toFixed(1) + "%";
       }
 
       function updateFramework(data) {
         const framework = data.strategicFramework;
-        
-        document.getElementById("speedCount").textContent = framework.speedToMarket.count;
-        document.getElementById("speedGrowth").textContent = framework.speedToMarket.avgFundingGrowth.toFixed(1);
-        document.getElementById("speedSuccess").textContent = framework.speedToMarket.successRate.toFixed(1);
 
-        document.getElementById("trapCount").textContent = framework.technicalDebtTrap.count;
-        document.getElementById("trapGrowth").textContent = framework.technicalDebtTrap.avgFundingGrowth.toFixed(1);
-        document.getElementById("trapSuccess").textContent = framework.technicalDebtTrap.successRate.toFixed(1);
+        document.getElementById("speedCount").textContent =
+          framework.speedToMarket.count;
+        document.getElementById("speedGrowth").textContent =
+          framework.speedToMarket.avgFundingGrowth.toFixed(1);
+        document.getElementById("speedSuccess").textContent =
+          framework.speedToMarket.successRate.toFixed(1);
 
-        document.getElementById("sustainableCount").textContent = framework.sustainableExecution.count;
-        document.getElementById("sustainableGrowth").textContent = framework.sustainableExecution.avgFundingGrowth.toFixed(1);
-        document.getElementById("sustainableSuccess").textContent = framework.sustainableExecution.successRate.toFixed(1);
+        document.getElementById("trapCount").textContent =
+          framework.technicalDebtTrap.count;
+        document.getElementById("trapGrowth").textContent =
+          framework.technicalDebtTrap.avgFundingGrowth.toFixed(1);
+        document.getElementById("trapSuccess").textContent =
+          framework.technicalDebtTrap.successRate.toFixed(1);
 
-        document.getElementById("prematureCount").textContent = framework.prematureOptimization.count;
-        document.getElementById("prematureGrowth").textContent = framework.prematureOptimization.avgFundingGrowth.toFixed(1);
-        document.getElementById("prematureSuccess").textContent = framework.prematureOptimization.successRate.toFixed(1);
+        document.getElementById("sustainableCount").textContent =
+          framework.sustainableExecution.count;
+        document.getElementById("sustainableGrowth").textContent =
+          framework.sustainableExecution.avgFundingGrowth.toFixed(1);
+        document.getElementById("sustainableSuccess").textContent =
+          framework.sustainableExecution.successRate.toFixed(1);
+
+        document.getElementById("prematureCount").textContent =
+          framework.prematureOptimization.count;
+        document.getElementById("prematureGrowth").textContent =
+          framework.prematureOptimization.avgFundingGrowth.toFixed(1);
+        document.getElementById("prematureSuccess").textContent =
+          framework.prematureOptimization.successRate.toFixed(1);
       }
 
       function updateEmpirical(data) {
@@ -640,50 +744,76 @@
         const correlation = findings.primaryAssociation;
         const isSupported = findings.associationSupported;
 
-        document.getElementById("correlationDisplay").textContent = correlation.toFixed(3);
-        document.getElementById("primaryCorr").textContent = correlation.toFixed(3);
-        document.getElementById("regressionSlope").textContent = findings.regressionSlope.toFixed(3);
-        document.getElementById("modelRSquared").textContent = findings.rSquared.toFixed(3);
+        document.getElementById("correlationDisplay").textContent =
+          correlation.toFixed(3);
+        document.getElementById("primaryCorr").textContent =
+          correlation.toFixed(3);
+        document.getElementById("regressionSlope").textContent =
+          findings.regressionSlope.toFixed(3);
+        document.getElementById("modelRSquared").textContent =
+          findings.rSquared.toFixed(3);
 
         const resultElement = document.getElementById("associationResult");
-        resultElement.className = `association-result ${isSupported ? "association-supported" : "association-not-supported"}`;
-        resultElement.textContent = isSupported ? "ASSOCIATION DETECTED" : "NO SIGNIFICANT ASSOCIATION";
+        resultElement.className = `association-result ${
+          isSupported ? "association-supported" : "association-not-supported"
+        }`;
+        resultElement.textContent = isSupported
+          ? "ASSOCIATION DETECTED"
+          : "NO SIGNIFICANT ASSOCIATION";
 
-        document.getElementById("empiricalDetails").textContent = 
-          `${findings.significanceLevel.toUpperCase()} association (n = ${findings.sampleSize}) | R² = ${findings.rSquared.toFixed(3)}`;
+        document.getElementById(
+          "empiricalDetails"
+        ).textContent = `${findings.significanceLevel.toUpperCase()} association (n = ${
+          findings.sampleSize
+        }) | R² = ${findings.rSquared.toFixed(3)}`;
 
-        document.getElementById("corrInterpretation").textContent = findings.significanceLevel + " association";
-        document.getElementById("fitInterpretation").textContent = `${(findings.rSquared * 100).toFixed(1)}% variance explained`;
+        document.getElementById("corrInterpretation").textContent =
+          findings.significanceLevel + " association";
+        document.getElementById("fitInterpretation").textContent = `${(
+          findings.rSquared * 100
+        ).toFixed(1)}% variance explained`;
       }
 
       function updateCorrelations(data) {
         const corr = data.correlationMatrix;
         const findings = data.empiricalFindings;
-        
-        document.getElementById("corrDebtAgility").textContent = corr.debtAgility.toFixed(3);
-        document.getElementById("corrDebtFunding").textContent = corr.debtFunding.toFixed(3);
-        document.getElementById("corrAgilityFunding").textContent = corr.agilityFunding.toFixed(3);
-        document.getElementById("corrDebtTeamSize").textContent = corr.debtTeamSize.toFixed(3);
-        document.getElementById("corrAgilityAge").textContent = corr.agilityAge.toFixed(3);
+
+        document.getElementById("corrDebtAgility").textContent =
+          corr.debtAgility.toFixed(3);
+        document.getElementById("corrDebtFunding").textContent =
+          corr.debtFunding.toFixed(3);
+        document.getElementById("corrAgilityFunding").textContent =
+          corr.agilityFunding.toFixed(3);
+        document.getElementById("corrDebtTeamSize").textContent =
+          corr.debtTeamSize.toFixed(3);
+        document.getElementById("corrAgilityAge").textContent =
+          corr.agilityAge.toFixed(3);
         document.getElementById("sampleSize").textContent = findings.sampleSize;
-        document.getElementById("significanceLevel").textContent = findings.significanceLevel;
+        document.getElementById("significanceLevel").textContent =
+          findings.significanceLevel;
       }
 
       function updateCharts(data) {
         // Technical Debt Quartile Chart
         if (debtChart) debtChart.destroy();
-        const debtCtx = document.getElementById("debtQuartileChart").getContext("2d");
+        const debtCtx = document
+          .getElementById("debtQuartileChart")
+          .getContext("2d");
         debtChart = new Chart(debtCtx, {
           type: "bar",
           data: {
-            labels: data.ventureOutcomes.byDebtQuartile.map(q => q.quartile),
-            datasets: [{
-              label: "Avg Funding Growth (%)",
-              data: data.ventureOutcomes.byDebtQuartile.map(q => q.avgFundingGrowth),
-              backgroundColor: ["#10b981", "#f59e0b", "#ef4444", "#7c2d12"],
-              borderWidth: 2,
-              borderColor: "#1e293b",
-            }],
+            labels: data.ventureOutcomes.byDebtQuartile.map((q) => q.quartile),
+            datasets: [
+              {
+                label: "Avg Funding Growth (%)",
+                data: data.ventureOutcomes.byDebtQuartile.map(
+                  (q) => q.avgFundingGrowth
+                ),
+                backgroundColor: ["#10b981", "#f59e0b", "#ef4444", "#7c2d12"],
+                borderWidth: 2,
+                borderColor: "#1e293b",
+              },
+            ],
           },
           options: {
             responsive: true,
@@ -700,20 +830,28 @@
 
         // Organizational Agility Quartile Chart
         if (agilityChart) agilityChart.destroy();
-        const agilityCtx = document.getElementById("agilityQuartileChart").getContext("2d");
+        const agilityCtx = document
+          .getElementById("agilityQuartileChart")
+          .getContext("2d");
         agilityChart = new Chart(agilityCtx, {
           type: "line",
           data: {
-            labels: data.ventureOutcomes.byAgilityQuartile.map(q => q.quartile),
-            datasets: [{
-              label: "Avg Funding Growth (%)",
-              data: data.ventureOutcomes.byAgilityQuartile.map(q => q.avgFundingGrowth),
-              borderColor: "#3b82f6",
-              backgroundColor: "rgba(59, 130, 246, 0.1)",
-              borderWidth: 3,
-              fill: true,
-              tension: 0.4,
-            }],
+            labels: data.ventureOutcomes.byAgilityQuartile.map(
+              (q) => q.quartile
+            ),
+            datasets: [
+              {
+                label: "Avg Funding Growth (%)",
+                data: data.ventureOutcomes.byAgilityQuartile.map(
+                  (q) => q.avgFundingGrowth
+                ),
+                borderColor: "#3b82f6",
+                backgroundColor: "rgba(59, 130, 246, 0.1)",
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+              },
+            ],
           },
           options: {
             responsive: true,
@@ -731,45 +869,154 @@
 
       function updateInsights(data) {
         const insights = data.entrepreneurshipInsights;
-        document.getElementById("primaryFinding").textContent = insights.primaryFinding;
-        document.getElementById("practicalImplication").textContent = insights.practicalImplication;
-        document.getElementById("vcImplication").textContent = insights.vcImplication;
-        document.getElementById("entrepreneurialRecommendation").textContent = insights.entrepreneurialRecommendation;
-        document.getElementById("researchContribution").textContent = insights.researchContribution;
-        document.getElementById("studyLimitations").textContent = insights.studyLimitations;
+        document.getElementById("primaryFinding").textContent =
+          insights.primaryFinding;
+        document.getElementById("practicalImplication").textContent =
+          insights.practicalImplication;
+        document.getElementById("vcImplication").textContent =
+          insights.vcImplication;
+        document.getElementById("entrepreneurialRecommendation").textContent =
+          insights.entrepreneurialRecommendation;
+        document.getElementById("researchContribution").textContent =
+          insights.researchContribution;
+        document.getElementById("studyLimitations").textContent =
+          insights.studyLimitations;
       }
 
       function loadDemoData() {
         // Demo data for fallback - using the demo structure from analytics.ts
         const demoData = {
           summary: {
-            totalVentures: 42,
-            totalExecutionPeriods: 87,
-            avgFundingGrowthRate: 145.7,
-            executionSuccessRate: 71.2,
+            totalVentures: 70,
+            validDataPoints: 120,
+            filteredDataPoints: 33,
+            avgFundingGrowthRate: 150,
+            avgDaysBetweenRounds: 449,
+            avgTechnicalDebtRatio: 0.03952054138294575,
+            avgDevelopmentVelocity: 425.97976712614866,
+            fundingSuccessRate: 56.666666666666664,
+          },
+          dataQuality: {
+            totalRecords: 153,
+            recordsWithValidTDR: 153,
+            recordsWithSufficientCode: 151,
+            recordsUsedInAnalysis: 120,
+            filteringReason:
+              "Filtered 33 records: Required TDR 0-1, LOC >5000, period >90 days",
           },
           strategicFramework: {
-            speedToMarket: { count: 18, avgFundingGrowth: 178.5, successRate: 83.3 },
-            technicalDebtTrap: { count: 12, avgFundingGrowth: 89.2, successRate: 25.0 },
-            sustainableExecution: { count: 31, avgFundingGrowth: 195.8, successRate: 90.3 },
-            prematureOptimization: { count: 26, avgFundingGrowth: 124.1, successRate: 53.8 },
+            lowDebtHighVelocity: {
+              count: 31,
+              avgFundingGrowth: 173.6953557195493,
+              successRate: 64.51612903225806,
+              avgTDR: 0.018710277877656886,
+              avgVelocity: 1047.48226499187,
+            },
+            highDebtHighVelocity: {
+              count: 29,
+              avgFundingGrowth: 171.58738711714494,
+              successRate: 68.96551724137932,
+              avgTDR: 0.12994152431819886,
+              avgVelocity: 994.2576044855815,
+            },
+            lowDebtLowVelocity: {
+              count: 29,
+              avgFundingGrowth: 142.1290600744727,
+              successRate: 44.827586206896555,
+              avgTDR: 0.015431456620322524,
+              avgVelocity: 250.9483609355227,
+            },
+            highDebtLowVelocity: {
+              count: 31,
+              avgFundingGrowth: 151.3105153804733,
+              successRate: 48.38709677419355,
+              avgTDR: 0.11984993896267028,
+              avgVelocity: 214.08281842197889,
+            },
           },
-          empiricalFindings: {
-            primaryAssociation: -0.347,
-            regressionSlope: -2.45,
-            rSquared: 0.120,
-            sampleSize: 87,
-            significanceLevel: "moderate",
-            associationSupported: true,
+          statisticalAnalysis: {
+            correlation_TDR_velocity: -0.15465002347905357,
+            correlation_TDR_funding: 0.10321044588027511,
+            correlation_velocity_funding: 0.07602969950016245,
+            correlation_TDRchange_funding: -0.003759971138441394,
+            regressionSlope: -137.3,
+            rSquared: 0,
+            pValue: 0.1,
+            significanceLevel: "not significant",
           },
-          correlationMatrix: {
-            debtAgility: -0.347,
-            debtFunding: -0.128,
-            agilityFunding: 0.256,
-            debtTeamSize: -0.089,
-            agilityAge: -0.134,
+          fundingAnalysis: {
+            byTDRQuartile: [
+              {
+                quartile: "Q1",
+                avgTDR: 0.00981711209845274,
+                avgFundingGrowth: 152.68936805346587,
+                successRate: 63.33333333333333,
+                count: 30,
+              },
+              {
+                quartile: "Q2",
+                avgTDR: 0.024433916441437813,
+                avgFundingGrowth: 164.18725759539197,
+                successRate: 46.666666666666664,
+                count: 30,
+              },
+              {
+                quartile: "Q3",
+                avgTDR: 0.061088159569805935,
+                avgFundingGrowth: 191.5477568093802,
+                successRate: 63.33333333333333,
+                count: 30,
+              },
+              {
+                quartile: "Q4",
+                avgTDR: 0.1883669175325456,
+                avgFundingGrowth: 130.67424996368234,
+                successRate: 53.333333333333336,
+                count: 30,
+              },
+            ],
+            byVelocityQuartile: [
+              {
+                quartile: "Q1",
+                avgVelocity: 128.72974618111505,
+                avgFundingGrowth: 145.98005946527337,
+                successRate: 53.333333333333336,
+                count: 30,
+              },
+              {
+                quartile: "Q2",
+                avgVelocity: 335.0725817592684,
+                avgFundingGrowth: 147.76556449987265,
+                successRate: 40,
+                count: 30,
+              },
+              {
+                quartile: "Q3",
+                avgVelocity: 591.5087328843687,
+                avgFundingGrowth: 164.58091049300972,
+                successRate: 66.66666666666666,
+                count: 30,
+              },
+              {
+                quartile: "Q4",
+                avgVelocity: 1452.0052919432921,
+                avgFundingGrowth: 180.77209796376468,
+                successRate: 66.66666666666666,
+                count: 30,
+              },
+            ],
           },
-          // ... rest of demo data structure
+          insights: {
+            primaryFinding:
+              "Weak to no correlation (r=-0.155) between technical debt and development velocity.",
+            dataQualityNote:
+              "Analysis based on 120 high-quality data points out of 153 total records (21.6% filtered). Filtering criteria: TDR 0-1, >5000 LOC, >90 day periods.",
+            practicalImplication:
+              "No clear relationship between technical debt and development velocity found in this sample. Other factors may be more important.",
+            limitations:
+              "Key limitations: (1) Sample limited to open-source ventures, (2) TDR calculation depends on Qlty's effort estimates, (3) Temporal lag may not capture all effects, (4) Survivorship bias in funded companies.",
+          },
+          exportDate: "2025-09-10T07:22:50.777Z",
         };
 
         updateMetrics(demoData);

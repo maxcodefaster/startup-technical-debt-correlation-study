@@ -56,7 +56,6 @@ export class QltyAnalyzer {
     private analysisDate: string,
     private roundType: string
   ) {
-    // Create folder structure: outputBaseDir/companyName/roundType_date
     this.outputDir = path.join(
       outputBaseDir,
       companyName,
@@ -86,10 +85,26 @@ export class QltyAnalyzer {
       const issuesDensity =
         linesOfCode > 0 ? (totalIssues / linesOfCode) * 1000 : 0;
 
-      // Technical debt ratio: effort minutes / estimated development time (1 LOC = 0.5 minutes)
-      const estimatedDevMinutes = linesOfCode * 0.5;
-      const technicalDebtRatio =
-        estimatedDevMinutes > 0 ? totalEffortMinutes / estimatedDevMinutes : 0;
+      // FIXED: Proper COCOMO-based TDR calculation
+      // Using COCOMO basic model: Effort = 2.4 * (KLOC)^1.05 person-months
+      // Convert to minutes: 1 person-month = 152 hours = 9120 minutes
+      let technicalDebtRatio = 0;
+      if (linesOfCode > 0) {
+        const kloc = linesOfCode / 1000;
+        const effortPersonMonths = 2.4 * Math.pow(kloc, 1.05);
+        const estimatedDevMinutes = effortPersonMonths * 152 * 60; // Convert to minutes
+
+        // Calculate TDR as percentage (0-1 scale)
+        technicalDebtRatio = totalEffortMinutes / estimatedDevMinutes;
+
+        // Cap at 100% (1.0) - technical debt cannot exceed development effort
+        technicalDebtRatio = Math.min(technicalDebtRatio, 1.0);
+
+        // Handle edge cases
+        if (!isFinite(technicalDebtRatio) || technicalDebtRatio < 0) {
+          technicalDebtRatio = 0;
+        }
+      }
 
       return {
         linesOfCode,
@@ -136,26 +151,18 @@ export class QltyAnalyzer {
   }
 
   private async ensureQltyInstalled(): Promise<string> {
-    // First try with current PATH
     try {
       const { stdout } = await execAsync("qlty --version");
       return stdout.trim();
     } catch (error) {
-      // Try with common installation path
       try {
         const { stdout } = await execAsync("~/.local/bin/qlty --version");
-        // Add to PATH for subsequent commands
         process.env.PATH = `${process.env.HOME}/.local/bin:${process.env.PATH}`;
         return stdout.trim();
       } catch (secondError) {
-        // Install qlty
         console.log("📦 Installing Qlty CLI...");
         await execAsync("curl -sSL https://qlty.sh | sh");
-
-        // Update PATH to include the installation directory
         process.env.PATH = `${process.env.HOME}/.local/bin:${process.env.PATH}`;
-
-        // Verify installation
         const { stdout } = await execAsync("qlty --version");
         console.log(`✅ Qlty installed: ${stdout.trim()}`);
         return stdout.trim();
@@ -169,21 +176,18 @@ export class QltyAnalyzer {
 
   private async runCodeSmellsToFile(): Promise<void> {
     const outputFile = path.join(this.outputDir, "smells.json");
-
     const { stdout } = await execAsync(
       "qlty smells --all --quiet --json --no-duplication",
       {
         cwd: this.repoPath,
-        maxBuffer: 4 * 1024 * 1024 * 1024, // 4GB
+        maxBuffer: 4 * 1024 * 1024 * 1024,
       }
     );
-
     const cleanedOutput = this.removeSnippetProperties(stdout);
     fs.writeFileSync(outputFile, cleanedOutput);
   }
 
   private removeSnippetProperties(jsonString: string): string {
-    // Regex that removes both "snippet" and "snippetWithContext" properties to save space
     return jsonString.replace(
       /"(?:snippet|snippetWithContext)"\s*:\s*"(?:[^"\\]|\\.)*"\s*,?\s*/g,
       ""
@@ -192,12 +196,10 @@ export class QltyAnalyzer {
 
   private async runMetricsToFile(): Promise<void> {
     const outputFile = path.join(this.outputDir, "metrics.txt");
-
     const { stdout } = await execAsync("qlty metrics --all --quiet", {
       cwd: this.repoPath,
-      maxBuffer: 4 * 1024 * 1024 * 1024, // 4GB
+      maxBuffer: 4 * 1024 * 1024 * 1024,
     });
-
     const cleanedOutput = this.stripAnsiCodes(stdout);
     const filteredOutput = this.filterMetricsOutput(cleanedOutput);
     fs.writeFileSync(outputFile, filteredOutput);
@@ -217,7 +219,6 @@ export class QltyAnalyzer {
 
   private async parseCodeSmellsFile(): Promise<Partial<QltyMetrics>> {
     const filePath = path.join(this.outputDir, "smells.json");
-
     if (!fs.existsSync(filePath)) {
       return this.getEmptySmells();
     }
@@ -245,13 +246,10 @@ export class QltyAnalyzer {
 
     for (const issue of issues) {
       totalEffortMinutes += issue.effortMinutes || 0;
-
       const category = issue.category || "UNKNOWN";
       categoryCount[category] = (categoryCount[category] || 0) + 1;
-
       const level = issue.level || "UNKNOWN";
       levelCount[level] = (levelCount[level] || 0) + 1;
-
       const language = issue.language || "UNKNOWN";
       languageCount[language] = (languageCount[language] || 0) + 1;
 
@@ -299,14 +297,12 @@ export class QltyAnalyzer {
 
   private async parseMetricsFile(): Promise<Partial<QltyMetrics>> {
     const filePath = path.join(this.outputDir, "metrics.txt");
-
     if (!fs.existsSync(filePath)) {
       return this.getEmptyMetrics();
     }
 
     const content = fs.readFileSync(filePath, "utf8");
     const totalLineMatch = content.match(/^\s*TOTAL\s*\|(.+)$/m);
-
     if (!totalLineMatch) {
       return this.getEmptyMetrics();
     }
