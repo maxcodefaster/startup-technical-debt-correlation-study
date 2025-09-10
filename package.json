@@ -2,9 +2,9 @@
   "name": "entrepreneurship-technical-debt-analysis",
   "version": "1.0.0",
   "description": "Master's thesis: Technical debt associations with entrepreneurial execution in technology ventures",
-  "main": "src/index.ts",
+  "main": "src/_main.ts",
   "scripts": {
-    "start": "bun run src/index.ts",
+    "start": "bun run src/_main.ts",
     "generate": "bunx drizzle-kit generate --dialect sqlite --schema ./src/db/schema.ts",
     "studio": "bunx drizzle-kit studio"
   },

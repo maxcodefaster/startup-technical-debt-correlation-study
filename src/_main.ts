@@ -19,9 +19,8 @@ function displayMenu() {
   console.log("=".repeat(85));
   console.log("1. 📊 Run Complete Analysis");
   console.log("2. 📈 View Dashboard");
-  console.log("3. 🔍 Quick Preview");
-  console.log("4. 🗑️ Clean repos");
-  console.log("5. ❌ Exit");
+  console.log("3. 🗑️ Clean repos");
+  console.log("4. ❌ Exit");
 }
 
 async function getUserChoice(): Promise<string> {
@@ -29,29 +28,13 @@ async function getUserChoice(): Promise<string> {
   for await (const line of console) {
     return line.trim();
   }
-  return "5";
-}
-
-// Analyze at funding date (when decision was made) and 3 months before
-function getAnalysisDates(fundingDate: string): {
-  atFunding: string;
-  beforeFunding: string;
-} {
-  const fundingDateObj = new Date(fundingDate);
-  const beforeDateObj = new Date(fundingDate);
-  beforeDateObj.setMonth(beforeDateObj.getMonth() - 3);
-
-  return {
-    atFunding: fundingDateObj.toISOString().split("T")[0],
-    beforeFunding: beforeDateObj.toISOString().split("T")[0],
-  };
+  return "4";
 }
 
 async function processVenture(company: any) {
   const gitHandler = new GitHandler(company.name, false);
 
   try {
-    console.log(`  → Cloning ${company.githubLink}...`);
     const repoPath = await gitHandler.cloneRepo(company.githubLink);
 
     const rounds = await db
@@ -77,7 +60,6 @@ async function processVenture(company: any) {
         new Date(a.roundDate).getTime() - new Date(b.roundDate).getTime()
     );
 
-    console.log(`  → ${analysisPoints.length} funding events to analyze`);
     const snapshots: any[] = [];
 
     for (const [index, round] of analysisPoints.entries()) {
@@ -269,7 +251,8 @@ async function processVenture(company: any) {
     console.log(
       `  ✅ ${company.name} - ${snapshots.length} snapshots, ${
         snapshots.length - 1
-      } velocity periods`
+      }
+ velocity periods`
     );
   } catch (error) {
     console.error(`  ❌ ${company.name}: ${(error as Error).message}`);
@@ -381,50 +364,6 @@ async function runCompleteAnalysis() {
   );
 }
 
-async function showQuickAnalytics() {
-  console.log("📊 Quick Preview of Analysis Results");
-
-  try {
-    const analytics = await calculateEntrepreneurshipAnalysis();
-
-    console.log(`\n📈 Dataset Summary:`);
-    console.log(`   Ventures analyzed: ${analytics.summary.totalVentures}`);
-    console.log(`   Valid data points: ${analytics.summary.validDataPoints}`);
-    console.log(`   Filtered out: ${analytics.summary.filteredDataPoints}`);
-    console.log(
-      `   Median funding growth: ${analytics.summary.avgFundingGrowthRate.toFixed(
-        1
-      )}%`
-    );
-    console.log(
-      `   Median TDR: ${analytics.summary.avgTechnicalDebtRatio.toFixed(3)}`
-    );
-    console.log(
-      `   Median velocity: ${analytics.summary.avgDevelopmentVelocity.toFixed(
-        1
-      )}`
-    );
-
-    console.log(`\n🔬 Statistical Analysis:`);
-    console.log(
-      `   TDR-Velocity correlation: ${analytics.statisticalAnalysis.correlation_TDR_velocity.toFixed(
-        3
-      )}`
-    );
-    console.log(
-      `   Significance: ${analytics.statisticalAnalysis.significanceLevel}`
-    );
-    console.log(
-      `   R-squared: ${analytics.statisticalAnalysis.rSquared.toFixed(3)}`
-    );
-
-    console.log(`\n💡 Finding: ${analytics.insights.primaryFinding}`);
-  } catch (error) {
-    console.log("⚠️ No analysis results available yet.");
-    console.log("Run complete analysis first (option 1).");
-  }
-}
-
 async function main() {
   while (true) {
     displayMenu();
@@ -435,23 +374,17 @@ async function main() {
         await runCompleteAnalysis();
         break;
       case "2":
-        console.log("🌐 Starting dashboard server...");
         await startDashboardServer();
         break;
       case "3":
-        await showQuickAnalytics();
-        break;
-      case "4":
-        console.log("🗑️ Cleaning repository cache...");
         GitHandler.cleanAllRepos();
         console.log("✅ All cloned repositories cleaned");
         break;
-      case "5":
-        console.log("👋 Good luck with your thesis!");
+      case "4":
         process.exit(0);
         break;
       default:
-        console.log("❌ Invalid choice. Please select 1-5.");
+        console.log("❌ Invalid choice. Please select 1-4.");
     }
 
     if (choice !== "2") {

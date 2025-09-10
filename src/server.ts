@@ -1,5 +1,5 @@
 import { calculateEntrepreneurshipAnalysis } from "./analytics";
-import dashboard from "./dashboard/index.html";
+import dashboard from "./dashboard.html";
 
 export async function startDashboardServer() {
   console.log(

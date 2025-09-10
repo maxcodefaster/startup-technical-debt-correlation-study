@@ -6,7 +6,7 @@ import {
   developmentVelocity,
   codeSnapshots,
 } from "./db/schema";
-import { eq, and, gt, lt, isNotNull } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import {
   cumulativeStdNormalProbability,
   linearRegression,
