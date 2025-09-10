@@ -137,8 +137,7 @@ function removeOutliers(values: number[]): number[] {
 
 function calculateCorrelation(x: number[], y: number[]): number {
   const n = x.length;
-  if (n === 0 || y.length !== n) return 0;
-
+  if (n === 0) return 0;
   const meanX = x.reduce((sum, val) => sum + val, 0) / n;
   const meanY = y.reduce((sum, val) => sum + val, 0) / n;
   const numerator = x.reduce(
@@ -277,7 +276,7 @@ export async function calculateEntrepreneurshipAnalysis(): Promise<Entrepreneurs
 
     // Must have reasonable velocity (not zero, not extreme)
     const validVelocity =
-      d.compositeVelocity !== null && // Fix: Add an explicit null check.
+      d.compositeVelocity !== null &&
       d.compositeVelocity > 0 &&
       d.compositeVelocity < 10000;
 
