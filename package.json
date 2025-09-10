@@ -8,7 +8,13 @@
     "generate": "bunx drizzle-kit generate --dialect sqlite --schema ./src/db/schema.ts",
     "studio": "bunx drizzle-kit studio"
   },
-  "keywords": ["entrepreneurship", "technical-debt", "startups", "venture-analysis", "masters-thesis"],
+  "keywords": [
+    "entrepreneurship",
+    "technical-debt",
+    "startups",
+    "venture-analysis",
+    "masters-thesis"
+  ],
   "author": "Your Name",
   "license": "MIT",
   "devDependencies": {
@@ -22,6 +28,6 @@
   "dependencies": {
     "better-sqlite3": "^12.2.0",
     "drizzle-orm": "^0.44.5",
-    "regression": "^2.0.1"
+    "simple-statistics": "^7.8.8"
   }
 }

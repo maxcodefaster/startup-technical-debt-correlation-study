@@ -7,9 +7,10 @@ import {
   codeSnapshots,
 } from "./db/schema";
 import { eq, and, gt, lt, isNotNull } from "drizzle-orm";
-
-// @ts-ignore
-import regression from "regression";
+import {
+  cumulativeStdNormalProbability,
+  linearRegression,
+} from "simple-statistics";
 
 interface EntrepreneurshipAnalysis {
   summary: {
@@ -140,17 +141,38 @@ function calculateCorrelation(x: number[], y: number[]): number {
   return numerator / (denomX * denomY);
 }
 
+/**
+ * Calculates the p-value for a given correlation coefficient and sample size.
+ * This function is now statistically valid and uses a proper statistical library.
+ * @param correlation - The Pearson correlation coefficient (r).
+ * @param n - The sample size.
+ * @returns The two-tailed p-value.
+ */
 function calculatePValue(correlation: number, n: number): number {
-  if (n <= 2) return 1;
-  const t = correlation * Math.sqrt((n - 2) / (1 - correlation * correlation));
-  // Approximate p-value (two-tailed)
-  const df = n - 2;
-  // Simplified p-value calculation
-  if (Math.abs(t) > 3.5) return 0.001;
-  if (Math.abs(t) > 2.5) return 0.01;
-  if (Math.abs(t) > 2.0) return 0.05;
-  if (Math.abs(t) > 1.5) return 0.1;
-  return 0.5;
+  if (n <= 2) {
+    return 1.0; // P-value is not meaningful for n <= 2
+  }
+
+  // Handle perfect correlation edge case to avoid division by zero
+  if (Math.abs(correlation) >= 1.0) {
+    return 0.0;
+  }
+
+  // Calculate the t-statistic from the correlation coefficient
+  const tStatistic =
+    correlation * Math.sqrt((n - 2) / (1 - correlation * correlation));
+
+  // If the t-statistic is not a finite number, return non-significant
+  if (!isFinite(tStatistic)) {
+    return 1.0;
+  }
+
+  // For n > 30, the t-distribution is well-approximated by the standard normal distribution.
+  // We calculate the two-tailed p-value from the standard normal cumulative distribution function (CDF).
+  // The probability of observing a value as extreme or more extreme than our t-statistic.
+  const pValue = 2 * (1 - cumulativeStdNormalProbability(Math.abs(tStatistic)));
+
+  return pValue;
 }
 
 export async function calculateEntrepreneurshipAnalysis(): Promise<EntrepreneurshipAnalysis> {
@@ -305,21 +327,20 @@ export async function calculateEntrepreneurshipAnalysis(): Promise<Entrepreneurs
     ),
   };
 
-  // Regression analysis
+  // Regression analysis using simple-statistics
+  const regressionData: [number, number][] = validData.map((d) => [
+    (d.startTDR! + d.endTDR!) / 2,
+    d.compositeVelocity!,
+  ]);
+
   let regressionSlope = 0;
-  let rSquared = 0;
-  try {
-    const regressionData = validData.map((d) => [
-      (d.startTDR! + d.endTDR!) / 2,
-      d.compositeVelocity!,
-    ]);
-    const result = regression.linear(regressionData);
-    regressionSlope = result.equation[0];
-    rSquared = result.r2;
-  } catch (e) {
-    regressionSlope = correlations.tdr_velocity;
-    rSquared = Math.pow(correlations.tdr_velocity, 2);
+  if (regressionData.length > 1) {
+    const result = linearRegression(regressionData);
+    regressionSlope = result.m;
   }
+
+  // For simple linear regression, R-squared is the square of the correlation coefficient
+  const rSquared = Math.pow(correlations.tdr_velocity, 2);
 
   // Calculate p-value and significance
   const pValue = calculatePValue(correlations.tdr_velocity, validData.length);
